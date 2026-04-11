@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}{{ journalist.public_name }} — The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-3">
+  <div class="col-lg-9">
+
+    <!-- Journalist header -->
+    <div class="card border-0 shadow-sm mb-5">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div class="d-flex align-items-center gap-3">
+            {% if journalist.profile_picture %}
+            <img src="{{ journalist.profile_picture.url }}"
+                 class="avatar-circle avatar-circle--md border"
+                 alt="{{ journalist.public_name }}">
+            {% else %}
+            <div class="rounded-circle border d-flex align-items-center
+                        justify-content-center bg-light"
+                 style="width:72px;height:72px;">
+              <i class="bi bi-person fs-2 text-muted"></i>
+            </div>
+            {% endif %}
+            <div>
+              <h1 class="h2 mb-0">{{ journalist.public_name }}</h1>
+              {% if journalist.bio %}
+              <p class="text-muted small mt-1 mb-0">{{ journalist.bio }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if user.role == 'reader' %}
+          <form method="post" action="{% url 'news:toggle_subscription' %}"
+                class="flex-shrink-0">
+            {% csrf_token %}
+            <input type="hidden" name="type" value="journalist">
+            <input type="hidden" name="id" value="{{ journalist.pk }}">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            {% if is_subscribed %}
+            <button type="submit" class="btn btn-dark btn-sm">
+              <i class="bi bi-bell-slash me-1"></i>Unsubscribe
+            </button>
+            {% else %}
+            <button type="submit" class="btn btn-outline-dark btn-sm">
+              <i class="bi bi-bell me-1"></i>Follow
+            </button>
+            {% endif %}
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Published articles -->
+    <div class="section-rule mb-4">
+      <span class="section-rule__label">
+        Articles ({{ articles.count }})
+      </span>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for article in articles %}
+      <div class="col">
+        <article class="card h-100 shadow-sm border-0">
+          {% if article.image %}
+          <img src="{{ article.image.url }}" class="card-img-top"
+               style="height:120px;object-fit:cover;" alt="{{ article.title }}">
+          {% endif %}
+          <div class="card-body">
+            {% if article.importance == 1 %}
+              <span class="badge bg-danger mb-2">Front Page</span>
+            {% elif article.importance == 2 %}
+              <span class="badge bg-warning text-dark mb-2">Top Story</span>
+            {% endif %}
+            <h3 class="h6 fw-bold">
+              <a href="{% url 'news:article_detail' article.pk %}"
+                 class="text-decoration-none stretched-link article-headline-link">
+                {{ article.title }}
+              </a>
+            </h3>
+          </div>
+          <div class="card-footer bg-transparent border-top-0">
+            <small class="text-muted">
+              {{ article.publication_date|date:"j N Y" }}
+              {% if article.publisher %}
+              &middot;
+              <a href="{% url 'news:publisher_profile' article.publisher.pk %}"
+                 class="text-decoration-none">
+                {{ article.publisher.name }}
+              </a>
+              {% endif %}
+            </small>
+          </div>
+        </article>
+      </div>
+      {% empty %}
+      <div class="col-12 text-muted">
+        <p>No published articles yet.</p>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

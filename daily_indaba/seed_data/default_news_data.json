@@ -1,0 +1,1838 @@
+{
+    "_comment": "Demo seed data for The Daily Indaba. No password hashes — passwords are set by seed_demo_news management command (default: demo1234).",
+    "subscription_pricing": {
+        "journalist_min_fee": "30.00",
+        "journalist_default_fee": "30.00",
+        "journalist_max_fee": "50.00",
+        "publisher_min_fee": "80.00",
+        "publisher_default_fee": "80.00",
+        "publisher_max_fee": "120.00",
+        "all_articles_monthly_fee": "200.00"
+    },
+    "categories": [
+        {
+            "name": "Politics",
+            "slug": "politics",
+            "description": "Political news, government, and policy."
+        },
+        {
+            "name": "Sport",
+            "slug": "sport",
+            "description": "Sport news and match coverage."
+        },
+        {
+            "name": "Economics",
+            "slug": "economics",
+            "description": "Economic analysis, markets, and finance."
+        },
+        {
+            "name": "Technology",
+            "slug": "technology",
+            "description": "Tech industry news, gadgets, and innovation."
+        },
+        {
+            "name": "Culture",
+            "slug": "culture",
+            "description": "Arts, entertainment, lifestyle, and society."
+        },
+        {
+            "name": "Science",
+            "slug": "science",
+            "description": "Scientific research, discoveries, and health."
+        },
+        {
+            "name": "Business",
+            "slug": "business",
+            "description": "Business news, companies, and entrepreneurship."
+        },
+        {
+            "name": "Entertainment",
+            "slug": "entertainment",
+            "description": "Film, music, TV, and celebrity news."
+        },
+        {
+            "name": "International",
+            "slug": "international",
+            "description": "World news and international events."
+        },
+        {
+            "name": "International Relations",
+            "slug": "international-relations",
+            "description": "Diplomacy, foreign policy, and international agreements."
+        }
+    ],
+    "users": [
+        {
+            "username": "thandi.nkosi",
+            "first_name": "Thandi",
+            "last_name": "Nkosi",
+            "email": "thandi.nkosi@dailyindaba.co.za",
+            "role": "journalist",
+            "display_name": "Nolitha Dube",
+            "bio": "Political and public-interest journalist covering government, governance and civil society.",
+            "profile_picture": "thandi_nkosi_avatar.png"
+        },
+        {
+            "username": "kabelo.dlamini",
+            "first_name": "Kabelo",
+            "last_name": "Dlamini",
+            "email": "kabelo.dlamini@dailyindaba.co.za",
+            "role": "journalist",
+            "display_name": "Sizwe Maseko",
+            "bio": "Business and telecoms reporter focused on banking, digital infrastructure and the South African economy.",
+            "profile_picture": "kabelo_dlamini_avatar.png"
+        },
+        {
+            "username": "ayanda.mokoena",
+            "first_name": "Ayanda",
+            "last_name": "Mokoena",
+            "email": "ayanda.mokoena@dailyindaba.co.za",
+            "role": "journalist",
+            "display_name": "Ayanda Mokoena",
+            "bio": "Sport and social trends reporter with a focus on cricket, rugby and national identity in sport.",
+            "profile_picture": "ayanda_mokoena_avatar.png"
+        },
+        {
+            "username": "pieter.kruger",
+            "first_name": "Pieter",
+            "last_name": "Krüger",
+            "email": "pieterhkruger@gmail.com",
+            "role": "journalist",
+            "display_name": "Pieter Krüger",
+            "bio": "Journalist and editor with a focus on culture, arts, youth talent and human-interest stories.",
+            "profile_picture": "pieter_kruger_avatar.png"
+        },
+        {
+            "username": "naledi.radebe",
+            "first_name": "Naledi",
+            "last_name": "Radebe",
+            "email": "naledi.radebe@dailyindaba.co.za",
+            "role": "journalist",
+            "display_name": "Naledi Radebe",
+            "bio": "Science and health correspondent covering research breakthroughs, archaeology and medical innovation.",
+            "profile_picture": "naledi_radebe_avatar.png"
+        },
+        {
+            "username": "nomusa.khumalo",
+            "first_name": "Nomusa",
+            "last_name": "Khumalo",
+            "email": "nomusa.khumalo@dailyindaba.co.za",
+            "role": "editor",
+            "display_name": "",
+            "bio": "Senior editor responsible for approval workflows and newsroom standards."
+        },
+        {
+            "username": "pieter.vanwyk",
+            "first_name": "Pieter",
+            "last_name": "van Wyk",
+            "email": "pieter.vanwyk@dailyindaba.co.za",
+            "role": "editor",
+            "display_name": "",
+            "bio": "Digital editor overseeing business, technology and subscriber-facing publishing flows.",
+            "profile_picture": "pieter_vanwyk_avatar.png"
+        },
+        {
+            "username": "viwe.madonsela",
+            "first_name": "Viwe",
+            "last_name": "Madonsela",
+            "email": "viwe.madonsela@dailyindaba.co.za",
+            "role": "editor",
+            "display_name": "",
+            "bio": "Features editor responsible for culture, science and long-form weekend commissioning."
+        },
+        {
+            "username": "the.daily.indaba",
+            "first_name": "",
+            "last_name": "",
+            "email": "publishers@dailyindaba.co.za",
+            "role": "publisher",
+            "display_name": "The Daily Indaba",
+            "bio": "Publisher account for The Daily Indaba's organisation profile and editor assignments."
+        },
+        {
+            "username": "gauteng.business.wire",
+            "first_name": "",
+            "last_name": "",
+            "email": "publishers@gautengbusinesswire.co.za",
+            "role": "publisher",
+            "display_name": "Gauteng Business Wire",
+            "bio": "Publisher account for Gauteng Business Wire's organisation profile and editor assignments."
+        },
+        {
+            "username": "lerato.maseko",
+            "first_name": "Lerato",
+            "last_name": "Maseko",
+            "email": "lerato.maseko@example.com",
+            "role": "reader",
+            "display_name": "Lerato M.",
+            "bio": "Reader interested in politics and business news."
+        },
+        {
+            "username": "sibusiso.naidoo",
+            "first_name": "Sibusiso",
+            "last_name": "Naidoo",
+            "email": "sibusiso.naidoo@example.com",
+            "role": "reader",
+            "display_name": "Sbu Naidoo",
+            "bio": "Reader who follows sport and economic stories."
+        },
+        {
+            "username": "fatima.patel",
+            "first_name": "Fatima",
+            "last_name": "Patel",
+            "email": "fatima.patel@example.com",
+            "role": "reader",
+            "display_name": "Fatima Patel",
+            "bio": "Reader interested in foreign affairs, public policy and technology."
+        },
+        {
+            "username": "zanele.motha",
+            "first_name": "Zanele",
+            "last_name": "Motha",
+            "email": "zanele.motha@example.com",
+            "role": "reader",
+            "display_name": "Zanele M.",
+            "bio": "Reader with a background in environmental science. Passionate about conservation, social justice and African culture."
+        },
+        {
+            "username": "ruan.duplessis",
+            "first_name": "Ruan",
+            "last_name": "du Plessis",
+            "email": "ruan.duplessis@example.com",
+            "role": "reader",
+            "display_name": "Ruan du Plessis",
+            "bio": "Reader who follows sport obsessively and keeps a close eye on the South African business landscape."
+        },
+        {
+            "username": "priya.naidoo",
+            "first_name": "Priya",
+            "last_name": "Naidoo",
+            "email": "priya.naidoo@example.com",
+            "role": "reader",
+            "display_name": "Priya N.",
+            "bio": "Reader with a keen interest in technology, AI and international affairs. Works in the software industry."
+        },
+        {
+            "username": "mpho.sithole",
+            "first_name": "Mpho",
+            "last_name": "Sithole",
+            "email": "mpho.sithole@example.com",
+            "role": "reader",
+            "display_name": "Mpho Sithole",
+            "bio": "Reader focused on politics, economic justice and public policy. Follows governance issues closely."
+        },
+        {
+            "username": "stefan.meyer",
+            "first_name": "Stefan",
+            "last_name": "Meyer",
+            "email": "stefan.meyer@example.com",
+            "role": "reader",
+            "display_name": "Stefan Meyer",
+            "bio": "Reader interested in geopolitics, science and technology. Follows international affairs with particular attention to Europe and the Middle East."
+        }
+    ],
+    "publishers": [
+        {
+            "name": "The Daily Indaba",
+            "description": "A Johannesburg-based South African digital publication focused on public-interest journalism, accountability and civic conversation.",
+            "account": "the.daily.indaba",
+            "curates_independent_journalists": true,
+            "editors": [
+                "nomusa.khumalo",
+                "viwe.madonsela"
+            ],
+            "journalists": [
+                "thandi.nkosi",
+                "kabelo.dlamini",
+                "ayanda.mokoena",
+                "pieter.kruger",
+                "naledi.radebe"
+            ]
+        },
+        {
+            "name": "Gauteng Business Wire",
+            "description": "A specialist South African publication covering business, telecoms, banking and industrial developments.",
+            "account": "gauteng.business.wire",
+            "curates_independent_journalists": false,
+            "editors": [
+                "pieter.vanwyk"
+            ],
+            "journalists": [
+                "kabelo.dlamini"
+            ]
+        }
+    ],
+    "articles": [
+        {
+            "title": "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+            "content": "01_ramaphosa_troop_deployment.html",
+            "image": "Troop Deployment.png",
+            "importance": 1,
+            "approved": true,
+            "publication_date": "2026-03-16T06:00:00Z",
+            "disclaimer": "",
+            "author": "thandi.nkosi",
+            "publisher": "The Daily Indaba",
+            "category_slug": "politics"
+        },
+        {
+            "title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "content": "02_pretoria_us_envoy.html",
+            "image": "Undiplomatic Remarks.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-14T06:02:00Z",
+            "disclaimer": "",
+            "author": "thandi.nkosi",
+            "publisher": "The Daily Indaba",
+            "category_slug": "international-relations"
+        },
+        {
+            "title": "South Africa Records First Current Account Surplus Since 2023",
+            "content": "03_sa_current_account_surplus.html",
+            "image": "sa_current_account_surplus.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-12T08:20:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "economics"
+        },
+        {
+            "title": "South Africa's Economy Grew 1.1% in 2025, Missing Official Forecasts",
+            "content": "04_sa_gdp_growth_2025.html",
+            "image": "sa_gdp_growth_2025.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-10T09:05:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "economics"
+        },
+        {
+            "title": "Manufacturing Output Still Under Pressure After January Improvement",
+            "content": "05_manufacturing_pressure.html",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-13T07:40:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "economics"
+        },
+        {
+            "title": "MTN Returns to Profit as African Operations Lift Group Performance",
+            "content": "06_mtn_returns_to_profit.html",
+            "image": "06_mtn_returns_to_profit.png",
+            "importance": 1,
+            "approved": true,
+            "publication_date": "2026-03-16T07:30:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "business"
+        },
+        {
+            "title": "South Africa Intercepts Chinese Fishing Vessels for Unauthorised Entry Into Its Waters",
+            "content": "07_chinese_fishing_vessels.html",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-12T11:25:00Z",
+            "disclaimer": "",
+            "author": "thandi.nkosi",
+            "publisher": "The Daily Indaba",
+            "category_slug": "politics"
+        },
+        {
+            "title": "Proteas Men's T20 Tour Gains Attention as New Zealand Rotates Key Players",
+            "content": "08_proteas_t20_tour.html",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-11T15:30:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": "The Daily Indaba",
+            "category_slug": "sport"
+        },
+        {
+            "title": "Kipchoge Starts His Continental Quest in Cape Town With First Marathon in Africa",
+            "content": "09_kipchoge_cape_town.html",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-09T14:10:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": "The Daily Indaba",
+            "category_slug": "culture"
+        },
+        {
+            "title": "South Africa Team Stranded in India to Fly Home After Airspace Closures",
+            "content": "10_sa_team_stranded_india.html",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-11T10:45:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": "The Daily Indaba",
+            "category_slug": "sport"
+        },
+        {
+            "title": "Woolworths CEO Roy Bagattini to Retire as Group Names Sam Ngumeni Successor",
+            "content": "11_woolworths_bagattini_retires.html",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-12T09:15:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "business"
+        },
+        {
+            "title": "FlySafair Adds Temporary Fuel Surcharge as Jet Fuel Prices Surge",
+            "content": "12_flysafair_fuel_surcharge.html",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-11T12:20:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "business"
+        },
+        {
+            "title": "Thinking Machines Secures Nvidia Backing and Major AI Chip Supply Deal",
+            "content": "13_thinking_machines_nvidia.html",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-10T18:00:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": null,
+            "category_slug": "technology"
+        },
+        {
+            "title": "Washington Withdraws Planned Rule on AI Chip Exports",
+            "content": "14_ai_chip_export_rule_withdrawn.html",
+            "image": "14_ai_chip_export_rule_withdrawn.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-13T16:10:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": null,
+            "category_slug": "technology"
+        },
+        {
+            "title": "Tesla Says Its Terafab AI Chip Project Will Launch Within Days",
+            "content": "15_tesla_terafab_launch.html",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-14T13:50:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": null,
+            "category_slug": "technology"
+        },
+        {
+            "title": "Brazil Dinosaur Discovery Suggests a Prehistoric Link Between South America and Europe",
+            "content": "16_brazil_dinosaur_discovery.html",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-13T17:40:00Z",
+            "disclaimer": "",
+            "author": "naledi.radebe",
+            "publisher": null,
+            "category_slug": "science"
+        },
+        {
+            "title": "Spanish Scientists Develop an Artificial Cornea From Fish Scales",
+            "content": "17_artificial_cornea_fish_scales.html",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-10T16:25:00Z",
+            "disclaimer": "",
+            "author": "naledi.radebe",
+            "publisher": null,
+            "category_slug": "science"
+        },
+        {
+            "title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "content": "18_white_south_africans_return_home.html",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-11T09:35:00Z",
+            "disclaimer": "",
+            "author": "thandi.nkosi",
+            "publisher": "The Daily Indaba",
+            "category_slug": "culture"
+        },
+        {
+            "title": "Oscars 2026: 'One Battle After Another' and 'Sinners' Lead the Night",
+            "content": "19_oscars_2026_winners.html",
+            "image": "19_oscars_2026_winners.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-16T05:10:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": null,
+            "category_slug": "entertainment"
+        },
+        {
+            "title": "Cannes to Honour Barbra Streisand With an Honorary Palme d'Or",
+            "content": "20_cannes_streisand_honorary_palme.html",
+            "image": "20_cannes_streisand_honorary_palme.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-11T11:30:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": null,
+            "category_slug": "entertainment"
+        },
+        {
+            "title": "War Around Iran Sends Shockwaves Through Energy Markets and Regional Security",
+            "content": "21_iran_energy_markets.html",
+            "image": "21_iran_energy_markets.png",
+            "importance": 1,
+            "approved": true,
+            "publication_date": "2026-03-15T18:20:00Z",
+            "disclaimer": "This article covers an active international conflict. Details may change quickly as official statements and battlefield developments evolve.",
+            "author": "thandi.nkosi",
+            "publisher": "The Daily Indaba",
+            "category_slug": "international"
+        },
+        {
+            "title": "Israel and Lebanon Expected to Hold Talks Soon, Officials Say",
+            "content": "22_israel_lebanon_talks.html",
+            "image": "22_israel_lebanon_talks.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-15T19:05:00Z",
+            "disclaimer": "",
+            "author": "thandi.nkosi",
+            "publisher": "The Daily Indaba",
+            "category_slug": "international-relations"
+        },
+        {
+            "title": "Anjanet Krüger: At Sixteen, a Natural Talent Alongside South Africa's Finest Artists",
+            "content": "24_anjanet_kruger_art_prodigy.html",
+            "image": "Anjanet - dog.jpeg",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-16T10:00:00Z",
+            "disclaimer": "",
+            "author": "pieter.kruger",
+            "publisher": "The Daily Indaba",
+            "category_slug": "culture"
+        },
+        {
+            "title": "Ukraine War Escalates Again as Moscow Reports Major Drone Attack",
+            "content": "23_ukraine_drone_attack.html",
+            "image": "23_ukraine_drone_attack.png",
+            "importance": 1,
+            "approved": true,
+            "publication_date": "2026-03-16T04:35:00Z",
+            "disclaimer": "This article covers claims made during an active war. Some operational details may remain contested or incomplete in the immediate aftermath.",
+            "author": "thandi.nkosi",
+            "publisher": null,
+            "category_slug": "international"
+        },
+        {
+            "title": "South Africa Rejects US Pressure to Distance Itself From Iran",
+            "content": "25_sa_rejects_us_pressure_iran.html",
+            "image": "25_sa_rejects_us_pressure_iran.png",
+            "importance": 1,
+            "approved": true,
+            "publication_date": "2026-03-18T06:10:00Z",
+            "disclaimer": "",
+            "author": "thandi.nkosi",
+            "publisher": "The Daily Indaba",
+            "category_slug": "international-relations"
+        },
+        {
+            "title": "South African Inflation Hits Central Bank Target but Iran War Risks Loom",
+            "content": "26_sa_inflation_target_iran_risks.html",
+            "image": "26_sa_inflation_target_iran_risks.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-18T07:25:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "economics"
+        },
+        {
+            "title": "Treasury Plays Down Oil Shock Risks as Commodity Prices Support Debt Outlook",
+            "content": "27_treasury_oil_shock_debt_outlook.html",
+            "image": "27_treasury_oil_shock_debt_outlook.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-18T09:05:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "economics"
+        },
+        {
+            "title": "South Africa Imposes Steep Tariffs on Structural Steel Imports From China and Thailand",
+            "content": "28_sa_structural_steel_tariffs.html",
+            "image": "28_sa_structural_steel_tariffs.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-20T07:10:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "economics"
+        },
+        {
+            "title": "South African Rand Opens the Week at a Four-Month Low Ahead of Rate Decision",
+            "content": "29_rand_four_month_low_rate_decision.html",
+            "image": "29_rand_four_month_low_rate_decision.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-23T06:30:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "economics"
+        },
+        {
+            "title": "Glencore Warns It Could Walk Away From South Africa Smelter Rescue Talks",
+            "content": "30_glencore_smelter_rescue_talks.html",
+            "image": "30_glencore_smelter_rescue_talks3.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-19T08:40:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "business"
+        },
+        {
+            "title": "African Airlines Face Fresh Pressure as Jet Fuel Costs Surge",
+            "content": "31_african_airlines_jet_fuel_pressure.html",
+            "image": "31_african_airlines_jet_fuel_pressure.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-20T10:15:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "business"
+        },
+        {
+            "title": "LIV Golf's African Debut Draws Emotional Home Crowds in Johannesburg",
+            "content": "32_liv_golf_african_debut_johannesburg.html",
+            "image": "32_liv_golf_african_debut_johannesburg.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-19T14:20:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": "The Daily Indaba",
+            "category_slug": "sport"
+        },
+        {
+            "title": "DeChambeau Wins LIV Golf South Africa Title After Play-Off at Steyn City",
+            "content": "33_dechambeau_liv_south_africa_title.html",
+            "image": "33_dechambeau_liv_south_africa_title.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-22T17:10:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": "The Daily Indaba",
+            "category_slug": "sport"
+        },
+        {
+            "title": "Tencent Pledges Higher AI Investment in 2026 After Chip Curbs Hit Capex Plans",
+            "content": "34_tencent_higher_ai_investment_2026.html",
+            "image": "34_tencent_higher_ai_investment_2026.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-18T12:10:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "technology"
+        },
+        {
+            "title": "Samsung Plans More Than $73 Billion Investment to Lead in AI Chips",
+            "content": "35_samsung_ai_chip_investment.html",
+            "image": "35_samsung_ai_chip_investment.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-19T09:20:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "technology"
+        },
+        {
+            "title": "Xiaomi Commits at Least $8.7 Billion to AI Over the Next Three Years",
+            "content": "36_xiaomi_ai_investment_three_years.html",
+            "image": "36_xiaomi_ai_investment_three_years.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-19T11:35:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "technology"
+        },
+        {
+            "title": "Micron Forecasts Strong Revenue on the AI Boom but Higher Spending Shakes Shares",
+            "content": "37_micron_ai_boom_spending.html",
+            "image": "37_micron_ai_boom_spending.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-18T18:25:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "technology"
+        },
+        {
+            "title": "China Approves World's First Commercial Brain-Computer Interface Device",
+            "content": "38_beijing_brain_chip_neuralink_gap.html",
+            "image": "38_beijing_brain_chip_neuralink_gap.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-13T08:38:00Z",
+            "disclaimer": "",
+            "author": "kabelo.dlamini",
+            "publisher": "Gauteng Business Wire",
+            "category_slug": "technology"
+        },
+        {
+            "title": "Heavy Social Media Use Erodes Young People's Wellbeing, New Report Finds",
+            "content": "39_social_media_youth_wellbeing_report.html",
+            "image": "39_social_media_youth_wellbeing_report.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-19T12:05:00Z",
+            "disclaimer": "",
+            "author": "pieter.kruger",
+            "publisher": "The Daily Indaba",
+            "category_slug": "culture"
+        },
+        {
+            "title": "Paul Freud Says Art Helps Him Make Sense of War and Politics",
+            "content": "40_paul_freud_art_war_politics.html",
+            "image": "40_paul_freud_art_war_politics.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-21T10:00:00Z",
+            "disclaimer": "",
+            "author": "pieter.kruger",
+            "publisher": "The Daily Indaba",
+            "category_slug": "culture"
+        },
+        {
+            "title": "Mars Rover Data Confirms Ancient Lake Sediments on Red Planet",
+            "content": "41_nasa_rover_oldest_mars_water_evidence.html",
+            "image": "41_nasa_rover_oldest_mars_water_evidence.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2024-01-27T08:53:00Z",
+            "disclaimer": "",
+            "author": "pieter.kruger",
+            "publisher": null,
+            "category_slug": "science"
+        },
+        {
+            "title": "Study Reopens Debate Over the Age of Chile's Monte Verde Archaeological Site",
+            "content": "42_monte_verde_age_debate.html",
+            "image": "42_monte_verde_age_debate.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-19T17:20:00Z",
+            "disclaimer": "",
+            "author": "pieter.kruger",
+            "publisher": null,
+            "category_slug": "science"
+        },
+        {
+            "title": "FDA Releases Draft Guidance to Reduce Primate Testing for Some Antibody Drugs",
+            "content": "43_fda_alternatives_to_animal_testing.html",
+            "image": "43_fda_alternatives_to_animal_testing.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2025-12-02T18:17:00Z",
+            "disclaimer": "",
+            "author": "pieter.kruger",
+            "publisher": null,
+            "category_slug": "science"
+        },
+        {
+            "title": "Val Kilmer to Appear Posthumously Through AI in 'As Deep as the Grave'",
+            "content": "44_val_kilmer_ai_film.html",
+            "image": "44_val_kilmer_ai_film2.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-18T19:10:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": null,
+            "category_slug": "entertainment"
+        },
+        {
+            "title": "Netflix Eyes a Global Concert Tour for 'KPop Demon Hunters'",
+            "content": "45_kpop_demon_hunters_world_tour.html",
+            "image": "45_kpop_demon_hunters_world_tour.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-19T13:30:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": null,
+            "category_slug": "entertainment"
+        },
+        {
+            "title": "Pop Mart and Sony Join Forces on a Labubu Feature Film",
+            "content": "46_pop_mart_sony_labubu_film.html",
+            "image": "46_pop_mart_sony_labubu_film.png",
+            "importance": 3,
+            "approved": true,
+            "publication_date": "2026-03-19T15:20:00Z",
+            "disclaimer": "",
+            "author": "ayanda.mokoena",
+            "publisher": null,
+            "category_slug": "entertainment"
+        },
+        {
+            "title": "France Steps Up Diplomacy After Lebanon Talks With a Visit to Israel",
+            "content": "47_france_diplomacy_lebanon_israel.html",
+            "image": "47_france_diplomacy_lebanon_israel.png",
+            "importance": 2,
+            "approved": true,
+            "publication_date": "2026-03-19T18:10:00Z",
+            "disclaimer": "",
+            "author": "thandi.nkosi",
+            "publisher": "The Daily Indaba",
+            "category_slug": "international-relations"
+        },
+        {
+            "title": "Ukraine and US Teams End Florida Talks With Possible New POW Exchange on the Table",
+            "content": "48_ukraine_us_florida_talks_pow_exchange.html",
+            "image": "48_ukraine_us_florida_talks.png",
+            "importance": 1,
+            "approved": true,
+            "publication_date": "2026-03-23T05:40:00Z",
+            "disclaimer": "This article covers an active war. Some operational and diplomatic details may change quickly as official statements and battlefield developments evolve.",
+            "author": "thandi.nkosi",
+            "publisher": "The Daily Indaba",
+            "category_slug": "international-relations"
+        }
+    ],
+    "newsletters": [
+        {
+            "title": "SA Politics & Security Weekly",
+            "description": "A weekly roundup of political developments, governance news and state security matters affecting South Africa.",
+            "category_slug": "politics",
+            "author": "thandi.nkosi",
+            "article_titles": [
+                "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+                "South Africa Intercepts Chinese Fishing Vessels for Unauthorised Entry Into Its Waters"
+            ]
+        },
+        {
+            "title": "Sport Watch",
+            "description": "South African sport news, fixtures, selection analysis and travel disruptions affecting teams.",
+            "category_slug": "sport",
+            "author": "ayanda.mokoena",
+            "article_titles": [
+                "Proteas Men's T20 Tour Gains Attention as New Zealand Rotates Key Players",
+                "South Africa Team Stranded in India to Fly Home After Airspace Closures",
+                "LIV Golf's African Debut Draws Emotional Home Crowds in Johannesburg",
+                "DeChambeau Wins LIV Golf South Africa Title After Play-Off at Steyn City"
+            ]
+        },
+        {
+            "title": "SA Economics Briefing",
+            "description": "Regular analysis of South Africa's macroeconomic indicators, growth figures and industrial performance.",
+            "category_slug": "economics",
+            "author": "kabelo.dlamini",
+            "article_titles": [
+                "South Africa Records First Current Account Surplus Since 2023",
+                "South Africa's Economy Grew 1.1% in 2025, Missing Official Forecasts",
+                "Manufacturing Output Still Under Pressure After January Improvement",
+                "South African Inflation Hits Central Bank Target but Iran War Risks Loom",
+                "Treasury Plays Down Oil Shock Risks as Commodity Prices Support Debt Outlook",
+                "South Africa Imposes Steep Tariffs on Structural Steel Imports From China and Thailand",
+                "South African Rand Opens the Week at a Four-Month Low Ahead of Rate Decision"
+            ]
+        },
+        {
+            "title": "Tech and AI Briefing",
+            "description": "Coverage of artificial intelligence, semiconductors and fast-moving technology policy.",
+            "category_slug": "technology",
+            "author": "kabelo.dlamini",
+            "article_titles": [
+                "Thinking Machines Secures Nvidia Backing and Major AI Chip Supply Deal",
+                "Washington Withdraws Planned Rule on AI Chip Exports",
+                "Tesla Says Its Terafab AI Chip Project Will Launch Within Days",
+                "Tencent Pledges Higher AI Investment in 2026 After Chip Curbs Hit Capex Plans",
+                "Samsung Plans More Than $73 Billion Investment to Lead in AI Chips",
+                "Xiaomi Commits at Least $8.7 Billion to AI Over the Next Three Years",
+                "Micron Forecasts Strong Revenue on the AI Boom but Higher Spending Shakes Shares",
+                "China Approves World's First Commercial Brain-Computer Interface Device"
+            ]
+        },
+        {
+            "title": "Culture and Society",
+            "description": "Stories about identity, public life and cultural meaning in South Africa and beyond.",
+            "category_slug": "culture",
+            "author": "thandi.nkosi",
+            "article_titles": [
+                "Kipchoge Starts His Continental Quest in Cape Town With First Marathon in Africa",
+                "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+                "Anjanet Krüger: At Sixteen, a Natural Talent Alongside South Africa's Finest Artists",
+                "Heavy Social Media Use Erodes Young People's Wellbeing, New Report Finds",
+                "Paul Freud Says Art Helps Him Make Sense of War and Politics"
+            ]
+        },
+        {
+            "title": "Science Update",
+            "description": "Scientific research, medical innovation and discoveries shaping how we understand the world.",
+            "category_slug": "science",
+            "author": "fatima.patel",
+            "article_titles": [
+                "Brazil Dinosaur Discovery Suggests a Prehistoric Link Between South America and Europe",
+                "Spanish Scientists Develop an Artificial Cornea From Fish Scales",
+                "Mars Rover Data Confirms Ancient Lake Sediments on Red Planet",
+                "Study Reopens Debate Over the Age of Chile's Monte Verde Archaeological Site",
+                "FDA Releases Draft Guidance to Reduce Primate Testing for Some Antibody Drugs"
+            ]
+        },
+        {
+            "title": "Business Wire Weekly",
+            "description": "Corporate leadership, transport costs, telecoms performance and wider commercial developments.",
+            "category_slug": "business",
+            "author": "kabelo.dlamini",
+            "article_titles": [
+                "MTN Returns to Profit as African Operations Lift Group Performance",
+                "Woolworths CEO Roy Bagattini to Retire as Group Names Sam Ngumeni Successor",
+                "FlySafair Adds Temporary Fuel Surcharge as Jet Fuel Prices Surge",
+                "Glencore Warns It Could Walk Away From South Africa Smelter Rescue Talks",
+                "African Airlines Face Fresh Pressure as Jet Fuel Costs Surge"
+            ]
+        },
+        {
+            "title": "Entertainment Roundup",
+            "description": "Film awards, festival honours and major entertainment-industry developments.",
+            "category_slug": "entertainment",
+            "author": "ayanda.mokoena",
+            "article_titles": [
+                "Oscars 2026: 'One Battle After Another' and 'Sinners' Lead the Night",
+                "Cannes to Honour Barbra Streisand With an Honorary Palme d'Or",
+                "Val Kilmer to Appear Posthumously Through AI in 'As Deep as the Grave'",
+                "Netflix Eyes a Global Concert Tour for 'KPop Demon Hunters'",
+                "Pop Mart and Sony Join Forces on a Labubu Feature Film"
+            ]
+        },
+        {
+            "title": "World Report",
+            "description": "International news covering major global events and their broader consequences.",
+            "category_slug": "international",
+            "author": "thandi.nkosi",
+            "article_titles": [
+                "War Around Iran Sends Shockwaves Through Energy Markets and Regional Security",
+                "Ukraine War Escalates Again as Moscow Reports Major Drone Attack",
+                "France Steps Up Diplomacy After Lebanon Talks With a Visit to Israel",
+                "Ukraine and US Teams End Florida Talks With Possible New POW Exchange on the Table"
+            ]
+        },
+        {
+            "title": "Diplomatic Briefing",
+            "description": "Diplomacy, foreign policy, bilateral tensions and regional talks affecting the international system.",
+            "category_slug": "international-relations",
+            "author": "thandi.nkosi",
+            "article_titles": [
+                "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+                "Israel and Lebanon Expected to Hold Talks Soon, Officials Say",
+                "Washington Withdraws Planned Rule on AI Chip Exports",
+                "South Africa Rejects US Pressure to Distance Itself From Iran",
+                "France Steps Up Diplomacy After Lebanon Talks With a Visit to Israel",
+                "Ukraine and US Teams End Florida Talks With Possible New POW Exchange on the Table"
+            ]
+        }
+    ],
+    "subscriptions": [
+        {
+            "reader": "lerato.maseko",
+            "publisher": "The Daily Indaba",
+            "journalist": null
+        },
+        {
+            "reader": "lerato.maseko",
+            "publisher": null,
+            "journalist": "kabelo.dlamini"
+        },
+        {
+            "reader": "sibusiso.naidoo",
+            "publisher": "Gauteng Business Wire",
+            "journalist": null
+        },
+        {
+            "reader": "fatima.patel",
+            "publisher": null,
+            "journalist": "thandi.nkosi"
+        },
+        {
+            "reader": "fatima.patel",
+            "publisher": "The Daily Indaba",
+            "journalist": null
+        }
+    ],
+    "comments": [
+        {
+            "id": "c1",
+            "article_title": "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+            "author": "lerato.maseko",
+            "parent_id": null,
+            "body": "This is a serious move. I hope the government explains how success will actually be measured — troop numbers alone do not tell us much."
+        },
+        {
+            "id": "c2",
+            "article_title": "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+            "author": "sibusiso.naidoo",
+            "parent_id": "c1",
+            "body": "Agreed. Soldiers can stabilise an area for a few weeks, but if policing reform and community trust do not improve, we end up back where we started."
+        },
+        {
+            "id": "c3",
+            "article_title": "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+            "author": "fatima.patel",
+            "parent_id": "c2",
+            "body": "Yes, and prosecution capacity is just as important. Arrests mean nothing if cases collapse in court because dockets go missing or witnesses refuse to testify."
+        },
+        {
+            "id": "c4",
+            "article_title": "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+            "author": "mpho.sithole",
+            "parent_id": null,
+            "body": "My concern is civilian oversight. Who is monitoring what the troops are actually doing on the ground? The rules of engagement need to be public, not just promised."
+        },
+        {
+            "id": "c5",
+            "article_title": "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+            "author": "ruan.duplessis",
+            "parent_id": "c4",
+            "body": "That is a fair point, but in areas like Riverlea the situation had become completely untenable. Sometimes you need a visible show of force just to restore the baseline."
+        },
+        {
+            "id": "c6",
+            "article_title": "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+            "author": "zanele.motha",
+            "parent_id": "c5",
+            "body": "Both things can be true. Relief in the short term and genuine risk in the long term if oversight is weak. History gives us enough examples of that in this country."
+        },
+        {
+            "id": "c7",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "mpho.sithole",
+            "parent_id": null,
+            "body": "The audacity is striking. A guest ambassador publicly dismissing our courts and calling our transformation laws anti-white. Sovereignty means something or it does not."
+        },
+        {
+            "id": "c8",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "fatima.patel",
+            "parent_id": "c7",
+            "body": "The embassy walking back the judicial comment while the rest stood tells you everything. They know exactly what they are doing — applying pressure while leaving an escape route."
+        },
+        {
+            "id": "c9",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "stefan.meyer",
+            "parent_id": null,
+            "body": "From a trade perspective this is worrying. The US investigation into South African exports combined with this kind of rhetoric could cost jobs in sectors that depend on AGOA preferences."
+        },
+        {
+            "id": "c10",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "priya.naidoo",
+            "parent_id": "c9",
+            "body": "Exactly. The diplomatic theatre makes headlines but it is the trade effects that will matter to ordinary workers. Companies looking at investment decisions will be watching this closely."
+        },
+        {
+            "id": "c11",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "lerato.maseko",
+            "parent_id": "c10",
+            "body": "Which is precisely why Lamola's response was measured rather than sharp. The government needs room to manage this without it escalating into something that damages the economy further."
+        },
+        {
+            "id": "c12",
+            "article_title": "South Africa Records First Current Account Surplus Since 2023",
+            "author": "lerato.maseko",
+            "parent_id": null,
+            "body": "Encouraging, but one strong quarter does not mean households will feel relief yet. The structural issues that cause the deficits have not gone away."
+        },
+        {
+            "id": "c13",
+            "article_title": "South Africa Records First Current Account Surplus Since 2023",
+            "author": "sibusiso.naidoo",
+            "parent_id": "c12",
+            "body": "Exactly. Food, fuel and transport still shape how people judge the economy day to day. A surplus in the current account does not immediately translate to lower prices at the till."
+        },
+        {
+            "id": "c14",
+            "article_title": "South Africa Records First Current Account Surplus Since 2023",
+            "author": "ruan.duplessis",
+            "parent_id": null,
+            "body": "The precious metals export performance is the real story here. When gold and platinum prices move, the numbers can shift dramatically. That is not a structural improvement, it is a commodity windfall."
+        },
+        {
+            "id": "c15",
+            "article_title": "South Africa Records First Current Account Surplus Since 2023",
+            "author": "mpho.sithole",
+            "parent_id": "c14",
+            "body": "Right. And if Transnet cannot reliably move the ore to the ports, even the commodity windfall gets undermined. The infrastructure bottleneck is the consistent thread through almost every economic story."
+        },
+        {
+            "id": "c16",
+            "article_title": "South Africa's Economy Grew 1.1% in 2025, Missing Official Forecasts",
+            "author": "ruan.duplessis",
+            "parent_id": null,
+            "body": "Missing the forecast by that margin is not a disaster, but it confirms what businesses have been saying all year — the operating environment is still too difficult to unlock investment at the scale needed."
+        },
+        {
+            "id": "c17",
+            "article_title": "South Africa's Economy Grew 1.1% in 2025, Missing Official Forecasts",
+            "author": "mpho.sithole",
+            "parent_id": "c16",
+            "body": "Growth at 1.1 percent with unemployment at the levels we have is not a success story. You need at least five or six percent consistently to make a dent. This is treading water."
+        },
+        {
+            "id": "c18",
+            "article_title": "South Africa's Economy Grew 1.1% in 2025, Missing Official Forecasts",
+            "author": "lerato.maseko",
+            "parent_id": "c17",
+            "body": "The load shedding improvement did not deliver the growth bump Treasury expected. That should prompt some honest reflection on how many other constraints were being masked by the electricity narrative."
+        },
+        {
+            "id": "c19",
+            "article_title": "South Africa Intercepts Chinese Fishing Vessels for Unauthorised Entry Into Its Waters",
+            "author": "zanele.motha",
+            "parent_id": null,
+            "body": "This is important. Illegal fishing by large foreign fleets is one of the most serious threats to coastal ecosystems and the livelihoods of small-scale fishers who depend on those stocks."
+        },
+        {
+            "id": "c20",
+            "article_title": "South Africa Intercepts Chinese Fishing Vessels for Unauthorised Entry Into Its Waters",
+            "author": "mpho.sithole",
+            "parent_id": "c19",
+            "body": "The diplomatic dimension will be interesting to watch. China is a major trade partner and lender. How firmly the government pursues this will say something about whether the relationship is genuinely reciprocal."
+        },
+        {
+            "id": "c21",
+            "article_title": "South Africa Intercepts Chinese Fishing Vessels for Unauthorised Entry Into Its Waters",
+            "author": "stefan.meyer",
+            "parent_id": "c20",
+            "body": "The navy and fisheries department deserve credit for the interception. The question is whether the legal follow-through matches the initial enforcement action, or whether the case quietly disappears."
+        },
+        {
+            "id": "c22",
+            "article_title": "South Africa Intercepts Chinese Fishing Vessels for Unauthorised Entry Into Its Waters",
+            "author": "zanele.motha",
+            "parent_id": "c20",
+            "body": "If the case quietly disappears, fishing communities will notice. They have been raising alarms about foreign fleet activity for years. That outcome would confirm their worst fears about who the system actually protects."
+        },
+        {
+            "id": "c23",
+            "article_title": "Proteas Men's T20 Tour Gains Attention as New Zealand Rotates Key Players",
+            "author": "sibusiso.naidoo",
+            "parent_id": null,
+            "body": "This is exactly the kind of series where South Africa should be testing depth properly. If the selectors play the same eleven throughout, they will have wasted the opportunity."
+        },
+        {
+            "id": "c24",
+            "article_title": "Proteas Men's T20 Tour Gains Attention as New Zealand Rotates Key Players",
+            "author": "lerato.maseko",
+            "parent_id": "c23",
+            "body": "I agree. The bigger question is whether South Africa handles pressure moments better. The talent is there — the collapses in big tournaments are a mental and tactical issue more than a personnel one."
+        },
+        {
+            "id": "c25",
+            "article_title": "Proteas Men's T20 Tour Gains Attention as New Zealand Rotates Key Players",
+            "author": "ruan.duplessis",
+            "parent_id": null,
+            "body": "I want to see Tristan Stubbs given a proper run in the middle order. He has the game for T20 but keeps getting shifted around in the batting order without consistency."
+        },
+        {
+            "id": "c26",
+            "article_title": "Proteas Men's T20 Tour Gains Attention as New Zealand Rotates Key Players",
+            "author": "zanele.motha",
+            "parent_id": "c25",
+            "body": "Agreed on Stubbs. And I would like to see more variety in the bowling. Relying on three or four main options in a five-match series will just give the opposition time to adapt."
+        },
+        {
+            "id": "c27",
+            "article_title": "Kipchoge Starts His Continental Quest in Cape Town With First Marathon in Africa",
+            "author": "zanele.motha",
+            "parent_id": null,
+            "body": "What a moment. Kipchoge running in Africa for the first time on African soil — and in Cape Town of all places. I hope this inspires more investment in distance running development here."
+        },
+        {
+            "id": "c28",
+            "article_title": "Kipchoge Starts His Continental Quest in Cape Town With First Marathon in Africa",
+            "author": "ruan.duplessis",
+            "parent_id": "c27",
+            "body": "His engagement with the Khayelitsha schoolchildren the day before was the most important part of the visit. That kind of direct connection lasts longer than any race result."
+        },
+        {
+            "id": "c29",
+            "article_title": "Kipchoge Starts His Continental Quest in Cape Town With First Marathon in Africa",
+            "author": "sibusiso.naidoo",
+            "parent_id": "c28",
+            "body": "True, but the performance also matters. A course record shows that Cape Town can host elite competition at the highest level. That has commercial and tourism implications for future editions."
+        },
+        {
+            "id": "c30",
+            "article_title": "Kipchoge Starts His Continental Quest in Cape Town With First Marathon in Africa",
+            "author": "mpho.sithole",
+            "parent_id": null,
+            "body": "What would make this genuinely meaningful is if Athletics South Africa used the momentum to fund more regional talent identification programmes. Cape Town got the spectacle. The Eastern Cape and Limpopo need the infrastructure."
+        },
+        {
+            "id": "c31",
+            "article_title": "FlySafair Adds Temporary Fuel Surcharge as Jet Fuel Prices Surge",
+            "author": "lerato.maseko",
+            "parent_id": null,
+            "body": "This shows how quickly an overseas conflict can hit ordinary travellers here. A war in the Strait of Hormuz adds cost to a flight from Johannesburg to Cape Town. The interconnection is real."
+        },
+        {
+            "id": "c32",
+            "article_title": "FlySafair Adds Temporary Fuel Surcharge as Jet Fuel Prices Surge",
+            "author": "priya.naidoo",
+            "parent_id": "c31",
+            "body": "What strikes me is how transparent FlySafair was about it. Disclosing a separate surcharge rather than hiding it in the base fare is worth noting. Other airlines could learn from that approach."
+        },
+        {
+            "id": "c33",
+            "article_title": "FlySafair Adds Temporary Fuel Surcharge as Jet Fuel Prices Surge",
+            "author": "ruan.duplessis",
+            "parent_id": "c32",
+            "body": "The aviation fuel tax point in the article is something that needs more attention. We already pay too much relative to regional peers. Domestic air travel accessibility suffers as a result."
+        },
+        {
+            "id": "c34",
+            "article_title": "Thinking Machines Secures Nvidia Backing and Major AI Chip Supply Deal",
+            "author": "priya.naidoo",
+            "parent_id": null,
+            "body": "Guaranteed chip access is genuinely the moat here. Every other AI company is fighting over the same limited supply. This deal changes Thinking Machines' trajectory more than the cash investment does."
+        },
+        {
+            "id": "c35",
+            "article_title": "Thinking Machines Secures Nvidia Backing and Major AI Chip Supply Deal",
+            "author": "stefan.meyer",
+            "parent_id": "c34",
+            "body": "Nvidia taking equity is also significant. It means they are invested in Thinking Machines' success, not just in selling them chips. The roadmap alignment that comes from that relationship is valuable."
+        },
+        {
+            "id": "c36",
+            "article_title": "Thinking Machines Secures Nvidia Backing and Major AI Chip Supply Deal",
+            "author": "fatima.patel",
+            "parent_id": null,
+            "body": "I find myself more interested in the government contract discussions mentioned at the end. AI infrastructure procurement is where real geopolitical risk lives. Who gets access to what systems matters enormously."
+        },
+        {
+            "id": "c37",
+            "article_title": "Thinking Machines Secures Nvidia Backing and Major AI Chip Supply Deal",
+            "author": "priya.naidoo",
+            "parent_id": "c36",
+            "body": "That is the part that will get the least press coverage and have the most consequence. Military and intelligence AI procurement operates largely out of public view and accountability frameworks have not caught up."
+        },
+        {
+            "id": "c38",
+            "article_title": "Spanish Scientists Develop an Artificial Cornea From Fish Scales",
+            "author": "fatima.patel",
+            "parent_id": null,
+            "body": "This is fascinating. Medical innovation often sounds abstract until it points to real sight restoration for people who have been waiting years for donor tissue that simply is not available."
+        },
+        {
+            "id": "c39",
+            "article_title": "Spanish Scientists Develop an Artificial Cornea From Fish Scales",
+            "author": "lerato.maseko",
+            "parent_id": "c38",
+            "body": "Yes, and it is the kind of science story that is easy to overlook next to politics. Twelve million people waiting for corneal transplants globally — that number is staggering."
+        },
+        {
+            "id": "c40",
+            "article_title": "Spanish Scientists Develop an Artificial Cornea From Fish Scales",
+            "author": "zanele.motha",
+            "parent_id": null,
+            "body": "The access angle is what matters most here. If this works in trials, can it be manufactured cheaply enough to reach eye clinics in sub-Saharan Africa? The technology is useless if the supply chain does not reach the people who need it."
+        },
+        {
+            "id": "c41",
+            "article_title": "Spanish Scientists Develop an Artificial Cornea From Fish Scales",
+            "author": "priya.naidoo",
+            "parent_id": "c40",
+            "body": "That is exactly the right question, and it is one that should be baked into the clinical trial design from the beginning — not treated as an afterthought once the wealthy-country approvals are secured."
+        },
+        {
+            "id": "c42",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "mpho.sithole",
+            "parent_id": null,
+            "body": "The contrast between these lived accounts and what gets amplified internationally is striking. Most people's daily reality here is far more complicated than either the crisis narrative or the boosterism allows for."
+        },
+        {
+            "id": "c43",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "ruan.duplessis",
+            "parent_id": "c42",
+            "body": "I think it is worth acknowledging that both things can be true at once. There are genuine safety concerns that affect everyone and there is also a politically motivated exaggeration of those concerns for audiences overseas."
+        },
+        {
+            "id": "c44",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "zanele.motha",
+            "parent_id": "c43",
+            "body": "What frustrates me is that the people promoting the persecution narrative are usually not the ones living with the actual consequences. They have audiences to perform to, not communities to support."
+        },
+        {
+            "id": "c45",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "stefan.meyer",
+            "parent_id": null,
+            "body": "From outside South Africa, the narrative that gets traction in European and American media is almost entirely the crisis version. Articles like this one rarely travel as far. That asymmetry shapes foreign policy in ways that affect South Africans who never leave."
+        },
+        {
+            "id": "c46",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "lerato.maseko",
+            "parent_id": "c45",
+            "body": "That asymmetry is exactly the problem. The people generating the narrative abroad benefit from the attention it creates. The people living here deal with the diplomatic and economic fallout of a story that does not reflect our daily lives."
+        },
+        {
+            "id": "c47",
+            "article_title": "Oscars 2026: 'One Battle After Another' and 'Sinners' Lead the Night",
+            "author": "zanele.motha",
+            "parent_id": null,
+            "body": "Demi Moore's speech was the highlight for me. She articulated something many people in her position never say publicly — that the industry told her repeatedly that she was not serious enough, and she proved it wrong on her own terms."
+        },
+        {
+            "id": "c48",
+            "article_title": "Oscars 2026: 'One Battle After Another' and 'Sinners' Lead the Night",
+            "author": "lerato.maseko",
+            "parent_id": "c47",
+            "body": "Agreed. And Michael B. Jordan winning for Sinners felt earned in the best possible way — a performance that was physical and interior at the same time. Coogler gets the best out of him every time."
+        },
+        {
+            "id": "c49",
+            "article_title": "Oscars 2026: 'One Battle After Another' and 'Sinners' Lead the Night",
+            "author": "priya.naidoo",
+            "parent_id": null,
+            "body": "Two thoughts: One Battle After Another deserved every award it got, and the fact that it was in French and still dominated an American ceremony says something about how the industry's taste is shifting."
+        },
+        {
+            "id": "c50",
+            "article_title": "War Around Iran Sends Shockwaves Through Energy Markets and Regional Security",
+            "author": "stefan.meyer",
+            "parent_id": null,
+            "body": "The emergency stockpile releases are a short-term signal, not a solution. If the Strait of Hormuz situation does not stabilise, the price pressure will return within weeks. Markets know this and are pricing in the uncertainty."
+        },
+        {
+            "id": "c51",
+            "article_title": "War Around Iran Sends Shockwaves Through Energy Markets and Regional Security",
+            "author": "priya.naidoo",
+            "parent_id": "c50",
+            "body": "The disruption to shipping insurance costs is being undercovered. When rates on vessels transiting the region spike, the cost passes through to every cargo using those routes — which means almost everything South Africa imports and exports."
+        },
+        {
+            "id": "c52",
+            "article_title": "War Around Iran Sends Shockwaves Through Energy Markets and Regional Security",
+            "author": "fatima.patel",
+            "parent_id": "c51",
+            "body": "The energy angle matters most for South Africa right now given where our fuel price is. Even people far from the conflict will feel it at the petrol station within a fortnight if this does not settle down."
+        },
+        {
+            "id": "c53",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "ruan.duplessis",
+            "parent_id": null,
+            "body": "Read the actual transcript. The prepared speech was almost entirely positive — investment, trade, shared values, praise for South African civil society. The 'Kill the Boer' question came in Q&A, not in his address. The media had its headline before he opened his mouth, and the organisers of that Q&A knew exactly what they were doing by allowing it."
+        },
+        {
+            "id": "c54",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "stefan.meyer",
+            "parent_id": "c53",
+            "body": "The trap argument is interesting but it still leaves Bozell responsible for his own answer. A seasoned diplomat in a sensitive posting should have seen that question coming from a mile away and deflected with something diplomatic. He chose not to. Whatever the intent of the questioner, his answer handed every editor in the country exactly what they needed."
+        },
+        {
+            "id": "c55",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "zanele.motha",
+            "parent_id": "c54",
+            "body": "Both things are true at the same time. The question was designed to corner him, and he gave the worst possible response. That is not a defence of the editorial framing — it is just what happened. You can criticise the press for how they used it and still acknowledge that he made it easy for them."
+        },
+        {
+            "id": "c56",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "sibusiso.naidoo",
+            "parent_id": null,
+            "body": "The part that keeps getting lost is that he is entirely entitled to think 'Kill the Boer' is hate speech. That is just an opinion — and plenty of South Africans across all communities share it. The court ruled on the legal question; his personal moral view is a separate matter. The problem was expressing it as a sitting ambassador at a business forum, not holding it."
+        },
+        {
+            "id": "c57",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "priya.naidoo",
+            "parent_id": "c56",
+            "body": "Exactly the right distinction. No one should be required to agree with a court ruling as a matter of personal conscience — that is what free expression actually means. What matters is venue, timing, and the position he holds. He answered as if he were a private citizen, not as the representative of a foreign government on South African soil."
+        },
+        {
+            "id": "c58",
+            "article_title": "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+            "author": "priya.naidoo",
+            "parent_id": null,
+            "body": "I will say what many hesitate to: this is the right call and it is working. Communities in Riverlea and the Cape Flats have been pleading for state intervention for years while politicians debated oversight frameworks and exit strategies. The families living there are not interested in theory — they want to collect their children from school without a shootout. Sometimes urgency has to override procedural purity."
+        },
+        {
+            "id": "c59",
+            "article_title": "South Africa's Economy Grew 1.1% in 2025, Missing Official Forecasts",
+            "author": "zanele.motha",
+            "parent_id": null,
+            "body": "I want to push back on the consensus in this thread. 1.1 percent growth in a year when load shedding continued, the Iran conflict disrupted global supply chains, and the Eurozone barely expanded is not the failure the headlines imply. We are measuring South Africa against its own ambitious forecasts rather than against comparable conditions elsewhere. That comparison is not entirely honest."
+        },
+        {
+            "id": "c60",
+            "article_title": "South Africa Records First Current Account Surplus Since 2023",
+            "author": "priya.naidoo",
+            "parent_id": "c14",
+            "body": "The windfall criticism is valid but the implied dismissal is not. A surplus means South Africa is not borrowing from the world to fund its consumption — that matters structurally regardless of what generated it. The policy question is how to convert a commodity-driven improvement into lasting investment. Treating the number as meaningless because it was not planned misses the point entirely."
+        },
+        {
+            "id": "c61",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "stefan.meyer",
+            "parent_id": null,
+            "body": "The article conflates two different groups: people who returned because life abroad was harder than expected, and people who have not returned because the safety concerns that drove them to leave remain real and unresolved. These are not the same story. The returnees' experience is encouraging, but presenting it as a rebuttal to the concerns of those who stayed away does not hold up under scrutiny."
+        },
+        {
+            "id": "c62",
+            "article_title": "Ukraine War Escalates Again as Moscow Reports Major Drone Attack",
+            "author": "fatima.patel",
+            "parent_id": null,
+            "body": "The overnight Russian bombardment — 430 drones and 68 missiles in a single night — is the figure that should lead every story about this conflict. Whatever the politics, that scale of sustained assault on schools, residential buildings, and power infrastructure has no coherent military justification. The civilian toll is the story."
+        },
+        {
+            "id": "c63",
+            "article_title": "Ukraine War Escalates Again as Moscow Reports Major Drone Attack",
+            "author": "ruan.duplessis",
+            "parent_id": "c62",
+            "body": "The human toll on the Ukrainian side is undeniable and I am not minimising it. But the framing that treats Ukrainian drone strikes on Moscow differently deserves scrutiny. If 430 projectiles targeting populated areas is unjustifiable when Russia launches them, the same standard should apply to deep-strike operations on Russian cities. Consistent principles, or we are picking sides dressed as moral reasoning."
+        },
+        {
+            "id": "c64",
+            "article_title": "Ukraine War Escalates Again as Moscow Reports Major Drone Attack",
+            "author": "sibusiso.naidoo",
+            "parent_id": "c63",
+            "body": "The equivalence argument sounds balanced but it obscures a fundamental asymmetry. One side crossed an internationally recognised border, occupied territory, and is systematically destroying a neighbouring country to break its will. The other is trying to make that campaign costly enough that it stops. The moral weight of those two positions is not the same, even when the weapons look similar."
+        },
+        {
+            "id": "c65",
+            "article_title": "Ukraine War Escalates Again as Moscow Reports Major Drone Attack",
+            "author": "stefan.meyer",
+            "parent_id": null,
+            "body": "The line buried near the end of this article — that diplomatic efforts are stalled — is the only sentence that matters. Every week this continues costs thousands of lives on both sides and permanently narrows the range of tolerable outcomes. I am less interested in relitigating the history than in what it would actually take to stop the killing. Nobody in any position of authority seems to be asking that question seriously."
+        },
+        {
+            "id": "c66",
+            "article_title": "Ukraine War Escalates Again as Moscow Reports Major Drone Attack",
+            "author": "mpho.sithole",
+            "parent_id": "c65",
+            "body": "The call for negotiation always sounds reasonable from a distance until you specify whose terms. A settlement that locks in Russian occupation rewards an invasion with permanent territorial gain — and signals to every country with a larger neighbour that international law is negotiable under sufficient military pressure. Ukraine decides when it has had enough. That is not outside observers' call to make."
+        },
+        {
+            "id": "c67",
+            "article_title": "Kipchoge Starts His Continental Quest in Cape Town With First Marathon in Africa",
+            "author": "zanele.motha",
+            "parent_id": "c30",
+            "body": "I will respectfully push back. Cape Town built on existing strengths, delivered a world-class event, and attracted arguably the greatest distance runner in history to the continent for the first time. Using that achievement as a launchpad to argue about what Limpopo did not receive is fair as a policy point, but it deflates something genuinely worth being proud of without qualification."
+        },
+        {
+            "id": "c68",
+            "article_title": "Oscars 2026: 'One Battle After Another' and 'Sinners' Lead the Night",
+            "author": "ruan.duplessis",
+            "parent_id": null,
+            "body": "Contrarian take: the ceremony was 40 minutes too long, the speeches spent more time on political positioning than on the work itself, and several of the headline winners were films most people accessed through a streaming subscription rather than actively chose to see. The films may be excellent. The Oscars as a television event has become an endurance test in collective self-congratulation."
+        },
+        {
+            "id": "c69",
+            "article_title": "Oscars 2026: 'One Battle After Another' and 'Sinners' Lead the Night",
+            "author": "lerato.maseko",
+            "parent_id": "c68",
+            "body": "You are not wrong about the length. But the streaming point cuts both ways — those films would not exist without streaming budgets, and they reached far wider audiences than theatrical distribution alone would have found. What cinema means is a live question. The Oscars adjusting to that reality is not necessarily a failure, even if the ceremony format has not kept pace."
+        },
+        {
+            "id": "c70",
+            "article_title": "Spanish Scientists Develop an Artificial Cornea From Fish Scales",
+            "author": "stefan.meyer",
+            "parent_id": "c39",
+            "body": "Worth adding a note of caution alongside the excitement: the distance from promising laboratory results to affordable clinical availability in low-income countries is typically fifteen to twenty years, multiple failed trials, and a separate regulatory process in each jurisdiction. We have been here before with treatments that looked transformative at exactly this stage. The science may be real and still never reach the patients who need it most."
+        },
+        {
+            "id": "c71",
+            "article_title": "FlySafair Adds Temporary Fuel Surcharge as Jet Fuel Prices Surge",
+            "author": "mpho.sithole",
+            "parent_id": null,
+            "body": "FlySafair's transparency is admirable, but let us not let the government off the hook entirely. The fuel tax structure that makes South African domestic aviation so expensive relative to regional peers is a policy choice, not an inevitability. When a temporary external shock arrives, it lands on a base price that is already inflated by decisions made in Pretoria. The airline is not the problem here."
+        },
+        {
+            "id": "c72",
+            "article_title": "Ramaphosa Authorises Troop Deployment as Government Escalates Anti-Crime Response",
+            "author": "zanele.motha",
+            "parent_id": "c58",
+            "body": "I hear you and I am not going to argue the theory this time. I lost someone close three years ago to gang violence and I am still waiting for the state to treat it with the urgency it deserves. You can work through the oversight debate and the exit strategy — those of us who have buried someone just want somebody to show up. So yes. Show up."
+        },
+        {
+            "id": "c73",
+            "article_title": "Ukraine War Escalates Again as Moscow Reports Major Drone Attack",
+            "author": "zanele.motha",
+            "parent_id": "c65",
+            "body": "Stefan, I know the diplomatic framing is important and I agree with the substance of what you are saying. But I have been reading these updates since the start of this war and I cannot absorb another casualty line without feeling something break a little. Six people killed overnight. Six people who had nothing to do with any of it. The negotiation debate feels very far away from that."
+        },
+        {
+            "id": "c74",
+            "article_title": "Pretoria Seeks Clarification After US Envoy's Undiplomatic Remarks",
+            "author": "ruan.duplessis",
+            "parent_id": "c56",
+            "body": "Honestly? For the first time in a long time I felt something like relief. Someone in a position of authority said publicly what many of us have been saying for years and been told to keep quiet about. I am genuinely grateful for that. The usual response is to dismiss it, to call it right-wing panic, to say the court has ruled so the conversation is closed. But think about it from the outside: any rational person watching a faction sing a word meaning 'kill' directed specifically at a minority group would call it what it is. It takes a particular ideological commitment to look at that and insist it is not hateful. That commitment is not neutrality — it is the leftist agenda suppressing a legitimate free speech argument because the answer is inconvenient."
+        },
+        {
+            "id": "c75",
+            "article_title": "Kipchoge Starts His Continental Quest in Cape Town With First Marathon in Africa",
+            "author": "lerato.maseko",
+            "parent_id": "c30",
+            "body": "Mpho, I agree with the infrastructure point completely and I will be back to arguing for it tomorrow. But can I admit that when Kipchoge crossed that finish line on African soil for the very first time, I cried? Properly cried. There are moments that exist before the political conversation catches up with them, and this was one of those moments."
+        },
+        {
+            "id": "c76",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "fatima.patel",
+            "parent_id": "c61",
+            "body": "Stefan I think your analytical point holds. But I want to add something else: I have close friends who left and came back, and the loneliness they describe from abroad — the feeling of being a stranger in a country they thought would feel like home — is a different kind of pain to the safety stories, and just as real. This country does something to you whether you stay or go. That does not fit neatly into either the crisis narrative or the rebuttal."
+        },
+        {
+            "id": "c81",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "priya.naidoo",
+            "parent_id": null,
+            "body": "Whatever the politics surrounding it, these are people who genuinely believed they were in danger. I will not second-guess a family that made that decision under that pressure. If the US wants to offer a pathway, that is between them and the people who take it up. The label of refugee is the least important part of the conversation."
+        },
+        {
+            "id": "c82",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "sibusiso.naidoo",
+            "parent_id": "c81",
+            "body": "I do not object to people seeking safety if they feel they need to. What I object to is the 'refugee' designation being used as a geopolitical instrument. Refugee status carries legal and moral weight built over decades of international law — it was designed for people fleeing war and famine. Applying it here distorts that framework. Call it a special visa, call it an emigration programme, but the word refugee is doing political work that has nothing to do with the individuals involved."
+        },
+        {
+            "id": "c83",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "lerato.maseko",
+            "parent_id": "c82",
+            "body": "Exactly right. The distinction matters globally, not just here. Every time the refugee label is stretched for political convenience, it weakens the protection it provides to the millions of people worldwide who have no other option. You can support people's freedom to move and still insist the terminology is used honestly."
+        },
+        {
+            "id": "c84",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "mpho.sithole",
+            "parent_id": null,
+            "body": "Honestly — if sections of this community spent three decades resisting every corrective policy, treating transformation as a personal attack, and now need a foreign government's refugee programme to feel at home, perhaps the fit was never quite right. This country moved forward. Not everyone chose to move with it."
+        },
+        {
+            "id": "c85",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "ruan.duplessis",
+            "parent_id": "c84",
+            "body": "And there it is. Comments like 'perhaps the fit was never quite right' for a specific community — that is exactly what drives people out. You do not want certain South Africans here. You can wrap it in the language of transformation all you like. What you are expressing is that some people's belonging is conditional. Say it plainly."
+        },
+        {
+            "id": "c86",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "mpho.sithole",
+            "parent_id": "c85",
+            "body": "I said nothing about race. I critiqued a political attitude — the refusal to accept democratic change. You immediately turned that into a statement about race and now you want to call me a racist and someone who hates white people. That pivot is not an argument, it is a silencing tactic. And it has been used to shut down legitimate political debate in this country for long enough. I will not be quiet because the accusation makes you comfortable."
+        },
+        {
+            "id": "c87",
+            "article_title": "Some White South Africans Return Home, Rejecting the Persecution Narrative",
+            "author": "zanele.motha",
+            "parent_id": null,
+            "body": "⚠ï¸ Moderator note: The thread below (c84 onwards) is on the line. Mpho — 'the fit was never quite right' applied to a community is not a political argument, it is a statement about people's right to belong here. That crosses into territory we do not allow regardless of the intent behind it. Ruan — responding to a policy critique with a direct accusation of racism and hatred directed at a fellow commenter, instead of engaging the substance, is exactly the kind of escalation that poisons these conversations. Both approaches shut down debate rather than advance it. This is a final warning for this thread: argue the policy, argue the label, argue the history. Do not argue about whether specific people belong here, and do not make accusations about what is in another commenter's heart. The next violation in this thread will result in removal."
+        },
+        {
+            "id": "c88",
+            "article_title": "Anjanet Krüger: At Sixteen, a Natural Talent Alongside South Africa's Finest Artists",
+            "author": "lerato.maseko",
+            "parent_id": null,
+            "body": "I do not usually stop at arts stories but this one stopped me completely. Traditional painting, self-taught digital illustration, and Disney-quality animation — all three, at sixteen, with no formal training. That is not one talent developing on schedule. That is something genuinely unusual."
+        },
+        {
+            "id": "c89",
+            "article_title": "Anjanet Krüger: At Sixteen, a Natural Talent Alongside South Africa's Finest Artists",
+            "author": "fatima.patel",
+            "parent_id": "c88",
+            "body": "The Krita animation detail is what struck me most. That platform has a steep learning curve even for adults with professional backgrounds. She taught herself, developed a consistent technique, and is producing work that stops experienced animators. The confidence in that mark-making the article describes — you either have that instinct or you do not. She clearly does."
+        },
+        {
+            "id": "c90",
+            "article_title": "Anjanet Krüger: At Sixteen, a Natural Talent Alongside South Africa's Finest Artists",
+            "author": "priya.naidoo",
+            "parent_id": "c89",
+            "body": "I genuinely hope someone in the international animation and fine art world is paying attention. Talent like this at this age, with time and proper support, could carry South Africa's name into galleries and studios far beyond our borders. We have the raw material. What she needs now is a pathway that matches the scale of what she is already doing."
+        },
+        {
+            "id": "c91",
+            "article_title": "Anjanet Krüger: At Sixteen, a Natural Talent Alongside South Africa's Finest Artists",
+            "author": "mpho.sithole",
+            "parent_id": null,
+            "body": "How many Anjanets are there who never make it to a single column? The ones who never had a teacher who noticed, or parents who could afford the materials, or a quiet room to work in, or an internet connection fast enough to learn from. I am genuinely glad this one got seen. I just cannot stop thinking about the ones who did not."
+        },
+        {
+            "id": "c92",
+            "article_title": "Anjanet Krüger: At Sixteen, a Natural Talent Alongside South Africa's Finest Artists",
+            "author": "zanele.motha",
+            "parent_id": "c91",
+            "body": "That is the question that should follow every story like this. The talent itself is extraordinary and the article is right to celebrate it. But the pipeline that gets talent noticed is fragile and deeply unequal. If she had grown up somewhere without reliable internet, a stable home, or parents who took the work seriously, we would never know her name. The gift is hers. The platform was not guaranteed."
+        },
+        {
+            "id": "c93",
+            "article_title": "Anjanet Krüger: At Sixteen, a Natural Talent Alongside South Africa's Finest Artists",
+            "author": "sibusiso.naidoo",
+            "parent_id": "c92",
+            "body": "Which is precisely why stories like this matter beyond the individual profile. They make the case for arts funding, for talent identification in under-resourced schools, for treating creative work as a serious career path rather than a hobby. If even one decision-maker reads this and channels resources toward finding the next Anjanet, the article will have done more than a profile usually does."
+        },
+        {
+            "id": "c94",
+            "article_title": "Israel and Lebanon Expected to Hold Talks Soon, Officials Say",
+            "author": "ruan.duplessis",
+            "parent_id": null,
+            "body": "Israel has the right to defend itself from a movement that has stated plainly it does not accept its existence. That said, the most effective long-term defence is a political framework that removes Hezbollah's justifications and gives the Lebanese state room to govern its own territory. State-to-state talks are the right direction. I will take this seriously if both sides do."
+        },
+        {
+            "id": "c95",
+            "article_title": "Israel and Lebanon Expected to Hold Talks Soon, Officials Say",
+            "author": "stefan.meyer",
+            "parent_id": "c94",
+            "body": "The ceasefire has held considerably longer than most analysts expected, which suggests there is something to build on. The harder question is whether the domestic political conditions on both sides allow for the compromises any lasting framework requires. Talks are a necessary condition. They are nowhere near a sufficient one."
+        },
+        {
+            "id": "c96",
+            "article_title": "Israel and Lebanon Expected to Hold Talks Soon, Officials Say",
+            "author": "fatima.patel",
+            "parent_id": null,
+            "body": "I have found it very difficult to watch what happened in Lebanon over the past two years. The scale of civilian destruction was beyond anything that could be justified by legitimate security objectives. But if these talks produce something real — a genuine withdrawal, a political framework, conditions that make another round of this less likely — I will be the first to welcome it. Peace matters more than being right about who caused this."
+        },
+        {
+            "id": "c97",
+            "article_title": "Israel and Lebanon Expected to Hold Talks Soon, Officials Say",
+            "author": "mpho.sithole",
+            "parent_id": "c96",
+            "body": "Both things are true and it is important to hold them at the same time: October 7th was monstrous, and what followed in Lebanon far exceeded any proportionate response. If these talks can break the cycle rather than just pause it, that is worth engaging with — even if it requires accepting outcomes that feel uncomfortable given how we got here. The people living on both sides of that border have had enough."
+        },
+        {
+            "id": "c98",
+            "article_title": "Israel and Lebanon Expected to Hold Talks Soon, Officials Say",
+            "author": "priya.naidoo",
+            "parent_id": "c97",
+            "body": "That is exactly where I land. I am not going to pretend I am satisfied with how any of this unfolded. But an imperfect peace that holds is worth more than a principled ongoing war. The families burying their children on both sides are not interested in who history vindicates. They want it to stop."
+        },
+        {
+            "id": "c99",
+            "article_title": "Israel and Lebanon Expected to Hold Talks Soon, Officials Say",
+            "author": "lerato.maseko",
+            "parent_id": null,
+            "body": "I want to be hopeful and I am trying to be. What gives me pause is that we have been here before — talks in 2006, frameworks after 2014, ceasefires that became negotiations that became nothing. Every round raises hope and every round finds a way to collapse. What is structurally different this time?"
+        },
+        {
+            "id": "c100",
+            "article_title": "Israel and Lebanon Expected to Hold Talks Soon, Officials Say",
+            "author": "sibusiso.naidoo",
+            "parent_id": "c99",
+            "body": "The structural difference — if there is one — is that Hezbollah's military capacity has been significantly degraded, which changes the incentive calculation on both sides. That is not optimism, it is just the arithmetic. Whether the political will exists to convert that arithmetic into a durable agreement before the next flashpoint resets everything is the question nobody can answer yet. But the conditions for a deal are more present than they have been in a long time."
+        },
+        {
+            "id": "c77",
+            "article_title": "War Around Iran Sends Shockwaves Through Energy Markets and Regional Security",
+            "author": "ruan.duplessis",
+            "parent_id": null,
+            "body": "Can we be honest about something? South Africa's hand-wringing about 'geopolitical implications' would carry more weight if the government had ever been consistent about condemning state-sponsored aggression. Iran has funded and directed proxy forces across the region for decades. The silence from Pretoria when it suits them tells you exactly what 'non-alignment' actually means."
+        },
+        {
+            "id": "c78",
+            "article_title": "War Around Iran Sends Shockwaves Through Energy Markets and Regional Security",
+            "author": "sibusiso.naidoo",
+            "parent_id": "c77",
+            "body": "There it is — the assumption that any foreign policy position other than Washington's default is either naive or unprincipled. South Africa is not obligated to frame every conflict through a Western lens. And if consistency is the standard you want to apply, perhaps start with the allies who have been bombing civilian infrastructure for the past two years. But I suppose that does not count."
+        },
+        {
+            "id": "c79",
+            "article_title": "War Around Iran Sends Shockwaves Through Energy Markets and Regional Security",
+            "author": "ruan.duplessis",
+            "parent_id": "c78",
+            "body": "I did not mention any allies and you know it. That pivot — dragging in a completely separate conflict the moment someone challenges the position — is exactly the kind of bad-faith move that makes this debate impossible. If you cannot defend the actual argument, say so. Do not just throw whatever is most inflammatory at the wall and call it a rebuttal. Honestly."
+        },
+        {
+            "id": "c80",
+            "article_title": "War Around Iran Sends Shockwaves Through Energy Markets and Regional Security",
+            "author": "zanele.motha",
+            "parent_id": "c79",
+            "body": "⚠ï¸ Moderator note — This thread is crossing into personal territory. Ruan, 'bad-faith' and 'Honestly' directed at another commenter in that tone are on the boundary of what we allow. Sibusiso, bringing in unrelated conflicts as a deflection is not fair to the original argument either. Both of you: address the substance, not each other. The next comment in this thread that targets the person rather than the point will be removed without warning. You are both capable of better than this."
+        },
+        {
+            "id": "c101",
+            "article_title": "MTN Returns to Profit as African Operations Lift Group Performance",
+            "author": "priya.naidoo",
+            "parent_id": null,
+            "body": "The MTN Nigeria rebound is doing a lot of work here, but it still matters. A continental operator does not survive sixteen markets without at least a few engines pulling hard at the same time."
+        },
+        {
+            "id": "c102",
+            "article_title": "MTN Returns to Profit as African Operations Lift Group Performance",
+            "author": "sibusiso.naidoo",
+            "parent_id": "c101",
+            "body": "True, and the data and fintech numbers are probably the more durable signal. Voice revenue can plateau, but if Mobile Money and data usage keep compounding the group has a clearer long-term story."
+        },
+        {
+            "id": "c103",
+            "article_title": "MTN Returns to Profit as African Operations Lift Group Performance",
+            "author": "lerato.maseko",
+            "parent_id": null,
+            "body": "The dividend increase will please shareholders, but I am more interested in whether ordinary customers see service improvements. Profit recovery reads differently when dropped calls and expensive data remain part of daily life."
+        },
+        {
+            "id": "c104",
+            "article_title": "MTN Returns to Profit as African Operations Lift Group Performance",
+            "author": "ruan.duplessis",
+            "parent_id": "c103",
+            "body": "That is fair, although the capital expenditure number suggests they are at least putting money back into the network. The question is how much of that spend reaches South Africa versus the faster-growing markets."
+        },
+        {
+            "id": "c105",
+            "article_title": "MTN Returns to Profit as African Operations Lift Group Performance",
+            "author": "mpho.sithole",
+            "parent_id": "c104",
+            "body": "And whether affordability improves. Network expansion matters, but if households still ration data because prices are high, the digital inclusion story remains incomplete."
+        },
+        {
+            "id": "c106",
+            "article_title": "South Africa Rejects US Pressure to Distance Itself From Iran",
+            "author": "fatima.patel",
+            "parent_id": null,
+            "body": "Pretoria was right not to accept a foreign policy dictated through public pressure. If Washington wants cooperation, it has to argue its case rather than treating South Africa as a junior partner."
+        },
+        {
+            "id": "c107",
+            "article_title": "South Africa Rejects US Pressure to Distance Itself From Iran",
+            "author": "stefan.meyer",
+            "parent_id": "c106",
+            "body": "I agree on the principle, but the economic risk is real. Once AGOA and broader trade preferences enter the discussion, business confidence becomes part of the diplomatic cost."
+        },
+        {
+            "id": "c108",
+            "article_title": "South Africa Rejects US Pressure to Distance Itself From Iran",
+            "author": "lerato.maseko",
+            "parent_id": "c107",
+            "body": "That is why Dangor's tone mattered. He pushed back without closing the door. South Africa needs room to defend policy independence and still protect jobs tied to the US relationship."
+        },
+        {
+            "id": "c109",
+            "article_title": "South Africa Rejects US Pressure to Distance Itself From Iran",
+            "author": "mpho.sithole",
+            "parent_id": null,
+            "body": "The deeper issue is that Washington keeps framing disagreement as disloyalty. A sovereign country can oppose the war on Iran and still want a functional relationship with the United States."
+        },
+        {
+            "id": "c110",
+            "article_title": "South Africa Rejects US Pressure to Distance Itself From Iran",
+            "author": "priya.naidoo",
+            "parent_id": "c109",
+            "body": "Yes, but the government also needs a clearer contingency plan if the relationship worsens. Principle is easier to defend when you have already mapped the economic fallback."
+        },
+        {
+            "id": "c111",
+            "article_title": "Ukraine and US Teams End Florida Talks With Possible New POW Exchange on the Table",
+            "author": "lerato.maseko",
+            "parent_id": null,
+            "body": "A prisoner exchange would not end the war, but it would matter enormously to the families involved. Sometimes the most credible sign that talks are useful is a concrete humanitarian result."
+        },
+        {
+            "id": "c112",
+            "article_title": "Ukraine and US Teams End Florida Talks With Possible New POW Exchange on the Table",
+            "author": "fatima.patel",
+            "parent_id": "c111",
+            "body": "Agreed, though I would still be cautious about overselling it. POW exchanges are important and humane, but they can also become symbolic wins that leave the underlying territorial deadlock untouched."
+        },
+        {
+            "id": "c113",
+            "article_title": "Ukraine and US Teams End Florida Talks With Possible New POW Exchange on the Table",
+            "author": "stefan.meyer",
+            "parent_id": "c112",
+            "body": "That is true, but repeated humanitarian exchanges can still build a minimum level of trust. In a conflict this entrenched, small working channels are often the only channels available."
+        },
+        {
+            "id": "c114",
+            "article_title": "Ukraine and US Teams End Florida Talks With Possible New POW Exchange on the Table",
+            "author": "mpho.sithole",
+            "parent_id": null,
+            "body": "I remain skeptical of the Florida format itself. Kushner and Witkoff may secure headlines, but the real test is whether either side leaves with incentives strong enough to shift battlefield decisions."
+        },
+        {
+            "id": "c115",
+            "article_title": "Ukraine and US Teams End Florida Talks With Possible New POW Exchange on the Table",
+            "author": "priya.naidoo",
+            "parent_id": "c114",
+            "body": "Fair, although if the talks produce another exchange or a safer corridor for prisoners, families will not care who was in the room. The diplomatic branding matters less than the outcome."
+        },
+        {
+            "id": "c116",
+            "article_title": "MTN Returns to Profit as African Operations Lift Group Performance",
+            "author": "stefan.meyer",
+            "parent_id": null,
+            "created_at": "2026-03-19T08:35:00Z",
+            "body": "I think the headline flatters MTN a bit too much. A return to profit after a bad year is not the same thing as a healthy long-term position, especially when so much of the bounce comes from Nigeria and currency effects. Investors may celebrate, but customers are still dealing with expensive data and uneven service."
+        },
+        {
+            "id": "c117",
+            "article_title": "MTN Returns to Profit as African Operations Lift Group Performance",
+            "author": "priya.naidoo",
+            "parent_id": "c116",
+            "created_at": "2026-03-19T09:02:00Z",
+            "body": "That is fair, but the article did not say the business was fixed. Returning to profit matters because it buys the group room to invest rather than cut back. The real test is whether that stronger balance sheet turns into better coverage, lower churn, and more competitive pricing over the next year."
+        },
+        {
+            "id": "c118",
+            "article_title": "South Africa Rejects US Pressure to Distance Itself From Iran",
+            "author": "ruan.duplessis",
+            "parent_id": null,
+            "created_at": "2026-03-24T07:45:00Z",
+            "body": "I disagree with the framing here. South Africa does not need to take orders from Washington, but it also should not pretend the Iran relationship is purely symbolic or consequence-free. If Pretoria wants to defend its position credibly, it needs to explain what strategic value it gets from that tie and where it draws the line when Iranian regional conduct raises obvious security and energy risks."
+        },
+        {
+            "id": "c119",
+            "article_title": "South Africa Rejects US Pressure to Distance Itself From Iran",
+            "author": "lerato.maseko",
+            "parent_id": "c118",
+            "created_at": "2026-03-24T08:16:00Z",
+            "body": "That is a fair challenge, but the line cannot be that South Africa adjusts its foreign policy whenever a larger power threatens economic pain. A better standard is transparency: explain the national interest clearly, keep diplomatic channels open, and prepare for retaliation instead of outsourcing principle to Washington."
+        },
+        {
+            "id": "c120",
+            "article_title": "South Africa Rejects US Pressure to Distance Itself From Iran",
+            "author": "stefan.meyer",
+            "parent_id": "c119",
+            "created_at": "2026-03-24T08:54:00Z",
+            "body": "Exactly, and that preparation piece is what has been missing from government communication. Strategic autonomy is more persuasive when it comes with a sober account of the trade-offs and a plan for the costs."
+        }
+    ]
+}

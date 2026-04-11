@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Privacy Policy &mdash; The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+  <div class="col-lg-8">
+
+    <div class="section-rule mb-4">
+      <span class="section-rule__label">Privacy Policy</span>
+    </div>
+
+    <h1 class="article-headline mb-3">Privacy Policy</h1>
+    <p class="lead mb-4">
+      The Daily Indaba collects only the information required to operate a
+      subscription-based news platform. We do not sell personal data, and we do
+      not share reader activity with advertisers because the platform carries no
+      advertising.
+    </p>
+    <p class="small text-muted mb-5">
+      Version <strong>March 2026 (v1)</strong>. This policy should be read
+      together with our <a href="{% url 'accounts:terms_and_conditions' %}">Terms and Conditions</a>.
+    </p>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+      <h2 class="h5 mb-3">What We Collect</h2>
+      <ul class="small mb-0">
+        <li>Account information such as username, email address, role, and encrypted password.</li>
+        <li>Profile information you choose to add, including display name, biography, and profile picture.</li>
+        <li>Subscription and billing preferences, including journalist, publisher, and all-articles plans selected on the platform.</li>
+        <li>Platform activity required to deliver the service, such as articles authored, newsletters created, comments posted, and subscription actions.</li>
+      </ul>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+      <h2 class="h5 mb-3">How We Use It</h2>
+      <ul class="small mb-0">
+        <li>To create and secure your account.</li>
+        <li>To provide access to subscribed content and manage subscription status.</li>
+        <li>To operate editorial, commenting, subscription, and publisher workflows on the platform.</li>
+        <li>To send essential service emails such as password resets, account notices, and subscription confirmations.</li>
+      </ul>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+      <h2 class="h5 mb-3">How We Protect and Share Data</h2>
+      <p class="small text-muted mb-3">
+        We process personal information in line with South Africa's
+        <strong>Protection of Personal Information Act (POPIA)</strong>.
+      </p>
+      <ul class="small mb-0">
+        <li>We do not sell personal information to advertisers, brokers, or unrelated third parties.</li>
+        <li>We limit data access to the platform functions and roles that require it.</li>
+        <li>We may retain records needed for legal compliance, security, and audit purposes.</li>
+        <li>Where disclosure is required by law, court order, or a legitimate enforcement request, we may disclose the minimum information necessary.</li>
+      </ul>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+      <h2 class="h5 mb-3">Your Rights</h2>
+      <ul class="small mb-0">
+        <li>You may review and update your account details through your profile.</li>
+        <li>You may request account deletion, subject to any records we must retain for legal or operational reasons.</li>
+        <li>You may contact us to ask what personal information we hold about you or to raise a privacy concern.</li>
+      </ul>
+    </div>
+
+    <div class="card border-0 bg-light rounded-3 p-4">
+      <h2 class="h6 fw-bold mb-2">Privacy Contact</h2>
+      <p class="small text-muted mb-2">
+        For privacy-related questions, access requests, or complaints, contact
+        us at <a href="mailto:privacy@dailyindaba.co.za">privacy@dailyindaba.co.za</a>.
+      </p>
+      <p class="small text-muted mb-0">
+        General editorial and corrections contacts remain available on the
+        <a href="{% url 'news:contact' %}">Contact</a> page.
+      </p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

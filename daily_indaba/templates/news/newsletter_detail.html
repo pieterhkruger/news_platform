@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}{{ newsletter.title }} — The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-3">
+  <div class="col-lg-9">
+
+    <header class="mb-4">
+      <span class="badge bg-dark mb-2">
+        {% if newsletter.category %}
+        {{ newsletter.category.name }}
+        {% else %}
+        Multi-category edition
+        {% endif %}
+      </span>
+      <h1 class="article-headline">{{ newsletter.title }}</h1>
+      <p class="text-muted small">
+        Curated by
+        {% if newsletter.author.role == 'journalist' %}
+        <a href="{% url 'news:journalist_profile' newsletter.author.pk %}"
+           class="fw-semibold text-decoration-none">
+          {{ newsletter.author.public_name }}
+        </a>
+        {% else %}
+        <span class="fw-semibold">{{ newsletter.author.public_name }}</span>
+        {% endif %}
+        &middot; {{ newsletter.created_at|date:"j N Y" }}
+      </p>
+      {% if newsletter.description %}
+      <p class="lead">{{ newsletter.description }}</p>
+      {% endif %}
+    </header>
+
+    <div class="section-rule mb-4">
+      <span class="section-rule__label">
+        Articles in this edition ({{ articles.count }})
+      </span>
+    </div>
+
+    {% if articles %}
+    <div class="row row-cols-1 g-3">
+      {% for article in articles %}
+      <div class="col">
+        <article class="card border-0 shadow-sm">
+          <div class="card-body d-flex align-items-start gap-3">
+            {% if article.image %}
+            <img src="{{ article.image.url }}"
+                 class="rounded-2 flex-shrink-0"
+                 style="width:80px;height:60px;object-fit:cover;"
+                 alt="{{ article.title }}">
+            {% endif %}
+            <div class="flex-grow-1">
+              <div class="mb-1">
+                {% if article.importance == 1 %}
+                  <span class="badge bg-danger">Front Page</span>
+                {% elif article.importance == 2 %}
+                  <span class="badge bg-warning text-dark">Top Story</span>
+                {% endif %}
+              </div>
+              <h3 class="h5 mb-1">
+                <a href="{% url 'news:article_detail' article.pk %}"
+                   class="text-decoration-none article-headline-link">
+                  {{ article.title }}
+                </a>
+              </h3>
+              <p class="text-muted small mb-0">
+                {{ article.content|striptags|truncatewords:20 }}
+              </p>
+              <small class="text-muted">
+                By {{ article.author.public_name }}
+                &middot; {{ article.publication_date|date:"j N Y" }}
+              </small>
+            </div>
+          </div>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-file-earmark-text display-1 d-block mb-3"></i>
+      <p>No approved articles in this edition yet.</p>
+    </div>
+    {% endif %}
+
+    <!-- Editor/journalist actions -->
+    {% if user.role == 'editor' or newsletter.author == user %}
+    <div class="mt-4 d-flex gap-2">
+      <a href="{% url 'news:newsletter_edit' newsletter.pk %}"
+         class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-pencil-square me-1"></i>Edit
+      </a>
+      <a href="{% url 'news:newsletter_delete' newsletter.pk %}"
+         class="btn btn-outline-danger btn-sm">
+        <i class="bi bi-trash me-1"></i>Delete
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

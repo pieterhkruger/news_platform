@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Approval Queue — The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mt-3 mb-4">
+  <h1 class="h2 mb-0">
+    <i class="bi bi-inbox me-2"></i>Approval Queue
+    <span class="badge bg-danger ms-2 fs-5">{{ pending.count }}</span>
+  </h1>
+  <a href="{% url 'news:editor_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+    &larr; Dashboard
+  </a>
+</div>
+
+{% if pending %}
+<div class="list-group shadow-sm">
+  {% for article in pending %}
+  <div class="list-group-item list-group-item-action p-4">
+    <div class="row align-items-start g-3">
+
+      <div class="col-md-8">
+        <!-- Badges -->
+        <div class="mb-2 d-flex gap-2 flex-wrap">
+          {% if article.importance == 1 %}
+            <span class="badge bg-danger">Front Page</span>
+          {% elif article.importance == 2 %}
+            <span class="badge bg-warning text-dark">Top Story</span>
+          {% else %}
+            <span class="badge bg-secondary">Standard</span>
+          {% endif %}
+          {% if article.publisher %}
+            <span class="badge bg-dark">{{ article.publisher.name }}</span>
+          {% endif %}
+        </div>
+
+        <h3 class="h5 fw-bold mb-1">{{ article.title }}</h3>
+        <p class="text-muted small mb-2">
+          By
+          <a href="{% url 'news:journalist_profile' article.author.pk %}">
+            {{ article.author.public_name }}
+          </a>
+          &middot; Submitted {{ article.created_at|date:"j N Y, P" }}
+        </p>
+        <p class="small mb-0">
+          {{ article.content|striptags|truncatewords:40 }}
+        </p>
+        {% if article.disclaimer %}
+        <div class="disclaimer-banner mt-2">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>
+          <strong>Disclaimer:</strong> {{ article.disclaimer }}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Action buttons -->
+      <div class="col-md-4 d-flex flex-column gap-2">
+        <a href="{% url 'news:article_detail' article.pk %}"
+           class="btn btn-outline-secondary btn-sm w-100">
+          <i class="bi bi-eye me-1"></i>Read full article
+        </a>
+
+        <form method="post" action="{% url 'news:article_approve' article.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success btn-sm w-100">
+            <i class="bi bi-check-circle me-1"></i>Approve &amp; Publish
+          </button>
+        </form>
+
+        <form method="post" action="{% url 'news:article_reject' article.pk %}">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label for="editor-comment-{{ article.pk }}"
+                   class="form-label small fw-semibold mb-1">
+              {{ rejection_form.reason.label }}
+            </label>
+            <textarea name="reason"
+                      id="editor-comment-{{ article.pk }}"
+                      rows="3"
+                      class="form-control"
+                      placeholder="Add revision comments for the journalist (optional)."></textarea>
+          </div>
+          <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+            <i class="bi bi-x-circle me-1"></i>Return to Journalist
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-5 text-muted">
+  <i class="bi bi-check2-all display-1 d-block mb-3 text-success"></i>
+  <h3>Queue is clear!</h3>
+  <p>All articles have been reviewed. Great work.</p>
+</div>
+{% endif %}
+{% endblock %}

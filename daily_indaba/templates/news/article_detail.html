@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% comment %}
+Article detail page structure:
+1. Article metadata and media
+2. Access-controlled body or paywall
+3. Reader discussion and comment form
+{% endcomment %}
+
+{% block title %}{{ article.title }} - The Daily Indaba{% endblock %}
+
+{% block content %}
+  {% comment %}
+  Resolve repeated URLs and request-derived values once near the top so the
+  markup below reads more like page structure than plumbing.
+  {% endcomment %}
+  {% url 'news:article_detail' article.pk as url_article_detail %}
+  {% url 'news:journalist_profile' article.author.pk as url_journalist_profile %}
+  {% url 'news:toggle_subscription' as url_toggle_subscription %}
+  {% url 'accounts:subscriptions' as url_subscriptions %}
+  {% url 'accounts:login' as url_login %}
+  {% url 'news:post_comment' article.pk as url_post_comment %}
+  {% if article.publisher %}
+    {% url 'news:publisher_profile' article.publisher.pk as url_publisher_profile %}
+  {% endif %}
+
+  {% with current_path=request.get_full_path %}
+  <div class="row justify-content-center mt-3">
+    <div class="col-lg-8">
+
+      {# ===== Article Header ===== #}
+      <header class="mb-4">
+        {% if article.importance == 1 %}
+          <span class="badge bg-danger mb-2">Front Page</span>
+        {% elif article.importance == 2 %}
+          <span class="badge bg-warning text-dark mb-2">Top Story</span>
+        {% else %}
+          <span class="badge bg-secondary mb-2">Standard</span>
+        {% endif %}
+
+        <h1 class="article-headline mt-2">{{ article.title }}</h1>
+
+        <div class="d-flex align-items-center gap-3 mt-3">
+          {% if article.author.profile_picture %}
+          <img src="{{ article.author.profile_picture.url }}"
+               class="avatar-circle avatar-circle--sm border flex-shrink-0"
+               alt="{{ article.author.public_name }}">
+          {% else %}
+          <div class="rounded-circle border d-flex align-items-center justify-content-center bg-light flex-shrink-0 avatar-circle--sm">
+            <i class="bi bi-person fs-4 text-muted"></i>
+          </div>
+          {% endif %}
+
+          <p class="text-muted small mb-0">
+            By
+            <a href="{{ url_journalist_profile }}"
+               class="fw-semibold text-decoration-none">
+              {{ article.author.public_name }}
+            </a>
+            {% if article.publisher %}
+            &mdash;
+            <a href="{{ url_publisher_profile }}"
+               class="text-decoration-none">
+              {{ article.publisher.name }}
+            </a>
+            {% endif %}
+            {% if article.publication_date %}
+            &middot; <time datetime="{{ article.publication_date|date:'Y-m-d' }}">
+              {{ article.publication_date|date:"j N Y, P" }}
+            </time>
+            {% endif %}
+          </p>
+        </div>
+
+        {% if user.role == 'editor' or user.id == article.author_id %}
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          {% if article.status == 'approved' %}
+            {% if article.approved_by_id == user.id %}
+            <span class="badge bg-success fs-6">
+              <i class="bi bi-check2-circle me-1"></i>Approved by you
+            </span>
+            {% elif article.approved_by %}
+            <span class="badge text-bg-light border fs-6">
+              <i class="bi bi-check2 me-1"></i>
+              Approved by
+              {% firstof article.approved_by.get_full_name article.approved_by.username %}
+            </span>
+            {% else %}
+            <span class="badge text-bg-light border fs-6">
+              <i class="bi bi-check2 me-1"></i>Approved
+            </span>
+            {% endif %}
+          {% elif article.status == 'returned' %}
+          <span class="badge text-bg-danger fs-6">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Returned to journalist
+          </span>
+          {% else %}
+          <span class="badge text-bg-warning fs-6">
+            <i class="bi bi-hourglass-split me-1"></i>Awaiting approval
+          </span>
+          {% endif %}
+        </div>
+
+        {% if article.status == 'returned' and article.editor_feedback %}
+        <div class="alert alert-warning mt-3 mb-0">
+          <div class="fw-semibold mb-1">Editor comments</div>
+          <div class="small">{{ article.editor_feedback|linebreaksbr }}</div>
+        </div>
+        {% endif %}
+        {% endif %}
+      </header>
+
+      {# ===== Article Media ===== #}
+      {% if article.image %}
+      <figure class="mb-4">
+        <img src="{{ article.image.url }}"
+             class="img-fluid rounded-3 w-100"
+             alt="{{ article.title }}">
+      </figure>
+      {% endif %}
+
+      {% if article.disclaimer %}
+      <div class="disclaimer-banner mb-4">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Bias Disclaimer:</strong> {{ article.disclaimer }}
+      </div>
+      {% endif %}
+
+      {# ===== Access-Controlled Article Body ===== #}
+      {% comment %}
+      Keep the article body, teaser state, and reader upsell in one branch so
+      the access rule is easy to follow in one place.
+      {% endcomment %}
+      {% if full_access %}
+      <div class="article-body mb-5" id="article-body">
+        {{ article.content|safe }}
+      </div>
+
+      {% if user.role == 'reader' %}
+      <div class="card border-0 bg-light rounded-3 p-3 mb-5 d-flex flex-row
+                  align-items-center justify-content-between gap-3">
+        <p class="mb-0 small">
+          Enjoy this article? Follow
+          <strong>{{ article.author.public_name }}</strong>
+          to get notified when new articles are published.
+        </p>
+        <form method="post" action="{{ url_toggle_subscription }}">
+          {% csrf_token %}
+          <input type="hidden" name="type" value="journalist">
+          <input type="hidden" name="id" value="{{ article.author.pk }}">
+          <input type="hidden" name="next" value="{{ current_path }}">
+          <button class="btn btn-sm btn-outline-dark text-nowrap" type="submit">
+            Follow journalist
+          </button>
+        </form>
+      </div>
+      {% endif %}
+
+      {% else %}
+      <div class="article-body mb-3">
+        <p class="lead">{{ teaser }}</p>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-3 p-4 mb-5 text-center
+                  paywall-card">
+        <i class="bi bi-lock-fill fs-2 text-secondary mb-2"></i>
+        <h3 class="h5 mb-2">Subscribe to read the full article</h3>
+        <p class="text-muted small mb-3">
+          This article is available to subscribers only.
+          Subscribe to
+          {% if article.author %}
+            <strong>{{ article.author.public_name }}</strong>
+            {% if subscribe_fee_info.journalist_fee %}
+              (R{{ subscribe_fee_info.journalist_fee }}/month)
+            {% endif %}
+          {% endif %}
+          {% if article.publisher and subscribe_fee_info.publisher_fee %}
+            or <strong>{{ article.publisher.name }}</strong>
+            (R{{ subscribe_fee_info.publisher_fee }}/month)
+          {% endif %}
+          to unlock full access.
+        </p>
+
+        {% if user.is_authenticated %}
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+          {% if article.author %}
+          <form method="post" action="{{ url_toggle_subscription }}">
+            {% csrf_token %}
+            <input type="hidden" name="type" value="journalist">
+            <input type="hidden" name="id" value="{{ article.author.pk }}">
+            <input type="hidden" name="next" value="{{ current_path }}">
+            <button class="btn btn-dark btn-sm" type="submit">
+              <i class="bi bi-bell me-1"></i>
+              Subscribe to {{ article.author.public_name }}
+              {% if subscribe_fee_info.journalist_fee %}
+                - R{{ subscribe_fee_info.journalist_fee }}/month
+              {% endif %}
+            </button>
+          </form>
+          {% endif %}
+
+          {% if article.publisher %}
+          <form method="post" action="{{ url_toggle_subscription }}">
+            {% csrf_token %}
+            <input type="hidden" name="type" value="publisher">
+            <input type="hidden" name="id" value="{{ article.publisher.pk }}">
+            <input type="hidden" name="next" value="{{ current_path }}">
+            <button class="btn btn-outline-dark btn-sm" type="submit">
+              <i class="bi bi-building me-1"></i>
+              Subscribe to {{ article.publisher.name }}
+              {% if subscribe_fee_info.publisher_fee %}
+                - R{{ subscribe_fee_info.publisher_fee }}/month
+              {% endif %}
+            </button>
+          </form>
+          {% endif %}
+
+          <a href="{{ url_subscriptions }}"
+             class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-collection me-1"></i>
+            All-Articles plan (R{{ all_articles_fee }}/month)
+          </a>
+        </div>
+        {% else %}
+        <a href="{{ url_login }}?next={{ current_path|urlencode }}"
+           class="btn btn-dark btn-sm">
+          <i class="bi bi-box-arrow-in-right me-1"></i>Log in to subscribe
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}{# end full_access #}
+
+      {# ===== Comment Section ===== #}
+      <div class="section-rule mb-4">
+        <span class="section-rule__label">
+          Comments{% if full_access %} ({{ comment_count }}){% endif %}
+        </span>
+      </div>
+
+      {% comment %}
+      Replies are rendered server-side up to three visible levels deep. The
+      include keeps the repeated comment chrome in one partial.
+      {% endcomment %}
+      {% if comment_roots %}
+      <div class="comment-thread mb-5" id="comment-thread">
+        {% for comment in comment_roots %}
+          {% include 'news/_comment_item.html' %}
+          {% if comment.children %}
+          <div class="comment-replies">
+            {% for reply in comment.children %}
+            {% with comment=reply %}
+              {% include 'news/_comment_item.html' %}
+            {% endwith %}
+
+            {% if reply.children %}
+            <div class="comment-replies">
+              {% for subreply in reply.children %}
+              {% with comment=subreply %}
+                {% include 'news/_comment_item.html' %}
+              {% endwith %}
+              {% endfor %}
+            </div>
+            {% endif %}{# end reply.children #}
+            {% endfor %}
+          </div>
+          {% endif %}{# end comment.children #}
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-muted small mb-5">
+        {% if full_access %}
+        No comments yet. Be the first to share your thoughts.
+        {% else %}
+        Subscribe to read comments.
+        {% endif %}
+      </p>
+      {% endif %}
+
+      {# ===== Comment Form ===== #}
+      {% if comment_form %}
+      <div class="card border-0 shadow-sm rounded-3 p-4 mb-5" id="comment-form-card">
+        <h4 class="h5 mb-3">
+          <i class="bi bi-chat-left-text me-2"></i>
+          Post a comment
+        </h4>
+
+        {% if reply_parent %}
+        <p class="text-muted small mb-3">
+          Replying to <strong>{{ reply_parent.author.public_name }}</strong> &mdash;
+          <a href="{{ url_article_detail }}#comment-form-card">Cancel</a>
+        </p>
+        {% endif %}
+
+        <form method="post" action="{{ url_post_comment }}">
+          {% csrf_token %}
+          {{ comment_form.parent_id }}
+          <div class="mb-3">
+            {{ comment_form.body }}
+          </div>
+          <button type="submit" class="btn btn-dark">
+            <i class="bi bi-send me-1"></i>Post comment
+          </button>
+        </form>
+      </div>
+      {% elif user.role != 'reader' %}
+      <p class="text-muted small mb-4">
+        <i class="bi bi-info-circle me-1"></i>
+        Comments are available to registered readers only.
+      </p>
+      {% endif %}{# end comment_form #}
+
+    </div>
+  </div>
+  {% endwith %}
+{% endblock %}

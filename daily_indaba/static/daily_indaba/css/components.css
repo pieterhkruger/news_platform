@@ -1,0 +1,201 @@
+/*
+ * Shared UI components.
+ * These extend Bootstrap primitives with app-specific visual behavior.
+ */
+
+/* ==========================================================================
+   Tags And Role Badges
+   ========================================================================== */
+/* Small colored badge that labels content categories or states with uppercase text. */
+.tag {
+  display: inline-block;
+  background: var(--green);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--radius);
+}
+
+.tag-gold  { background: var(--gold);  color: var(--dark); }
+.tag-red   { background: var(--red);   color: #fff; }
+.tag-blue  { background: var(--blue);  color: #fff; }
+.tag-dark  { background: var(--dark);  color: #fff; }
+
+/* Extend Bootstrap badges with role colours. */
+/* Used in: base.html (daily_indaba), profile.html (accounts), terms_and_conditions.html (accounts) */
+.badge-reader     { background-color: var(--blue)  !important; color: #fff; }
+.badge-journalist { background-color: var(--green) !important; color: #fff; }
+.badge-editor     { background-color: var(--red)   !important; color: #fff; }
+.badge-publisher  { background-color: #7a5f2f !important; color: #fff; }
+.badge-admin      { background-color: var(--dark)  !important; color: var(--gold); }
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+/* Base button with bold type, consistent border radius, and smooth lift and opacity transitions on interaction. */
+/* Used in 30 files */
+.btn {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: .04em;
+  border-radius: var(--radius);
+  border-width: 2px;
+  transition: opacity .18s, transform .12s, background .18s, color .18s;
+}
+
+.btn:hover  { opacity: .9; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+/* Used in 12 files */
+.btn-primary   { background: var(--green); color: #fff; border-color: var(--green); }
+.btn-primary:hover { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
+/* Used in: profile.html (accounts) */
+.btn-secondary { background: var(--blue);  color: #fff; border-color: var(--blue); }
+.btn-secondary:hover { background: var(--blue-dark); border-color: var(--blue-dark); color: #fff; }
+/* Used in: article_confirm_delete.html (news), newsletter_confirm_delete.html (news) */
+.btn-danger    { background: var(--red);   color: #fff; border-color: var(--red); }
+.btn-danger:hover  { background: var(--red-dark);  border-color: var(--red-dark);  color: #fff; }
+/* Used in 8 files */
+.btn-dark      { background: var(--dark);  color: #fff; border-color: var(--dark); }
+
+/* Ghost button; transparent by default, fills green on hover — signals a secondary action without visual dominance. */
+/* Used in: terms_and_conditions.html (accounts), profile.html (accounts), password_change_form.html (accounts), password_reset_done.html (accounts), update_profile.html (accounts) */
+.btn-outline-green {
+  background: transparent;
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.btn-outline-green:hover { background: var(--green); color: #fff; }
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+/* Wraps a label and input with bottom spacing to visually group each field in a form. */
+/* Used in 6 files */
+.form-group { margin-bottom: 1.1rem; }
+
+/* Small bold label above each input, identifying the field without competing with input content. */
+.form-group label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--dark-4);
+  margin-bottom: .35rem;
+  letter-spacing: .03em;
+}
+
+/* Text input with a subtle border; green focus ring highlights the active field for keyboard navigation. */
+/* Used in 6 files */
+.form-control {
+  border-color: var(--paper-border);
+  background: #fff;
+  font-family: var(--font-sans);
+  font-size: .92rem;
+  color: var(--text);
+  border-radius: var(--radius);
+}
+
+.form-control:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(110, 150, 60, .18);
+}
+
+/* Small red text below an invalid field, delivering inline validation feedback without layout disruption. */
+/* Used in 6 files */
+.form-error { color: var(--red); font-size: .78rem; margin-top: .25rem; }
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+/* Bordered content container; subtle lift on hover signals interactivity and groups related elements visually. */
+/* Used in 31 files */
+.card {
+  background: #fff;
+  border: 1px solid var(--paper-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: box-shadow .2s, transform .2s;
+}
+
+.card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+/* Constrains card images to a fixed 16:9 ratio, preventing layout shifts from inconsistently sized uploads. */
+/* Used in: home.html (news), article_list.html (news), category_article_list.html (news), journalist_profile.html (news) */
+.card-img-top { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+
+/* Padded content area inside a card, providing consistent spacing around title, text, and action elements. */
+/* Used in 31 files */
+.card-body { padding: 1rem 1.1rem 1.2rem; }
+
+/* Serif headline within a card, creating visual hierarchy between the content title and supporting text. */
+/* Used in: home.html (news), article_list.html (news), category_article_list.html (news), newsletter_list.html (news) */
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: .3rem 0 .5rem;
+  color: var(--dark);
+}
+
+/* ==========================================================================
+   Avatars
+   ========================================================================== */
+/* Crops profile images into a uniform circle, normalizing varied upload dimensions across all contexts. */
+/* Used in: article_detail.html (news), journalist_list.html (news), journalist_profile.html (news), profile.html (accounts), subscriptions.html (accounts) */
+.avatar-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  overflow: hidden;
+}
+
+/* Used in: article_detail.html (news), journalist_list.html (news), subscriptions.html (accounts) */
+.avatar-circle--sm {
+  width: 56px;
+  height: 56px;
+}
+
+/* Used in: journalist_profile.html (news), profile.html (accounts) */
+.avatar-circle--md {
+  width: 72px;
+  height: 72px;
+}
+
+/* ==========================================================================
+   Flash Messages
+   ========================================================================== */
+/* Resets list markup for displaying system flash messages as a clean, unstyled vertical stack. */
+/* Used in: base.html (daily_indaba) */
+.messages-list { list-style: none; padding: 0; margin: 0; }
+
+/* Horizontal alert bar with icon spacing and bold text, communicating system feedback after user actions. */
+/* Used in: base.html (daily_indaba), login.html (accounts), password_change_form.html (accounts), password_reset_form.html (accounts), password_reset_confirm.html (accounts) */
+.message {
+  padding: .7rem 1.5rem;
+  font-size: .87rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.message.success { background: #dff0d8; color: #2d5a1b; border-left: 4px solid var(--green); }
+.message.error   { background: #f9e0de; color: #6b1e19; border-left: 4px solid var(--red); }
+.message.info    { background: #d8eaf5; color: #1d4a68; border-left: 4px solid var(--blue); }
+.message.warning { background: #fdf3d0; color: #7a5c00; border-left: 4px solid var(--gold); }
+
+/* ==========================================================================
+   Decorative Rules
+   ========================================================================== */
+/* Used in: login.html (accounts), register.html (accounts), password_reset_form.html (accounts) */
+.rule-gold  { border: none; border-top: 2px solid var(--gold);  margin: 1.5rem 0; }
+.rule-green { border: none; border-top: 2px solid var(--green); margin: 1.5rem 0; }
+.rule-dark  { border: none; border-top: 1px solid var(--dark-3); margin: 1.5rem 0; }

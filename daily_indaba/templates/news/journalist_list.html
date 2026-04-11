@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Our Journalists — The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+  <div class="col-lg-10">
+
+    <div class="section-rule mb-4">
+      <span class="section-rule__label">Our Journalists</span>
+    </div>
+
+    <p class="lead mb-5">The journalists of The Daily Indaba cover South Africa and the world with independence, rigour, and a commitment to the full story.</p>
+
+    {% if journalists %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+      {% for journalist in journalists %}
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              {% if journalist.profile_picture %}
+              <img src="{{ journalist.profile_picture.url }}"
+                   class="avatar-circle avatar-circle--sm border flex-shrink-0"
+                   alt="{{ journalist.public_name }}">
+              {% else %}
+              <div class="rounded-circle border d-flex align-items-center
+                          justify-content-center bg-light flex-shrink-0"
+                   style="width:56px;height:56px;">
+                <i class="bi bi-person fs-4 text-muted"></i>
+              </div>
+              {% endif %}
+              <div>
+                <h2 class="h6 fw-bold mb-0">{{ journalist.public_name }}</h2>
+              </div>
+            </div>
+            {% if journalist.bio %}
+            <p class="small text-muted mb-0">{{ journalist.bio }}</p>
+            {% endif %}
+          </div>
+          {% if user.is_authenticated %}
+          <div class="card-footer bg-transparent border-top-0 pb-3 px-4">
+            <a href="{% url 'news:journalist_profile' journalist.pk %}"
+               class="btn btn-sm btn-outline-dark">
+              <i class="bi bi-person-lines-fill me-1"></i>View profile
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">No journalists listed yet.</p>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

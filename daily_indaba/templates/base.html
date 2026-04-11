@@ -1,0 +1,392 @@
+{% comment %}
+Shared shell template for The Daily Indaba.
+{% endcomment %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     HEAD
+     Meta, fonts, CSS bundles, favicon, and child-template style slot.
+     ═══════════════════════════════════════════════════════════════════ -->
+<head>
+  {% comment %}
+  UTF-8 covers the character sets needed for English, South African place
+  names, user-generated content, and general web text.
+  {% endcomment %}
+  <meta charset="UTF-8">
+
+  {% comment %}
+  The viewport tag prevents mobile browsers from laying the page out at a
+  desktop-width virtual viewport and then shrinking it, which would make the
+  interface feel cramped and unreadable.
+  {% endcomment %}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  {% comment %}
+  Child templates can override the title block for page-specific titles. The
+  brand name remains the fallback so every page has a sensible default.
+  {% endcomment %}
+  <title>{% block title %}The Daily Indaba{% endblock %}</title>
+
+  <!-- ── Bootstrap 5 CSS ─────────────────────────────────────────────── -->
+  {% comment %}
+  Bootstrap provides the base layout and utility classes. It is loaded before
+  the app stylesheet so project-specific rules can override it through the
+  normal cascade.
+  {% endcomment %}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+        crossorigin="anonymous">
+
+  <!-- ── Bootstrap Icons ──────────────────────────────────────────────── -->
+  {% comment %}
+  Bootstrap Icons supplies the icon glyphs used throughout the interface.
+  {% endcomment %}
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <!-- ── App stylesheet ───────────────────────────────────────────────── -->
+  {% comment %}
+  The project stylesheet contains the Daily Indaba brand styling and component
+  rules layered on top of Bootstrap.
+  {% endcomment %}
+  <link rel="stylesheet" href="{% static 'daily_indaba/styles.css' %}">
+
+  <!-- ── Child-template style slot ───────────────────────────────────── -->
+  {% comment %}
+  Child templates can inject page-specific styles here without editing the
+  shared base template.
+  {% endcomment %}
+  {% block extra_css %}{% endblock %}
+</head>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     BODY
+     ═══════════════════════════════════════════════════════════════════ -->
+<body>
+
+  <!-- ── URL pre-resolution ───────────────────────────────────────────── -->
+  {% comment %}
+  Resolve frequently used named URLs once near the top of the template. That
+  keeps the markup below easier to read and centralizes future URL-name
+  changes.
+  {% endcomment %}
+  {% url 'news:home' as url_home %}
+  {% url 'news:articles' as url_articles %}
+  {% url 'news:newsletters' as url_newsletters %}
+  {% url 'news:category' 'politics' as url_politics %}
+  {% url 'news:category' 'sport' as url_sport %}
+  {% url 'news:category' 'economics' as url_economics %}
+  {% url 'news:category' 'technology' as url_technology %}
+  {% url 'news:category' 'culture' as url_culture %}
+  {% url 'news:category' 'international' as url_international %}
+  {% url 'news:category' 'international-relations' as url_intl_relations %}
+  {% url 'news:journalist_dashboard' as url_journalist_dashboard %}
+  {% url 'news:editor_dashboard' as url_editor_dashboard %}
+  {% url 'news:publisher_dashboard' as url_publisher_dashboard %}
+  {% url 'news:privacy_policy' as url_privacy_policy %}
+
+  <!-- ── Breaking news slot ───────────────────────────────────────────── -->
+  {% comment %}
+  Optional slot for pages that need a banner or live-ticker above the header.
+  Most pages leave this empty.
+  {% endcomment %}
+  {% block breaking_news %}{% endblock %}
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SITE HEADER
+       Three nested layers:
+         1. .site-header__brand   — clickable masthead logo
+         2. .site-header__account — auth-state-aware account bar
+         3. .site-header__nav     — primary navigation + mobile toggle
+       ═══════════════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <div class="site-header__inner">
+
+      <!-- ── Brand / Masthead ─────────────────────────────────────────── -->
+      {% comment %}
+      The masthead logo always links back to the home page. The default filter
+      provides a safe fallback during isolated template tests or temporary
+      URLconf mismatches.
+      {% endcomment %}
+      <div class="site-header__brand">
+        <a href="{{ url_home|default:'/' }}" class="masthead-logo">
+          <img src="{% static 'daily_indaba/The Daily Indaba.png' %}"
+               alt="The Daily Indaba - South Africa in conversation">
+        </a>
+      </div>
+
+      <div class="site-header__content">
+
+        <!-- ── Account bar ──────────────────────────────────────────────── -->
+        {% comment %}
+        The account bar shows the current date on the left and either account
+        controls or guest entry points on the right.
+        {% endcomment %}
+        <div class="site-header__account">
+          {% comment %}
+          Render the current date server-side using Django's timezone-aware
+          {% now %} tag. Browser-local time would require JavaScript unless a
+          suitably adjusted value is passed into the template context first.
+          {% endcomment %}
+          <span class="site-header__date">{% now "l, j F Y" %}</span>
+
+          {% if user.is_authenticated %}
+            {% comment %}
+            Authenticated users see their profile link, role badge, and a
+            logout form. Logout stays as POST to avoid unsafe state-changing
+            GET requests.
+            {% endcomment %}
+            <div class="site-header__account-main">
+              <a href="{% url 'accounts:profile' %}" class="site-header__profile-link">
+                {{ user.username }}
+              </a>
+              <span class="badge badge-{{ user.role }}">{{ user.role }}</span>
+              <form method="post"
+                    action="{% url 'accounts:logout' %}"
+                    class="site-header__logout-form">
+                {% csrf_token %}
+                <button type="submit" class="site-header__logout-btn">Log out</button>
+              </form>
+            </div>
+          {% else %}
+            {% comment %}
+            Guests get direct entry points into authentication flows.
+            {% endcomment %}
+            <div class="site-header__account-main">
+              <a href="{% url 'accounts:login' %}" class="site-header__profile-link">Log in</a>
+              <a href="{% url 'accounts:register' %}" class="site-header__profile-link">Register</a>
+            </div>
+          {% endif %}
+        </div>
+        <!-- End .site-header__account -->
+
+        <!-- ── Primary navigation ───────────────────────────────────────── -->
+        {% comment %}
+        The primary navigation uses a native details/summary disclosure widget
+        for small screens. That gives a usable mobile menu without relying on
+        JavaScript.
+        {% endcomment %}
+        <div class="site-header__nav">
+          <nav class="primary-nav" aria-label="Main navigation">
+            <div class="primary-nav__inner">
+              <details class="nav-menu" open>
+                <summary class="nav-toggle">Menu <span aria-hidden="true">&#9776;</span></summary>
+
+                {% comment %}
+                Active-state styling is rendered in Django by comparing the
+                current request path with each link URL. That keeps the base
+                navigation fully functional without client-side scripting.
+                {% endcomment %}
+                <ul class="nav-links">
+                  <li>
+                    <a href="{{ url_home|default:'/' }}"{% if request.path == url_home %} class="active" aria-current="page"{% endif %}>Home</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_articles|default:'#' }}"{% if request.path == url_articles %} class="active" aria-current="page"{% endif %}>Articles</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_newsletters|default:'#' }}"{% if request.path == url_newsletters %} class="active" aria-current="page"{% endif %}>Newsletters</a>
+                  </li>
+
+                  {% comment %}
+                  Category links point to slug-based routes. The default '#'
+                  fallback prevents template failure if a URL variable is ever
+                  unavailable during development or isolated rendering.
+                  {% endcomment %}
+                  <li>
+                    <a href="{{ url_politics|default:'#' }}"{% if request.path == url_politics %} class="active" aria-current="page"{% endif %}>Politics</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_sport|default:'#' }}"{% if request.path == url_sport %} class="active" aria-current="page"{% endif %}>Sport</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_economics|default:'#' }}"{% if request.path == url_economics %} class="active" aria-current="page"{% endif %}>Economics</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_technology|default:'#' }}"{% if request.path == url_technology %} class="active" aria-current="page"{% endif %}>Technology</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_culture|default:'#' }}"{% if request.path == url_culture %} class="active" aria-current="page"{% endif %}>Culture</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_international|default:'#' }}"{% if request.path == url_international %} class="active" aria-current="page"{% endif %}>International</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_intl_relations|default:'#' }}"{% if request.path == url_intl_relations %} class="active" aria-current="page"{% endif %}>
+                      International Relations
+                    </a>
+                  </li>
+
+                  {% comment %}
+                  Show only the dashboard link relevant to the authenticated
+                  user's role so the nav stays concise and role-appropriate.
+                  {% endcomment %}
+                  {% if user.is_authenticated %}
+                    {% if user.role == 'journalist' %}
+                      <li class="nav-desk">
+                        <a href="{{ url_journalist_dashboard|default:'#' }}"{% if request.path == url_journalist_dashboard %} class="active" aria-current="page"{% endif %}>My Desk</a>
+                      </li>
+                    {% elif user.role == 'editor' %}
+                      <li class="nav-editor">
+                        <a href="{{ url_editor_dashboard|default:'#' }}"{% if request.path == url_editor_dashboard %} class="active" aria-current="page"{% endif %}>Editor</a>
+                      </li>
+                    {% elif user.role == 'publisher' %}
+                      {% comment %}
+                      Publishers reuse the nav-editor styling hook so the
+                      role-specific dashboard link remains visually consistent.
+                      {% endcomment %}
+                      <li class="nav-editor">
+                        <a href="{{ url_publisher_dashboard|default:'#' }}"{% if request.path == url_publisher_dashboard %} class="active" aria-current="page"{% endif %}>Publisher</a>
+                      </li>
+                    {% endif %}
+                  {% endif %}
+                </ul>
+                <!-- End .nav-links -->
+              </details>
+              <!-- End .nav-menu -->
+            </div>
+            <!-- End .primary-nav__inner -->
+          </nav>
+        </div>
+        <!-- End .site-header__nav -->
+      </div>
+      <!-- End .site-header__content -->
+    </div>
+    <!-- End .site-header__inner -->
+  </header>
+  <!-- End Site Header ═══════════════════════════════════════════════════ -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       FLASH MESSAGES
+       One-time Django notifications consumed and cleared on this response.
+       ═══════════════════════════════════════════════════════════════════ -->
+  {% comment %}
+  Django's messaging framework queues one-time notifications for the next
+  response. Each message exposes tags such as success, warning, or error,
+  which the stylesheet can use for visual treatment.
+  {% endcomment %}
+  {% if messages %}
+  <ul class="messages-list">
+    {% for message in messages %}
+      <li class="message {{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       MAIN CONTENT
+       Primary injection point filled by each child template's content block.
+       ═══════════════════════════════════════════════════════════════════ -->
+  <main>
+    <div class="container-fluid px-4">
+      {% comment %}
+      Child templates replace this block with their page-specific body.
+      {% endcomment %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SITE FOOTER
+       Three-column grid (.footer-grid):
+         1. .footer-brand — masthead repeat and editorial tagline
+         2. .footer-col   — account management / auth entry points
+         3. .footer-col   — about / editorial links
+       Followed by a bottom strip with copyright and social links.
+       ═══════════════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="container-fluid px-4">
+      <div class="footer-grid">
+
+        <!-- ── Brand column ─────────────────────────────────────────────── -->
+        {% comment %}
+        The footer repeats the brand identity and key account/about links so
+        users still have navigation options after reading through long pages.
+        {% endcomment %}
+        <div class="footer-brand">
+          <img class="footer-brand-logo"
+               src="{% static 'daily_indaba/The Daily Indaba.png' %}"
+               alt="The Daily Indaba">
+          <p>South Africa's independent news platform - bringing readers, journalists, and ideas together through honest, fearless reporting.</p>
+        </div>
+
+        <!-- ── Account column ───────────────────────────────────────────── -->
+        <div class="footer-col">
+          <h4>Account</h4>
+          <ul>
+            {% if user.is_authenticated %}
+              <li><a href="{% url 'accounts:profile' %}">My Profile</a></li>
+              {% if user.role == 'publisher' %}
+              <li><a href="{% url 'news:publisher_dashboard' %}">Publisher Dashboard</a></li>
+              {% endif %}
+              <li><a href="{% url 'accounts:password_change' %}">Change Password</a></li>
+              <li><a href="{% url 'accounts:subscriptions' %}">Subscriptions</a></li>
+              <li>
+                {% comment %}
+                The footer logout control is styled like a plain link but kept
+                as a form button so logout remains a POST action.
+                {% endcomment %}
+                <form method="post" action="{% url 'accounts:logout' %}" style="display:inline">
+                  {% csrf_token %}
+                  <button type="submit" style="background:none;border:none;color:#777;font-size:.83rem;cursor:pointer;padding:0;">Log Out</button>
+                </form>
+              </li>
+            {% else %}
+              <li><a href="{% url 'accounts:login' %}">Log In</a></li>
+              <li><a href="{% url 'accounts:register' %}">Register</a></li>
+              <li><a href="{% url 'accounts:password_reset' %}">Forgot Password</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <!-- ── About column ─────────────────────────────────────────────── -->
+        <div class="footer-col">
+          <h4>About</h4>
+          <ul>
+            <li><a href="{% url 'news:about' %}">About The Indaba</a></li>
+            <li><a href="{% url 'news:journalist_list' %}">Our Journalists</a></li>
+            <li><a href="{% url 'news:publisher_list' %}">Publishers</a></li>
+            <li><a href="{% url 'news:contact' %}">Contact</a></li>
+          </ul>
+        </div>
+
+      </div>
+      <!-- End .footer-grid -->
+
+      <!-- ── Bottom strip: copyright and social links ──────────────────── -->
+      <div class="footer-bottom">
+        <div class="footer-meta">
+          {% comment %}
+          {% now "Y" %} keeps the copyright year current at render time.
+          {% endcomment %}
+          <span>&copy; {% now "Y" %} The Daily Indaba &mdash; South Africa in conversation.</span>
+          <a href="{{ url_privacy_policy|default:'#' }}">Privacy Policy</a>
+        </div>
+
+        {% comment %}
+        Social URLs are placeholders until real platform profiles are wired in.
+        {% endcomment %}
+        <div class="social-links" aria-label="Social media links">
+          <a href="#" title="X / Twitter" aria-label="X">X</a>
+          <a href="#" title="Facebook" aria-label="Facebook">f</a>
+          <a href="#" title="Instagram" aria-label="Instagram">&#9635;</a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+  <!-- End Site Footer ════════════════════════════════════════════════════ -->
+
+  <!-- ── Child-template script slot ──────────────────────────────────── -->
+  {% comment %}
+  Keep this block available for child templates that need page-specific
+  progressive enhancement. The shared shell itself does not depend on script
+  execution for its core layout, navigation, or date display.
+  {% endcomment %}
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Newsletters - The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="mt-2">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">All Newsletters</h1>
+    {% if user.role == 'journalist' or user.role == 'editor' %}
+    <a href="{% url 'news:newsletter_create' %}"
+       class="btn btn-dark btn-sm">
+      <i class="bi bi-plus-lg me-1"></i>New Newsletter
+    </a>
+    {% endif %}
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    {% for newsletter in newsletters %}
+    <div class="col">
+      <article class="card h-100 shadow-sm border-0">
+        <div class="card-body">
+          <span class="badge bg-dark mb-2">
+            {% if newsletter.category %}
+            {{ newsletter.category.name }}
+            {% else %}
+            Multi-category edition
+            {% endif %}
+          </span>
+          <h3 class="card-title article-card__headline">
+            <a href="{% url 'news:newsletter_detail' newsletter.pk %}"
+               class="text-decoration-none stretched-link article-headline-link">
+              {{ newsletter.title }}
+            </a>
+          </h3>
+          {% if newsletter.description %}
+          <p class="card-text text-muted small">
+            {{ newsletter.description|truncatewords:20 }}
+          </p>
+          {% endif %}
+        </div>
+        <div class="card-footer bg-transparent border-top-0">
+          <small class="text-muted">
+            <i class="bi bi-person me-1"></i>
+            {% if newsletter.author.role == 'journalist' %}
+            <a href="{% url 'news:journalist_profile' newsletter.author.pk %}"
+               class="text-decoration-none">
+              {{ newsletter.author.public_name }}
+            </a>
+            {% else %}
+            <span>{{ newsletter.author.public_name }}</span>
+            {% endif %}
+            &middot; {{ newsletter.created_at|date:"j N Y" }}
+          </small>
+        </div>
+      </article>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5 text-muted">
+      <i class="bi bi-journals display-1 d-block mb-3"></i>
+      <h3>No newsletters found.</h3>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

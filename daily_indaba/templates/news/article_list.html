@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Articles - The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="row g-4 align-items-start mt-2">
+
+  <div class="col-lg-3">
+    <aside class="category-filter-panel bg-white shadow-sm border rounded-3 p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <p class="category-filter-panel__eyebrow mb-1">Browse by</p>
+          <h2 class="h5 mb-0">Importance</h2>
+        </div>
+        {% if selected_importance %}
+        <a href="{% url 'news:articles' %}" class="small fw-semibold text-decoration-none">
+          Clear
+        </a>
+        {% endif %}
+      </div>
+
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item px-0">
+          <a href="{% url 'news:articles' %}"
+             class="category-filter-link d-flex justify-content-between
+             {% if not selected_importance %}category-filter-link--active{% endif %}">
+            <span><i class="bi bi-newspaper me-2"></i>All Articles</span>
+          </a>
+        </li>
+        {% for val, label in importance_labels %}
+        <li class="list-group-item px-0">
+          <a href="?importance={{ val }}"
+             class="category-filter-link d-flex justify-content-between
+             {% if selected_importance == val %}category-filter-link--active{% endif %}">
+            <span>
+              {% if val == 1 %}<i class="bi bi-star-fill text-danger me-2"></i>
+              {% elif val == 2 %}<i class="bi bi-star-half text-warning me-2"></i>
+              {% else %}<i class="bi bi-star text-secondary me-2"></i>{% endif %}
+              {{ label }}
+            </span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </aside>
+  </div>
+
+  <div class="col-lg-9">
+
+    {% if selected_importance %}
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+      {% for val, label in importance_labels %}
+        {% if val == selected_importance %}
+        <span class="badge text-bg-light border">{{ label }}</span>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if user.role == 'editor' %}
+    <div class="alert alert-light border shadow-sm d-flex align-items-start gap-3 mb-4">
+      <i class="bi bi-shield-check fs-4 text-success"></i>
+      <div>
+        <div class="fw-semibold">Editor view</div>
+        <p class="mb-0 small text-muted">
+          You are seeing every article, including drafts and returned items
+          that are not yet published.
+          Articles you approved are marked with a green tick.
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for article in articles %}
+      <div class="col">
+        <article class="card h-100 shadow-sm border-0 article-card">
+          {% if article.image %}
+          <img src="{{ article.image.url }}" class="card-img-top article-card__img"
+               alt="{{ article.title }}">
+          {% endif %}
+          <div class="card-body">
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              {% if article.importance == 1 %}
+                <span class="badge bg-danger">Front Page</span>
+              {% elif article.importance == 2 %}
+                <span class="badge bg-warning text-dark">Top Story</span>
+              {% else %}
+                <span class="badge bg-secondary">Standard</span>
+              {% endif %}
+
+              {% if user.role == 'editor' %}
+                {% if article.status == 'returned' %}
+                <span class="badge text-bg-danger">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>Returned
+                </span>
+                {% elif not article.approved %}
+                <span class="badge text-bg-warning">
+                  <i class="bi bi-hourglass-split me-1"></i>Pending review
+                </span>
+                {% elif article.approved_by_id == user.id %}
+                <span class="badge bg-success">
+                  <i class="bi bi-check2-circle me-1"></i>Approved by you
+                </span>
+                {% elif article.approved_by %}
+                <span class="badge text-bg-light border">
+                  <i class="bi bi-check2 me-1"></i>
+                  Approved by
+                  {% firstof article.approved_by.get_full_name article.approved_by.username %}
+                </span>
+                {% endif %}
+              {% endif %}
+            </div>
+            <h3 class="card-title article-card__headline">
+              <a href="{% url 'news:article_detail' article.pk %}"
+                 class="text-decoration-none stretched-link article-headline-link">
+                {{ article.title }}
+              </a>
+            </h3>
+            <p class="card-text text-muted small">
+              {{ article.content|striptags|truncatewords:20 }}
+            </p>
+          </div>
+          <div class="card-footer bg-transparent border-top-0">
+            <small class="text-muted">
+              By
+              <a href="{% url 'news:journalist_profile' article.author.pk %}">
+                {{ article.author.public_name }}
+              </a>
+              {% if article.publisher %}
+              &mdash;
+              <a href="{% url 'news:publisher_profile' article.publisher.pk %}">
+                {{ article.publisher.name }}
+              </a>
+              {% endif %}
+              {% if article.publication_date %}
+              &middot; {{ article.publication_date|date:"j N Y" }}
+              {% endif %}
+            </small>
+          </div>
+        </article>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-5 text-muted">
+        <i class="bi bi-emoji-frown display-1 d-block mb-3"></i>
+        <h3>No articles match this filter.</h3>
+        <a href="{% url 'news:articles' %}" class="btn btn-outline-secondary mt-2">
+          Clear filters
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

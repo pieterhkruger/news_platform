@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Terms and Conditions - The Daily Indaba{% endblock %}
+
+{% block extra_css %}
+<style>
+  .terms-section {
+    background: #fff;
+    border: 1px solid var(--paper-border);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1.25rem;
+  }
+  .terms-section.highlight {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(110,150,60,.12);
+  }
+  .terms-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: .9rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+  }
+  .terms-section ul {
+    list-style: disc;
+    padding-left: 1.4rem;
+  }
+  .terms-section ul li {
+    font-size: .92rem;
+    margin-bottom: .45rem;
+    line-height: 1.6;
+  }
+  .terms-intro {
+    font-size: .9rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    max-width: 680px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:740px;margin:2rem auto;">
+
+  <h1 style="font-family:var(--font-serif);font-size:1.9rem;margin-bottom:.4rem;">
+    Terms and Conditions
+  </h1>
+  <p class="terms-intro">
+    The Daily Indaba platform operates on principles of honest, fearless, and
+    independent journalism. By creating an account, every user accepts the
+    obligations set out below for their role. Terms version
+    <strong>March 2026 (v1)</strong>.
+  </p>
+  {% if role %}
+    <p style="font-size:.85rem;color:var(--green);font-weight:700;margin-bottom:1.2rem;">
+      Showing terms applicable to your selected role:
+      <strong>{{ role|capfirst }}</strong>.
+      Opened through a role-specific link, this page can also jump straight to
+      the highlighted section using the normal page anchor.
+    </p>
+  {% endif %}
+
+  {# Reader Terms #}
+  <div class="terms-section {% if role == 'reader' %}highlight{% endif %}"
+       id="reader-terms">
+    <h2>
+      <span class="badge badge-reader">Reader</span>
+      Reader Terms
+    </h2>
+    <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:.8rem;">
+      Applies to all accounts registered with the <em>Reader</em> role.
+    </p>
+    <ul>
+      <li>
+        You agree to treat all other users, journalists, and editors with
+        respect in every interaction on the platform, including comments.
+      </li>
+      <li>
+        You agree not to post, share, upload, or solicit explicit, offensive,
+        defamatory, or otherwise illegal material through any feature of the
+        platform.
+      </li>
+      <li>
+        You acknowledge that your personal data will be collected and processed
+        in accordance with the <strong>Protection of Personal Information Act
+        (POPIA)</strong> and
+        <a href="{% url 'news:privacy_policy' %}">The Daily Indaba's Privacy Policy</a>.
+      </li>
+      <li>
+        You understand that comments are limited to 5 responses per article and
+        100 words in total per article, and that violation of these limits may
+        result in your comment privileges being suspended.
+      </li>
+    </ul>
+  </div>
+
+  {# Journalist Terms #}
+  <div class="terms-section {% if role == 'journalist' %}highlight{% endif %}"
+       id="journalist-terms">
+    <h2>
+      <span class="badge badge-journalist">Journalist</span>
+      Journalist Terms
+    </h2>
+    <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:.8rem;">
+      Applies to all accounts registered with the <em>Journalist</em> role,
+      in addition to the Reader Terms above.
+    </p>
+    <ul>
+      <li>
+        You agree to maintain <strong>unbiased, factual reporting</strong> in
+        every article you submit to the platform. Speculation must be clearly
+        labelled as such.
+      </li>
+      <li>
+        You agree not to publish articles that constitute, contain, or are
+        materially influenced by advertising, sponsored content, or any other
+        promotional material.
+      </li>
+      <li>
+        You agree not to use your journalist status on The Daily Indaba for
+        personal financial gain, reputational advancement unrelated to your
+        published work, or any form of undisclosed conflict of interest.
+      </li>
+      <li>
+        Your personal data will be processed in accordance with
+        <strong>POPIA</strong> and
+        <a href="{% url 'news:privacy_policy' %}">The Daily Indaba's Privacy Policy</a>.
+      </li>
+      <li>
+        Where you recognise, or are made aware of, potential bias in an article
+        you have written, you <strong>must include a clear disclaimer</strong>
+        within the article body before submission. Failure to do so may result
+        in the article being rejected or removed.
+      </li>
+    </ul>
+  </div>
+
+  {# Editor Terms #}
+  <div class="terms-section {% if role == 'editor' %}highlight{% endif %}"
+       id="editor-terms">
+    <h2>
+      <span class="badge badge-editor">Editor</span>
+      Editor Terms
+    </h2>
+    <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:.8rem;">
+      Applies to all accounts registered with the <em>Editor</em> role,
+      in addition to the Reader Terms above.
+    </p>
+    <ul>
+      <li>
+        You agree to exercise editorial judgement <strong>fairly and
+        impartially</strong>, without favouring any political party, ideological
+        movement, commercial interest, or personal relationship.
+      </li>
+      <li>
+        You agree not to allow personal agenda or political bias to influence
+        which articles you approve, reject, or edit.
+      </li>
+      <li>
+        Your personal data will be processed in accordance with
+        <strong>POPIA</strong> and
+        <a href="{% url 'news:privacy_policy' %}">The Daily Indaba's Privacy Policy</a>.
+      </li>
+      <li>
+        Where you recognise potential bias in an article you are reviewing, you
+        must either require the journalist to add a disclaimer before approval,
+        or add a clearly marked editorial disclaimer yourself. Approving
+        demonstrably biased content without a disclaimer constitutes a breach of
+        these terms.
+      </li>
+    </ul>
+  </div>
+
+  {# Publisher Terms #}
+  <div class="terms-section {% if role == 'publisher' %}highlight{% endif %}"
+       id="publisher-terms">
+    <h2>
+      <span class="badge badge-publisher">Publisher</span>
+      Publisher Terms
+    </h2>
+    <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:.8rem;">
+      Applies to all accounts registered with the <em>Publisher</em> role,
+      in addition to the Reader Terms above.
+    </p>
+    <ul>
+      <li>
+        You agree that the publisher account represents a real organisation and
+        that all organisation details supplied to The Daily Indaba are accurate.
+      </li>
+      <li>
+        You agree to appoint only registered editors to curate your
+        publisher-linked articles and to remove assignments that are no longer
+        authorised.
+      </li>
+      <li>
+        Your organisation and account data will be processed in accordance with
+        <strong>POPIA</strong> and
+        <a href="{% url 'news:privacy_policy' %}">The Daily Indaba's Privacy Policy</a>.
+      </li>
+      <li>
+        You agree not to use the publisher role to misrepresent editorial
+        ownership, suppress required disclaimers, or interfere improperly with
+        article approval decisions assigned to affiliated editors.
+      </li>
+    </ul>
+  </div>
+
+  <div style="margin-top:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;">
+    <a href="{% url 'accounts:register' %}{% if role %}?role={{ role }}{% endif %}" class="btn btn-primary">
+      Back to Registration
+    </a>
+    <a href="{% url 'accounts:login' %}" class="btn btn-outline-green">
+      Log In
+    </a>
+  </div>
+
+</div>
+{% endblock %}

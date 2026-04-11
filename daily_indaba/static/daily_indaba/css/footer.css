@@ -1,0 +1,90 @@
+/*
+ * Footer-specific layout and interaction styles.
+ */
+
+/* ==========================================================================
+   Footer Shell
+   ========================================================================== */
+/* Dark footer with a gold top border, visually terminating the page and echoing the header's color scheme. */
+/* Used in: base.html (daily_indaba) */
+.site-footer { background: var(--dark); color: #888; border-top: 4px solid var(--gold); }
+
+/* Three-column grid: wide brand description on the left, two narrower link columns on the right. */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 2.5rem;
+  padding: 3rem 0 2rem;
+}
+
+.footer-brand-logo { height: 80px; width: auto; margin-bottom: .8rem; }
+.footer-brand p { font-size: .8rem; color: #666; line-height: 1.7; }
+
+/* ==========================================================================
+   Footer Columns
+   ========================================================================== */
+/* Small gold uppercase heading that labels each footer column and separates link groups visually. */
+/* Used in: base.html (daily_indaba) */
+.footer-col h4 {
+  font-family: var(--font-sans);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: .8rem;
+  padding-bottom: .4rem;
+  border-bottom: 1px solid var(--dark-3);
+}
+
+.footer-col ul li { margin-bottom: .38rem; }
+.footer-col ul li a { color: #777; font-size: .83rem; }
+.footer-col ul li a:hover { color: var(--gold); }
+
+/* ==========================================================================
+   Footer Meta Row
+   ========================================================================== */
+/* Slim bar below the footer grid holding copyright and social links, separated by a hairline top border. */
+/* Used in: base.html (daily_indaba) */
+.footer-bottom {
+  border-top: 1px solid var(--dark-3);
+  padding: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .75rem;
+  color: #4a4a4a;
+}
+
+/* Inline flex cluster of footer meta links (e.g. legal, about) displayed in a wrapping row. */
+.footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-bottom a { color: #4a4a4a; }
+.footer-bottom a:hover { color: var(--gold); }
+.social-links { display: flex; gap: .6rem; }
+
+/* ==========================================================================
+   Social Links
+   ========================================================================== */
+/* Square icon buttons with a border that fills gold on hover, providing recognizable social platform shortcuts. */
+/* Used in: base.html (daily_indaba) */
+.social-links a {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--dark-3);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: .82rem;
+  font-weight: 700;
+  transition: border-color .18s, color .18s, background .18s;
+}
+
+.social-links a:hover { border-color: var(--gold); color: var(--dark); background: var(--gold); }

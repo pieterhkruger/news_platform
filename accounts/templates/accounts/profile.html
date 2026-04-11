@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile — The Daily Indaba{% endblock %}
+
+{% block content %}
+<div style="max-width:640px;margin:2rem auto;">
+
+  <h1 style="font-family:var(--font-serif);font-size:1.8rem;margin-bottom:1.5rem;">
+    My Profile
+  </h1>
+
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div class="card-body" style="padding:1.6rem;">
+
+      <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.2rem;">
+        {% if user.profile_picture_url %}
+          <img src="{{ user.profile_picture_url }}"
+               alt="{{ user.username }}"
+               class="avatar-circle avatar-circle--md"
+               style="border:2px solid var(--paper-border);">
+        {% else %}
+          <div style="width:72px;height:72px;border-radius:50%;
+                      background:var(--green);color:#fff;
+                      display:flex;align-items:center;justify-content:center;
+                      font-family:var(--font-serif);font-size:1.8rem;font-weight:700;">
+            {{ user.username|first|upper }}
+          </div>
+        {% endif %}
+        <div>
+          <p style="font-family:var(--font-serif);font-size:1.15rem;font-weight:700;
+                    margin-bottom:.2rem;">
+            {{ user.get_full_name|default:user.username }}
+          </p>
+          <span class="badge badge-{{ user.role }}">{{ user.role|capfirst }}</span>
+        </div>
+      </div>
+
+      <dl style="display:grid;grid-template-columns:140px 1fr;gap:.5rem .75rem;
+                  font-size:.88rem;">
+        <dt style="color:var(--text-muted);font-weight:700;">Username</dt>
+        <dd>{{ user.username }}</dd>
+
+        <dt style="color:var(--text-muted);font-weight:700;">Email</dt>
+        <dd>{{ user.email|default:"—" }}</dd>
+
+        <dt style="color:var(--text-muted);font-weight:700;">First name</dt>
+        <dd>{{ user.first_name|default:"—" }}</dd>
+
+        <dt style="color:var(--text-muted);font-weight:700;">Last name</dt>
+        <dd>{{ user.last_name|default:"—" }}</dd>
+
+        <dt style="color:var(--text-muted);font-weight:700;">Member since</dt>
+        <dd>{{ user.date_joined|date:"d F Y" }}</dd>
+
+        {% if user.bio %}
+          <dt style="color:var(--text-muted);font-weight:700;">Bio</dt>
+          <dd style="line-height:1.6;">{{ user.bio }}</dd>
+        {% endif %}
+
+        {% if user.role == 'publisher' and user.managed_publisher %}
+          <dt style="color:var(--text-muted);font-weight:700;">Publisher</dt>
+          <dd>{{ user.managed_publisher.name }}</dd>
+        {% endif %}
+
+        {% if user.terms_acceptance %}
+          <dt style="color:var(--text-muted);font-weight:700;">T&amp;C accepted</dt>
+          <dd>
+            {{ user.terms_acceptance.terms_version }}
+            &mdash; {{ user.terms_acceptance.accepted_at|date:"d F Y" }}
+          </dd>
+        {% endif %}
+      </dl>
+
+    </div>
+  </div>
+
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+    <a href="{% url 'accounts:update_profile' %}" class="btn btn-primary btn-sm">
+      Edit Profile
+    </a>
+    <a href="{% url 'accounts:password_change' %}" class="btn btn-outline-green btn-sm">
+      Change Password
+    </a>
+    {% if user.is_reader %}
+      <a href="{% url 'accounts:subscriptions' %}" class="btn btn-secondary btn-sm">
+        Manage Subscriptions
+      </a>
+    {% endif %}
+    {% if user.is_publisher and user.managed_publisher %}
+      <a href="{% url 'news:publisher_dashboard' %}" class="btn btn-secondary btn-sm">
+        Manage Publisher
+      </a>
+    {% endif %}
+    <a href="{% url 'accounts:terms_and_conditions' %}?role={{ user.role }}#{{ user.role }}-terms"
+       target="_blank" class="btn btn-outline-green btn-sm">
+      View My Terms
+    </a>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Editor Dashboard — The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mt-3 mb-4">
+  <h1 class="h2 mb-0">
+    <i class="bi bi-shield-check me-2"></i>Editor Dashboard
+  </h1>
+  <a href="{% url 'news:approval_queue' %}" class="btn btn-dark">
+    <i class="bi bi-inbox me-1"></i>
+    Approval Queue
+    {% if pending %}
+    <span class="badge bg-danger ms-1">{{ pending.count }}</span>
+    {% endif %}
+  </a>
+</div>
+
+<div class="row g-4">
+
+  <!-- ════════════════════════════════════════
+       Pending approval (summary)
+  ════════════════════════════════════════ -->
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header bg-danger text-white d-flex
+                  justify-content-between align-items-center">
+        <h4 class="mb-0 fw-bold">
+          <i class="bi bi-hourglass-split me-2"></i>Awaiting Approval
+        </h4>
+        <span class="badge bg-white text-danger fw-bold fs-6">
+          {{ pending.count }}
+        </span>
+      </div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          {% for article in pending|slice:":6" %}
+          <li class="list-group-item d-flex justify-content-between
+                     align-items-center py-3">
+            <div>
+              <div class="fw-semibold small">{{ article.title }}</div>
+              <div class="text-muted" style="font-size:.78rem;">
+                By {{ article.author.public_name }}
+                &middot; {{ article.created_at|date:"j N Y" }}
+              </div>
+            </div>
+            <a href="{% url 'news:approval_queue' %}"
+               class="btn btn-sm btn-outline-danger">Review</a>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted py-3">
+            <i class="bi bi-check-circle text-success me-1"></i>
+            No articles pending approval.
+          </li>
+          {% endfor %}
+          {% if pending.count > 6 %}
+          <li class="list-group-item text-center py-2">
+            <a href="{% url 'news:approval_queue' %}" class="small">
+              View all {{ pending.count }} pending articles &rarr;
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       Recently published
+  ════════════════════════════════════════ -->
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header bg-dark text-white">
+        <h4 class="mb-0 fw-bold">
+          <i class="bi bi-check2-circle me-2"></i>Recently Published
+        </h4>
+      </div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          {% for article in recent %}
+          <li class="list-group-item d-flex justify-content-between
+                     align-items-center py-3">
+            <div>
+              <div class="fw-semibold small">
+                {{ article.title }}
+                {% if article.approved_by_id == user.id %}
+                <span class="badge bg-success ms-2">
+                  <i class="bi bi-check2-circle me-1"></i>Approved by you
+                </span>
+                {% elif article.approved_by %}
+                <span class="badge text-bg-light border ms-2">
+                  Approved by {% firstof article.approved_by.get_full_name article.approved_by.username %}
+                </span>
+                {% endif %}
+              </div>
+              <div class="text-muted" style="font-size:.78rem;">
+                By {{ article.author.public_name }}
+                &middot; {{ article.publication_date|date:"j N Y" }}
+              </div>
+            </div>
+            <div class="btn-group btn-group-sm">
+              <a href="{% url 'news:article_detail' article.pk %}"
+                 class="btn btn-outline-secondary" title="View">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{% url 'news:article_edit' article.pk %}"
+                 class="btn btn-outline-primary" title="Edit">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+              <a href="{% url 'news:article_delete' article.pk %}"
+                 class="btn btn-outline-danger" title="Delete">
+                <i class="bi bi-trash"></i>
+              </a>
+            </div>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted py-3">
+            No articles published yet.
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

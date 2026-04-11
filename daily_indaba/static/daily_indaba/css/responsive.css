@@ -1,0 +1,195 @@
+/*
+ * Responsive overrides.
+ * This remains last in the bundle so narrow-screen adjustments win cleanly.
+ */
+
+/* ==========================================================================
+   Shared Layout Adjustments
+   ========================================================================== */
+@media (max-width: 960px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .layout-editorial { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ==========================================================================
+   Narrow Layout Utilities
+   ========================================================================== */
+@media (max-width: 700px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .85rem;
+  }
+}
+
+/* ==========================================================================
+   Header Compression
+   ========================================================================== */
+@media (max-width: 1180px) {
+  .site-header__account {
+    padding: .72rem 1rem .35rem;
+  }
+  .site-header__nav {
+    padding: 0 .7rem .35rem;
+  }
+  .nav-links li a {
+    padding: .2rem .7rem .16rem;
+    font-size: .76rem;
+  }
+}
+
+/* ==========================================================================
+   Mobile Header And Dropdown Panel
+   ========================================================================== */
+@media (max-width: 960px) {
+  .site-header__inner {
+    grid-template-columns: 152px minmax(0, 1fr);
+    min-height: 102px;
+  }
+  .site-header__brand {
+    justify-content: flex-start;
+    align-items: center;
+    padding: .8rem .95rem;
+    border-right: 1px solid var(--dark-3);
+    border-bottom: none;
+  }
+  .site-header__content {
+    grid-template-rows: auto 1fr;
+  }
+  .site-header__account {
+    padding: .6rem .9rem 0;
+    align-items: flex-start;
+    border-bottom: none;
+  }
+  .site-header__account-main {
+    gap: .55rem;
+  }
+  .site-header__nav {
+    position: relative;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0 .6rem .5rem;
+  }
+  .primary-nav__inner {
+    min-height: 0;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 0;
+  }
+  .nav-menu {
+    position: relative;
+    width: auto;
+    margin-left: auto;
+  }
+  .nav-toggle {
+    display: flex;
+    margin-left: auto;
+    padding: .1rem .45rem 0;
+    line-height: 1;
+    font-size: .76rem;
+  }
+  /*
+   * Closed state: keep links out of layout until the native <details> element
+   * is opened. The panel is absolutely positioned so it can float below the
+   * toggle instead of reflowing the entire header.
+   */
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: calc(100% + .4rem);
+    right: .6rem;
+    width: min(320px, calc(100vw - 1.4rem));
+    /* Constrain height to the viewport and allow the menu to scroll internally. */
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    flex-direction: column;
+    background: var(--dark-2);
+    border: 1px solid var(--dark-3);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+    align-content: stretch;
+    row-gap: 0;
+    z-index: 20;
+  }
+  /* Open state: the browser adds [open] to <details>; this selector reveals the panel. */
+  .nav-menu[open] .nav-links { display: flex; }
+  .nav-links li a {
+    min-height: 0;
+    height: auto;
+    justify-content: flex-start;
+    align-items: center;
+    padding: .9rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, .14);
+    border-left: none;
+  }
+  .nav-desk a,
+  .nav-editor a {
+    border-left: none;
+  }
+}
+
+/* ==========================================================================
+   Compact Mobile Header
+   ========================================================================== */
+@media (max-width: 700px) {
+  .site-header__inner {
+    grid-template-columns: 132px minmax(0, 1fr);
+    min-height: 92px;
+  }
+  .site-header__brand { padding: .68rem .78rem; }
+  .site-header__account {
+    gap: .4rem;
+    padding: .5rem .68rem 0;
+  }
+  .site-header__account-main {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: .42rem;
+    margin-left: auto;
+  }
+  .masthead-logo img { height: 74px; }
+  .site-header__date {
+    font-size: .74rem;
+    min-width: 0;
+  }
+  .site-header__profile-link {
+    max-width: 7.5rem;
+    font-size: .82rem;
+  }
+  .site-header__logout-btn { font-size: .8rem; }
+  .site-header__nav { padding: 0 .45rem .42rem; }
+  .nav-toggle { padding: .05rem .35rem 0; }
+  .nav-links {
+    right: .45rem;
+    width: min(290px, calc(100vw - 1rem));
+  }
+}
+
+/* ==========================================================================
+   Tight Mobile Header
+   ========================================================================== */
+@media (max-width: 520px) {
+  .site-header__inner {
+    grid-template-columns: 118px minmax(0, 1fr);
+    min-height: 88px;
+  }
+  .masthead-logo img { height: 66px; }
+  .site-header__account {
+    padding: .45rem .55rem 0;
+  }
+  .site-header__date { font-size: .7rem; }
+  .site-header__profile-link {
+    max-width: 6.2rem;
+    font-size: .78rem;
+  }
+  .site-header__account-main { gap: .34rem; }
+  .site-header__logout-btn { font-size: .76rem; }
+  .site-header__nav { padding: 0 .35rem .35rem; }
+  .nav-links {
+    right: .35rem;
+    width: min(270px, calc(100vw - .8rem));
+  }
+}

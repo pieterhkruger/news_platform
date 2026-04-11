@@ -1,0 +1,45 @@
+/*
+ * Content-area helpers that are not part of the global shell or shared UI kit.
+ */
+
+/* ==========================================================================
+   Article Disclaimers
+   ========================================================================== */
+/* Gold-bordered yellow box alerting readers to potential article bias before they read it. */
+/* Used in: article_detail.html (news), approval_queue.html (news) */
+.disclaimer-banner {
+  background: #fdf3d0;
+  border-left: 4px solid var(--gold);
+  padding: .75rem 1.1rem;
+  font-size: .85rem;
+  color: #5a4800;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 1rem 0;
+}
+
+.disclaimer-banner strong { color: #3d3000; }
+
+/* ==========================================================================
+   Comment Threads
+   ========================================================================== */
+/* Indents nested replies with a left border, visually communicating thread depth and parent-child relationships. */
+/* Used in: article_detail.html (news) */
+.comment-replies {
+  margin-left: 1.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--paper-border);
+  margin-top: .25rem;
+  margin-bottom: .25rem;
+}
+
+.comment-replies .comment-replies {
+  border-left-color: var(--paper-dark);
+  margin-left: 1rem;
+}
+
+/* Sets readable font size and line height for comment text, ensuring legibility at conversational length. */
+/* Used in: _comment_item.html (news) */
+.comment-body { font-size: .9rem; line-height: 1.6; }
+/* Smaller muted text for author and timestamp, visually subordinate to the comment body to aid scanning. */
+/* Used in: _comment_item.html (news) */
+.comment-meta { font-size: .76rem; color: var(--text-muted); }

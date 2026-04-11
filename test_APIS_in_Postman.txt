@@ -1,0 +1,779 @@
+TESTING THE DAILY INDABA API IN POSTMAN
+=======================================
+
+This is a copy-and-paste guide for manually testing the API routes implemented
+through daily_indaba/api_views.py.
+
+No Postman environments are needed.
+No Basic Auth is needed.
+For protected routes, use Postman's Authorization tab -> API Key.
+
+
+WHY THIS PROJECT USES DRF TOKEN AUTH AND NOT BASIC AUTH
+-------------------------------------------------------
+
+Basic Auth was used in M06T07, but this project is different.
+
+This project is configured to use Django REST Framework token authentication.
+You can see that from the code:
+
+1. In news_platform/settings.py, REST_FRAMEWORK sets:
+   DEFAULT_AUTHENTICATION_CLASSES = [
+       "rest_framework.authentication.TokenAuthentication",
+   ]
+
+   That means protected API routes expect DRF token auth.
+
+2. There is no BasicAuthentication configured there.
+   So Postman Basic Auth will not satisfy the authentication layer.
+
+3. In daily_indaba/api_views.py:
+   - TokenLoginView subclasses ObtainAuthToken
+   - the view imports Token from rest_framework.authtoken.models
+   - on login it runs Token.objects.get_or_create(user=user)
+   - on logout it runs request.user.auth_token.delete()
+
+   That is a full login-token-logout flow, not a Basic Auth flow.
+
+
+WHY TOKEN AUTH IS BETTER HERE
+-----------------------------
+
+For this project, token auth is better than Basic Auth because:
+
+1. You send username and password only once, to /api/token/
+2. After that, you send only the token on protected requests
+3. The token can be deleted on logout through /api/token/logout/
+4. It matches the code that this project is actually using
+
+With Basic Auth, you would keep sending username and password on every
+request. That is not the pattern this project is built around.
+
+
+THE WORD "Token" MUST COME BEFORE THE KEY
+-----------------------------------------
+The Authorization header must look exactly like this:
+
+Authorization: Token your_actual_token_here
+
+The word "Token" is not something custom written in this project. It is DRF's
+default keyword for TokenAuthentication.
+
+In DRF, TokenAuthentication uses the keyword:
+
+Token
+
+This project does not override that default.
+
+So if Postman sends:
+
+Authorization: 123abc456def
+
+that is wrong.
+
+If Postman sends:
+
+Authorization: Token 123abc456def
+
+that is correct.
+
+This is why on protected routes you must use:
+
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_TOKEN_HERE
+Add to: Header
+
+
+MINIMUM START-UP
+----------------
+
+Run these commands from the news_platform folder:
+
+cd "c:\KURSUSSE\HyperionDev AI Engineering\PK25080018847\Level 2 - Software Engineering\M06T08 – Capstone Project – News Application\news_platform"
+python manage.py migrate
+python manage.py runserver
+
+The API base URL used below is:
+
+http://127.0.0.1:8000
+
+
+DEMO ACCOUNTS
+-------------
+
+Reader:
+Username: lerato.maseko
+Password: demo1234
+
+Journalist:
+Username: thandi.nkosi
+Password: demo1234
+
+Editor:
+Username: nomusa.khumalo
+Password: demo1234
+
+
+VERIFIED IDS USED IN THIS GUIDE
+-------------------------------
+
+These values were checked against the current local database used by this
+project:
+
+- The Daily Indaba publisher_id = 1
+- Politics category_id = 1
+
+That is why the request bodies below use:
+
+"publisher_id": 1
+"category_id": 1
+
+You should be able to paste those bodies directly without replacing either
+value.
+
+
+POSTMAN RULES FOR THIS PROJECT
+------------------------------
+
+RULE 1 - /api/token/ (LOGIN REQUEST)
+
+Use:
+- Method: POST
+- Authorization tab -> No Auth
+- Body tab -> raw -> JSON
+
+Paste this JSON:
+{
+  "username": "lerato.maseko",
+  "password": "demo1234"
+}
+
+Do not use Basic Auth for /api/token/.
+
+
+RULE 2 - ALL PROTECTED REQUESTS
+
+Use:
+- Authorization tab -> API Key
+- Key: Authorization
+- Value: Token PASTE_TOKEN_HERE
+- Add to: Header
+
+Do not use:
+- Authorization tab -> Basic Auth
+- Authorization tab -> Bearer Token
+
+
+RULE 3 - WRITE REQUESTS
+
+For POST, PUT, and PATCH:
+- Body tab -> raw -> JSON
+- Paste the body shown in this document
+
+When you choose raw JSON, Postman normally sets Content-Type automatically.
+
+
+REQUEST 1 - API ROOT
+--------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/
+
+Authorization:
+No Auth
+
+Expected result:
+200 OK
+
+
+REQUEST 2 - LOG IN AS READER
+----------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/token/
+
+Authorization:
+Authorization tab -> No Auth
+
+Body:
+{
+  "username": "lerato.maseko",
+  "password": "demo1234"
+}
+
+Expected result:
+200 OK
+
+What to do next:
+Copy the token value from the response and keep it as your READER TOKEN.
+
+
+REQUEST 3 - READER LISTS ARTICLES
+---------------------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/articles/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_READER_TOKEN_HERE
+Add to: Header
+
+Expected result:
+200 OK
+
+
+REQUEST 4 - READER LISTS SUBSCRIBED ARTICLES
+--------------------------------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/articles/subscribed/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_READER_TOKEN_HERE
+Add to: Header
+
+Expected result:
+200 OK
+
+
+REQUEST 5 - READER LISTS NEWSLETTERS
+------------------------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/newsletters/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_READER_TOKEN_HERE
+Add to: Header
+
+Expected result:
+200 OK
+
+
+REQUEST 6 - READER TRIES TO CREATE AN ARTICLE
+---------------------------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/articles/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_READER_TOKEN_HERE
+Add to: Header
+
+Body:
+{
+  "title": "Reader should not be able to create this",
+  "content": "This should fail because readers are not allowed to create articles.",
+  "importance": 3,
+  "publisher_id": 1,
+  "category_id": 1,
+  "disclaimer": "Negative permission test"
+}
+
+Expected result:
+403 Forbidden
+
+
+REQUEST 7 - LOG IN AS JOURNALIST
+--------------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/token/
+
+Authorization:
+Authorization tab -> No Auth
+
+Body:
+{
+  "username": "thandi.nkosi",
+  "password": "demo1234"
+}
+
+Expected result:
+200 OK
+
+What to do next:
+Copy the token value from the response and keep it as your JOURNALIST TOKEN.
+
+
+REQUEST 8 - JOURNALIST LISTS ARTICLES
+------------------------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/articles/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_JOURNALIST_TOKEN_HERE
+Add to: Header
+
+Expected result:
+200 OK
+
+Why this matters:
+thandi.nkosi is affiliated with The Daily Indaba, and nomusa.khumalo is an
+editor there, so that pairing gives the cleanest create-and-approve workflow.
+The guide already uses verified values for that pairing:
+- publisher_id = 1
+- category_id = 1
+
+
+REQUEST 9 - JOURNALIST CREATES A NEW ARTICLE
+--------------------------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/articles/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_JOURNALIST_TOKEN_HERE
+Add to: Header
+
+Body:
+{
+  "title": "Postman test article",
+  "content": "Opening sentence for the teaser. This second sentence is here so you can see full content behaviour after approval.",
+  "importance": 3,
+  "publisher_id": 1,
+  "category_id": 1,
+  "disclaimer": "Created manually in Postman"
+}
+
+Note:
+In a real app, the client would usually call lookup endpoints for publishers
+and categories first, show those choices to the user, and then submit the selected IDs.
+
+Expected result:
+201 Created
+
+What to do next:
+Copy the id from the response and keep it as ARTICLE_ID.
+
+
+REQUEST 10 - JOURNALIST RETRIEVES THAT ARTICLE
+----------------------------------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/articles/1/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_JOURNALIST_TOKEN_HERE
+Add to: Header
+
+Expected result:
+200 OK
+
+
+REQUEST 11 - JOURNALIST FULLY UPDATES OWN PENDING ARTICLE
+---------------------------------------------------------
+
+Method:
+PUT
+
+URL:
+http://127.0.0.1:8000/api/articles/1/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_JOURNALIST_TOKEN_HERE
+Add to: Header
+
+Body:
+{
+  "title": "Postman test article updated by PUT",
+  "content": "Updated first sentence. Updated second sentence for the full body.",
+  "importance": 3,
+  "publisher_id": 1,
+  "category_id": 1,
+  "disclaimer": "Updated fully through PUT"
+}
+
+Expected result:
+200 OK
+
+
+REQUEST 12 - LOG IN AS EDITOR
+-----------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/token/
+
+Authorization:
+Authorization tab -> No Auth
+
+Body:
+{
+  "username": "nomusa.khumalo",
+  "password": "demo1234"
+}
+
+Expected result:
+200 OK
+
+What to do next:
+Copy the token value from the response and keep it as your EDITOR TOKEN.
+
+
+REQUEST 13 - EDITOR PARTIALLY UPDATES THE PENDING ARTICLE
+---------------------------------------------------------
+
+Method:
+PATCH
+
+URL:
+http://127.0.0.1:8000/api/articles/50/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_EDITOR_TOKEN_HERE
+Add to: Header
+
+Body:
+{
+  "title": "Postman test article updated by editor PATCH",
+  "importance": 3
+}
+
+Expected result:
+200 OK
+
+
+REQUEST 14 - EDITOR APPROVES THE ARTICLE
+----------------------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/articles/50/approve/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_EDITOR_TOKEN_HERE
+Add to: Header
+
+Body:
+{}
+
+Expected result:
+200 OK
+
+What to check in the response:
+approved should now be true
+
+
+REQUEST 15 - READER RETRIEVES THE APPROVED ARTICLE
+--------------------------------------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/articles/REPLACE_WITH_ARTICLE_ID/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_READER_TOKEN_HERE
+Add to: Header
+
+Expected result:
+200 OK
+
+
+REQUEST 16 - READER TRIES TO UPDATE AN ARTICLE
+----------------------------------------------
+
+Method:
+PUT
+
+URL:
+http://127.0.0.1:8000/api/articles/REPLACE_WITH_ARTICLE_ID/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_READER_TOKEN_HERE
+Add to: Header
+
+Body:
+{
+  "title": "Reader overwrite attempt",
+  "content": "Readers are not supposed to be allowed to do this.",
+  "importance": 3,
+  "publisher_id": 1,
+  "category_id": 1,
+  "disclaimer": "This should fail"
+}
+
+Expected result:
+403 Forbidden
+
+
+REQUEST 17 - JOURNALIST CREATES A NEWSLETTER
+--------------------------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/newsletters/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_JOURNALIST_TOKEN_HERE
+Add to: Header
+
+Body:
+{
+  "title": "Postman newsletter test",
+  "description": "Newsletter created manually through Postman.",
+  "category_id": 1,
+  "article_ids": [REPLACE_WITH_ARTICLE_ID]
+}
+
+Expected result:
+201 Created
+
+What to do next:
+Copy the id from the response and keep it as NEWSLETTER_ID.
+
+
+REQUEST 18 - READER RETRIEVES THE NEWSLETTER LIST AGAIN
+-------------------------------------------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/newsletters/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_READER_TOKEN_HERE
+Add to: Header
+
+Expected result:
+200 OK
+
+
+REQUEST 19 - RETRIEVE ONE NEWSLETTER BY ID
+------------------------------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/newsletters/REPLACE_WITH_NEWSLETTER_ID/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_READER_TOKEN_HERE
+Add to: Header
+
+Expected result:
+200 OK
+
+
+REQUEST 20 - JOURNALIST PATCHES OWN NEWSLETTER
+----------------------------------------------
+
+Method:
+PATCH
+
+URL:
+http://127.0.0.1:8000/api/newsletters/REPLACE_WITH_NEWSLETTER_ID/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_JOURNALIST_TOKEN_HERE
+Add to: Header
+
+Body:
+{
+  "title": "Postman newsletter test updated"
+}
+
+Expected result:
+200 OK
+
+
+REQUEST 21 - EDITOR DELETES THE NEWSLETTER
+------------------------------------------
+
+Method:
+DELETE
+
+URL:
+http://127.0.0.1:8000/api/newsletters/REPLACE_WITH_NEWSLETTER_ID/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_EDITOR_TOKEN_HERE
+Add to: Header
+
+Expected result:
+204 No Content
+
+
+REQUEST 22 - TEST THE MOCK ANNOUNCEMENT ENDPOINT
+------------------------------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/mock-announcements/
+
+Authorization:
+Authorization tab -> No Auth
+
+Body:
+{
+  "announcement_type": "article_approval",
+  "article_id": 1,
+  "title": "Test Article",
+  "article_url": "http://127.0.0.1:8000/daily-indaba/articles/1/",
+  "author": "Test Author",
+  "kind": "link"
+}
+
+Expected result:
+201 Created
+
+
+REQUEST 23 - TEST MOCK ANNOUNCEMENT VALIDATION FAILURE
+------------------------------------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/mock-announcements/
+
+Authorization:
+Authorization tab -> No Auth
+
+Body:
+{
+  "announcement_type": "article_approval",
+  "article_id": 1,
+  "title": "Missing fields test"
+}
+
+Expected result:
+400 Bad Request
+
+
+REQUEST 24 - LOG OUT THE EDITOR TOKEN
+-------------------------------------
+
+Method:
+POST
+
+URL:
+http://127.0.0.1:8000/api/token/logout/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_EDITOR_TOKEN_HERE
+Add to: Header
+
+Body:
+{}
+
+Expected result:
+204 No Content
+
+
+REQUEST 25 - CONFIRM THE LOGGED-OUT TOKEN NO LONGER WORKS
+---------------------------------------------------------
+
+Method:
+GET
+
+URL:
+http://127.0.0.1:8000/api/articles/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_THE_SAME_EDITOR_TOKEN_HERE
+Add to: Header
+
+Expected result:
+401 Unauthorized
+
+
+OPTIONAL CLEAN-UP - EDITOR DELETES THE ARTICLE CREATED EARLIER
+--------------------------------------------------------------
+
+Method:
+DELETE
+
+URL:
+http://127.0.0.1:8000/api/articles/REPLACE_WITH_ARTICLE_ID/
+
+Authorization:
+Authorization tab -> API Key
+Key: Authorization
+Value: Token PASTE_EDITOR_TOKEN_HERE
+Add to: Header
+
+Expected result:
+204 No Content

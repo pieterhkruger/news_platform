@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Article Announcement — The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8 col-lg-6">
+
+    <div class="card shadow border-0">
+
+      <!-- Header banner -->
+      <div class="card-header bg-success text-white text-center py-4">
+        <i class="bi bi-megaphone-fill display-4 d-block mb-2"></i>
+        <h1 class="h3 mb-0 fw-bold">Article Published!</h1>
+      </div>
+
+      <div class="card-body p-4">
+
+        <!-- Article metadata -->
+        <div class="mb-4">
+          <h2 class="h5 fw-bold mb-1">{{ article.title }}</h2>
+          <p class="text-muted small mb-0">
+            By
+            <a href="{% url 'news:journalist_profile' article.author.pk %}">
+              {{ article.author.public_name }}
+            </a>
+            {% if article.publisher %}
+              &middot;
+              <a href="{% url 'news:publisher_profile' article.publisher.pk %}">
+                {{ article.publisher.name }}
+              </a>
+            {% endif %}
+            &middot; Published {{ article.publication_date|date:"j N Y, P" }}
+          </p>
+        </div>
+
+        <!-- Role-aware message -->
+        <div class="alert
+          {% if request.user.role == 'journalist' %}alert-success{% else %}alert-info{% endif %}
+          d-flex align-items-start gap-2"
+          role="alert">
+          {% if request.user.role == 'journalist' %}
+            <i class="bi bi-check-circle-fill flex-shrink-0 mt-1"></i>
+            <div>
+              Your article <strong>"{{ article.title }}"</strong> has been
+              approved by an editor and is now live on the site.
+            </div>
+          {% else %}
+            <i class="bi bi-bell-fill flex-shrink-0 mt-1"></i>
+            <div>
+              A new article from someone you follow is now available to read.
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Action buttons -->
+        <div class="d-grid gap-2 mt-4">
+          <a href="{{ primary_url }}" class="btn btn-success btn-lg">
+            <i class="bi bi-arrow-right-circle me-2"></i>{{ primary_label }}
+          </a>
+          <a href="{{ continue_url }}" class="btn btn-outline-secondary">
+            {{ continue_label }}
+          </a>
+        </div>
+
+      </div><!-- /card-body -->
+
+    </div><!-- /card -->
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Delete Article — The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6">
+    <div class="card border-danger shadow-sm">
+      <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+          <i class="bi bi-trash me-2"></i>Delete Article
+        </h4>
+      </div>
+      <div class="card-body p-4">
+        <p class="mb-1">You are about to permanently delete:</p>
+        <blockquote class="blockquote border-start border-danger ps-3 my-3">
+          <p class="mb-0 fw-bold">{{ article.title }}</p>
+          <footer class="blockquote-footer mt-1">
+            {{ article.author.public_name }}
+            &middot; {{ article.created_at|date:"j N Y" }}
+          </footer>
+        </blockquote>
+        <p class="text-danger fw-semibold">
+          <i class="bi bi-exclamation-triangle me-1"></i>
+          This action cannot be undone.
+        </p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">
+              <i class="bi bi-trash me-1"></i>Yes, delete it
+            </button>
+            <a href="{% url 'news:journalist_dashboard' %}"
+               class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

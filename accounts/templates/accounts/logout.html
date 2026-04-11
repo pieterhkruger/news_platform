@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Logged Out — The Daily Indaba{% endblock %}
+
+{% block content %}
+<div style="max-width:420px;margin:2rem auto;">
+
+  <h1 style="font-family:var(--font-serif);font-size:1.8rem;margin-bottom:.25rem;">
+    Logged Out
+  </h1>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;font-size:.9rem;">
+    You have been successfully logged out of The Daily Indaba.
+  </p>
+
+  <div class="card">
+    <div class="card-body" style="padding:1.6rem;">
+      <p style="margin-bottom:1rem;">
+        Your session has been cleared. You can sign in again whenever you are
+        ready.
+      </p>
+      <a href="{% url 'accounts:login' %}" class="btn btn-primary">
+        Log In Again
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

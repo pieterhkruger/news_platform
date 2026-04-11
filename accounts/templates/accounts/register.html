@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Create an Account - The Daily Indaba{% endblock %}
+
+{% block content %}
+<div style="max-width:520px;margin:2rem auto;">
+
+  <h1 style="font-family:var(--font-serif);font-size:1.8rem;margin-bottom:.25rem;">
+    Create an Account
+  </h1>
+  <p style="color:var(--text-muted);margin-bottom:1.5rem;font-size:.9rem;">
+    Join The Daily Indaba as a reader, journalist, editor, or publisher.
+  </p>
+
+  <div class="card">
+    <div class="card-body" style="padding:1.6rem;">
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if next %}
+          {# Preserve the incoming `next` redirect target so registration can return the user to the requested page after sign-up. Cf. Mele, Django 5 By Example, p. 347; Cf. Guest et al., Web Development with Django 6, pp. 619-620. #}
+          <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+        <input type="hidden" name="role" value="{{ selected_role }}">
+
+        {# Role selection is server-rendered so the form remains JavaScript-free. #}
+        <div class="form-group">
+          <label>Registering as</label>
+          <p style="font-size:.76rem;color:var(--text-muted);margin:.2rem 0 .6rem;">
+            Choose your role first. The form below updates when you open a role link.
+          </p>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+            {% for role_value, role_label in role_choices %}
+            <a href="{% url 'accounts:register' %}?role={{ role_value }}{% if next %}&next={{ next|urlencode }}{% endif %}"
+               class="btn {% if selected_role == role_value %}btn-primary{% else %}btn-outline-green{% endif %} btn-sm"
+               {% if selected_role == role_value %}aria-current="page"{% endif %}>
+              {{ role_label }}
+            </a>
+            {% endfor %}
+          </div>
+          <p style="font-size:.82rem;color:var(--text-muted);margin-top:.6rem;">
+            Selected role: <strong>{{ selected_role|capfirst }}</strong>.
+          </p>
+          {% if selected_role == 'editor' %}
+          <p style="font-size:.82rem;color:var(--text-muted);margin-top:.4rem;">
+            Editors must register with their real first and last name. The login username is generated after submission.
+          </p>
+          {% elif selected_role == 'publisher' %}
+          <p style="font-size:.82rem;color:var(--text-muted);margin-top:.4rem;">
+            Publisher accounts use the organisation name, and the login username is generated after submission.
+          </p>
+          {% endif %}
+          {% if form.role.errors %}
+            <p class="form-error">{{ form.role.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        {% if selected_role != 'publisher' %}
+        <div>
+          <div class="form-group">
+            <label for="id_first_name">First name</label>
+            <input class="form-control" type="text" name="first_name"
+                   id="id_first_name" autocomplete="given-name"
+                   value="{{ form.first_name.value|default:'' }}"
+                   maxlength="150">
+            {% if form.first_name.errors %}
+              <p class="form-error">{{ form.first_name.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="id_last_name">Last name</label>
+            <input class="form-control" type="text" name="last_name"
+                   id="id_last_name" autocomplete="family-name"
+                   value="{{ form.last_name.value|default:'' }}"
+                   maxlength="150">
+            {% if form.last_name.errors %}
+              <p class="form-error">{{ form.last_name.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if selected_role == 'reader' or selected_role == 'journalist' %}
+        <div class="form-group">
+          <label for="id_username">Username</label>
+          <input class="form-control" type="text" name="username"
+                 id="id_username" autofocus autocomplete="username"
+                 value="{{ form.username.value|default:'' }}"
+                 maxlength="150">
+          <p style="font-size:.76rem;color:var(--text-muted);margin-top:.2rem;">
+            {{ form.username.help_text }}
+          </p>
+          {% if form.username.errors %}
+            <p class="form-error">{{ form.username.errors.0 }}</p>
+          {% endif %}
+        </div>
+        {% else %}
+        <div style="background:var(--paper-dark);border:1px solid var(--paper-border);
+                    border-radius:var(--radius);padding:.9rem 1rem;margin-bottom:1rem;">
+          <p style="font-size:.85rem;color:var(--text-muted);margin:0;">
+            {{ form.username.help_text }}
+          </p>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label for="id_email">Email address</label>
+          <input class="form-control" type="email" name="email"
+                 id="id_email" autocomplete="email"
+                 value="{{ form.email.value|default:'' }}">
+          {% if form.email.errors %}
+            <p class="form-error">{{ form.email.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        {% if selected_role == 'publisher' %}
+        <div>
+          <div class="form-group">
+            <label for="id_publisher_name">Publisher name</label>
+            <input class="form-control" type="text" name="publisher_name"
+                   id="id_publisher_name"
+                   value="{{ form.publisher_name.value|default:'' }}"
+                   maxlength="200">
+            {% if form.publisher_name.errors %}
+              <p class="form-error">{{ form.publisher_name.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="id_publisher_description">Publisher description</label>
+            <textarea class="form-control" name="publisher_description"
+                      id="id_publisher_description" rows="3">{{ form.publisher_description.value|default:'' }}</textarea>
+            {% if form.publisher_description.errors %}
+              <p class="form-error">{{ form.publisher_description.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label for="id_password1">Password</label>
+          <input class="form-control" type="password" name="password1"
+                 id="id_password1" autocomplete="new-password">
+          {% if form.password1.errors %}
+            <p class="form-error">{{ form.password1.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_password2">Confirm password</label>
+          <input class="form-control" type="password" name="password2"
+                 id="id_password2" autocomplete="new-password">
+          {% if form.password2.errors %}
+            <p class="form-error">{{ form.password2.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div style="background:var(--paper-dark);border:1px solid var(--paper-border);
+                    border-radius:var(--radius);padding:1rem;margin-bottom:1rem;">
+          <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:.6rem;">
+            Before registering, please read the
+            <a href="{% url 'accounts:terms_and_conditions' %}?role={{ selected_role }}#{{ selected_role }}-terms"
+               target="_blank" rel="noopener">
+              terms and conditions applicable to your role
+            </a>.
+          </p>
+          <label style="display:flex;align-items:flex-start;gap:.55rem;
+                         cursor:pointer;font-size:.88rem;font-weight:400;">
+            <input type="checkbox" name="accept_terms" id="id_accept_terms"
+                   style="margin-top:.2rem;flex-shrink:0;"
+                   {% if form.accept_terms.value %}checked{% endif %}>
+            <span>{{ form.accept_terms.label }}</span>
+          </label>
+          {% if form.accept_terms.errors %}
+            <p class="form-error" style="margin-top:.4rem;">
+              {{ form.accept_terms.errors.0 }}
+            </p>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">
+          Create Account
+        </button>
+      </form>
+
+      <hr class="rule-gold" style="margin:1.25rem 0;">
+
+      <p style="font-size:.85rem;text-align:center;color:var(--text-muted);">
+        Already have an account?
+        <a href="{% url 'accounts:login' %}">Log in</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

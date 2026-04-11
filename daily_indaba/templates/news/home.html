@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Home — The Daily Indaba{% endblock %}
+
+{% block content %}
+<!-- ══════════════════════════════════════════════
+     Site description  (public strapline)
+══════════════════════════════════════════════ -->
+<div class="row justify-content-center mt-4 mb-5">
+  <div class="col-lg-8 text-center">
+    <p class="lead site-strapline">{{ site_description }}</p>
+    {% if not user.is_authenticated %}
+      <a href="{% url 'accounts:register' %}" class="btn btn-primary me-2">
+        Join the Indaba
+      </a>
+      <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary">
+        Sign in
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     Section divider
+══════════════════════════════════════════════ -->
+<div class="section-rule mb-4">
+  <span class="section-rule__label">Latest Articles</span>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     Article teasers grid
+══════════════════════════════════════════════ -->
+{% if teasers %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+  {% for item in teasers %}
+  {% with article=item.article %}
+  <div class="col">
+    <article class="card h-100 shadow-sm border-0 article-card">
+      {% if article.image %}
+      <img src="{{ article.image.url }}" class="card-img-top article-card__img"
+           alt="{{ article.title }}">
+      {% endif %}
+      <div class="card-body">
+        <!-- Importance badge -->
+        {% if article.importance == 1 %}
+          <span class="badge bg-danger mb-2">Front Page</span>
+        {% elif article.importance == 2 %}
+          <span class="badge bg-warning text-dark mb-2">Top Story</span>
+        {% else %}
+          <span class="badge bg-secondary mb-2">Standard</span>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+        <h2 class="card-title article-card__headline">
+          <a href="{% url 'news:article_detail' article.pk %}"
+             class="text-decoration-none stretched-link article-headline-link">
+            {{ article.title }}
+          </a>
+        </h2>
+        {% else %}
+        <h2 class="card-title article-card__headline">{{ article.title }}</h2>
+        {% endif %}
+
+        <p class="card-text article-card__teaser">{{ item.teaser }}</p>
+        <p class="mb-0">
+          <a href="{% url 'news:article_detail' article.pk %}"
+             class="fw-semibold text-decoration-none">
+            Read more ...
+          </a>
+        </p>
+      </div>
+      <div class="card-footer bg-transparent border-top-0">
+        <small class="text-muted">
+          By
+          {% if user.is_authenticated %}
+          <a href="{% url 'news:journalist_profile' article.author.pk %}">
+            {{ article.author.public_name }}
+          </a>
+          {% else %}
+          {{ article.author.public_name }}
+          {% endif %}
+          {% if article.publisher %}
+            &mdash; {{ article.publisher.name }}
+          {% endif %}
+          {% if article.publication_date %}
+            &middot; {{ article.publication_date|date:"j N Y" }}
+          {% endif %}
+        </small>
+      </div>
+    </article>
+  </div>
+  {% endwith %}
+  {% endfor %}
+</div>
+
+{% if user.is_authenticated %}
+<div class="text-center mt-5">
+  <a href="{% url 'news:articles' %}" class="btn btn-outline-primary px-4">
+    View all articles &rarr;
+  </a>
+</div>
+{% endif %}
+
+{% else %}
+<div class="text-center py-5 text-muted">
+  <i class="bi bi-newspaper display-1 d-block mb-3"></i>
+  <p>No articles have been published yet. Check back soon.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+<div class="comment-item" id="comment-{{ comment.id }}">
+  <div class="comment-body bg-white border rounded-3 p-3 mb-2">
+    <div class="comment-meta d-flex justify-content-between mb-2">
+      <span class="fw-semibold small">
+        <i class="bi bi-person-circle me-1"></i>
+        {{ comment.author.public_name }}
+      </span>
+      <span class="text-muted small">
+        {{ comment.created_at|date:"j N Y, P" }}
+      </span>
+    </div>
+    <p class="mb-1 small">{{ comment.body }}</p>
+    <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+
+      {% if user.role == 'reader' and comment.depth < 3 %}
+      <a href="{{ url_article_detail }}?reply_to={{ comment.id }}#comment-form-card"
+         class="btn btn-link btn-sm p-0 text-muted">
+        <i class="bi bi-reply me-1"></i>Reply
+      </a>
+      {% endif %}
+
+      {% if user.is_authenticated and user.role == 'reader' and comment.author == user %}
+      <a href="{% url 'news:comment_confirm_delete' article.pk comment.id %}"
+         class="btn btn-link btn-sm p-0 text-danger">
+        <i class="bi bi-trash me-1"></i>
+        {% if comment.has_replies %}Delete thread{% else %}Delete{% endif %}
+      </a>
+      {% endif %}
+
+    </div>
+  </div>
+</div>

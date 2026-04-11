@@ -1,0 +1,19 @@
+/*
+ * Bundle entry point for The Daily Indaba.
+ * Keep this file path stable because base.html links to it directly.
+ *
+ * Import order matters:
+ * 1. tokens and global foundation
+ * 2. reusable components
+ * 3. site chrome
+ * 4. footer
+ * 5. content-specific helpers
+ * 6. responsive overrides
+ */
+
+@import url("css/core.css");
+@import url("css/components.css");
+@import url("css/header.css");
+@import url("css/footer.css");
+@import url("css/content.css");
+@import url("css/responsive.css");

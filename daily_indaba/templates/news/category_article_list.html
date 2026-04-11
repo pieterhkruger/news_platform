@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}{{ category.name }} - Articles - The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="mt-2">
+  <div class="mb-4">
+    <h1 class="h3 mb-1">{{ category.name }}</h1>
+    {% if category.description %}
+    <p class="text-muted mb-0">{{ category.description }}</p>
+    {% endif %}
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for article in articles %}
+    <div class="col">
+      <article class="card h-100 shadow-sm border-0 article-card">
+        {% if article.image %}
+        <img src="{{ article.image.url }}"
+             class="card-img-top article-card__img"
+             alt="{{ article.title }}">
+        {% endif %}
+        <div class="card-body">
+          <div class="d-flex flex-wrap gap-2 mb-2">
+            <span class="badge bg-dark">{{ category.name }}</span>
+            {% if article.importance == 1 %}
+            <span class="badge bg-danger">Front Page</span>
+            {% elif article.importance == 2 %}
+            <span class="badge bg-warning text-dark">Top Story</span>
+            {% else %}
+            <span class="badge bg-secondary">Standard</span>
+            {% endif %}
+          </div>
+          <h3 class="card-title article-card__headline">
+            <a href="{% url 'news:article_detail' article.pk %}"
+               class="text-decoration-none stretched-link article-headline-link">
+              {{ article.title }}
+            </a>
+          </h3>
+          <p class="card-text text-muted small">
+            {{ article.content|striptags|truncatewords:20 }}
+          </p>
+        </div>
+        <div class="card-footer bg-transparent border-top-0">
+          <small class="text-muted">
+            By
+            <a href="{% url 'news:journalist_profile' article.author.pk %}">
+              {{ article.author.public_name }}
+            </a>
+            {% if article.publisher %}
+            &middot;
+            <a href="{% url 'news:publisher_profile' article.publisher.pk %}">
+              {{ article.publisher.name }}
+            </a>
+            {% endif %}
+            {% if article.publication_date %}
+            &middot; {{ article.publication_date|date:"j N Y" }}
+            {% endif %}
+          </small>
+        </div>
+      </article>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5 text-muted">
+      <i class="bi bi-newspaper display-1 d-block mb-3"></i>
+      <h3>No articles found in {{ category.name }}.</h3>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

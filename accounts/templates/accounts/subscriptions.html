@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+{% block title %}My Subscriptions - The Daily Indaba{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+  <div class="col-xl-10">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h2 mb-0">
+        <i class="bi bi-bell me-2"></i>My Subscriptions
+      </h1>
+      <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm">
+        &larr; Profile
+      </a>
+    </div>
+
+    {% if not user.is_reader %}
+    <div class="alert alert-info small">
+      Subscriptions are available for reader accounts only.
+      Journalists and editors follow content through their editorial
+      dashboards.
+    </div>
+    {% else %}
+
+    <p class="text-muted small mb-4">
+      Subscribe to publishers and journalists here to unlock full access to
+      their articles. Monthly fees are shown on every card, and the discount
+      tiers below explain how combined pricing works.
+    </p>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3 mb-4">
+      {% for tier in pricing_tiers %}
+      <div class="col">
+        <div class="card h-100 shadow-sm border-0 {{ tier.accent }}">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="text-uppercase small fw-semibold text-muted">
+                {{ tier.title }}
+              </span>
+              {% if pricing %}
+                {% if tier.title == 'All Access' and pricing.all_articles_active %}
+                <span class="badge text-bg-dark">Current</span>
+                {% elif tier.title == 'Reader Bundle' and not pricing.all_articles_active and pricing.total_subs >= 3 %}
+                <span class="badge text-bg-warning">Current</span>
+                {% elif tier.title == 'Double Source' and not pricing.all_articles_active and pricing.total_subs == 2 %}
+                <span class="badge text-bg-success">Current</span>
+                {% elif tier.title == 'Single Source' and not pricing.all_articles_active and pricing.total_subs == 1 %}
+                <span class="badge text-bg-primary">Current</span>
+                {% endif %}
+              {% endif %}
+            </div>
+            <div class="h4 mb-2">{{ tier.headline }}</div>
+            <p class="small text-muted mb-0">{{ tier.detail }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if pricing %}
+    <div class="card shadow-sm border-0 mb-4 {% if pricing.all_articles_active %}border-start border-4 border-success{% endif %}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+          <div>
+            <h2 class="h5 mb-1">
+              <i class="bi bi-receipt me-1"></i>Monthly Cost
+            </h2>
+            <p class="text-muted small mb-0">
+              Current plan: {{ pricing.current_plan_title }}
+            </p>
+          </div>
+          <span class="badge rounded-pill text-bg-light border text-dark">
+            {{ pricing.total_subs }} source{{ pricing.total_subs|pluralize }}
+          </span>
+        </div>
+
+        {% if pricing.all_articles_active %}
+        <div class="alert alert-success mb-3 small">
+          <i class="bi bi-check-circle me-1"></i>
+          <strong>All-Articles Plan active</strong> - flat rate
+          R{{ pricing.all_articles_fee }}/month for full access to every
+          article on the platform.
+        </div>
+        {% elif pricing.total_subs == 0 %}
+        <p class="text-muted small mb-0">
+          You have no active subscriptions yet. Use the publisher and
+          journalist cards below to subscribe directly from this page.
+        </p>
+        {% else %}
+        <div class="row g-2 mb-2">
+          <div class="col-sm-6">
+            <span class="text-muted small">Active subscriptions</span>
+            <div class="fs-5 fw-semibold">{{ pricing.total_subs }}</div>
+          </div>
+          <div class="col-sm-6">
+            <span class="text-muted small">Discount</span>
+            <div class="fs-5 fw-semibold {% if pricing.discount_pct > 0 %}text-success{% endif %}">
+              {% if pricing.discount_pct %}
+                {{ pricing.discount_pct }}% off
+              {% else %}
+                None
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if pricing.discount_pct %}
+        <div class="d-flex justify-content-between small text-muted mb-1">
+          <span>Full price</span>
+          <span>R{{ pricing.raw_total }}/month</span>
+        </div>
+        <div class="d-flex justify-content-between fw-semibold">
+          <span>You pay</span>
+          <span class="text-success">
+            R{{ pricing.discounted_total|floatformat:2 }}/month
+          </span>
+        </div>
+        {% else %}
+        <div class="d-flex justify-content-between fw-semibold">
+          <span>Total</span>
+          <span>R{{ pricing.raw_total }}/month</span>
+        </div>
+        {% endif %}
+
+        <p class="text-muted small mt-2 mb-0">
+          Pricing tiers: 1 source = listed price; 2 sources = 20% off combined total; 3+ sources = 30% off combined total; or choose the all-access flat rate.
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div>
+            <h2 class="h5 mb-1">
+              <i class="bi bi-collection me-1"></i>All-Articles Flat-Rate Plan
+            </h2>
+            <p class="text-muted small mb-0">
+              R{{ pricing.all_articles_fee }}/month - unlimited access to every
+              article from every journalist and publisher on The Daily Indaba.
+              Individual subscriptions remain visible, but this plan replaces
+              per-subscription billing while active.
+            </p>
+          </div>
+          <form method="post"
+                action="{% url 'news:subscribe_all_articles' %}"
+                class="flex-shrink-0">
+            {% csrf_token %}
+            {% if pricing.all_articles_active %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+              <i class="bi bi-x-circle me-1"></i>Cancel plan
+            </button>
+            {% else %}
+            <button type="submit" class="btn btn-sm btn-success">
+              <i class="bi bi-lightning-fill me-1"></i>Activate
+            </button>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <h2 class="h5 mb-3">
+      <i class="bi bi-building me-1"></i>Active Publisher Subscriptions
+    </h2>
+
+    {% if publisher_subs %}
+    <div class="list-group shadow-sm mb-4">
+      {% for sub in publisher_subs %}
+      <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+        <div>
+          <span class="fw-semibold">{{ sub.publisher.name }}</span>
+          <span class="badge bg-secondary ms-2 small">
+            R{{ sub.publisher.monthly_fee }}/month
+          </span>
+          {% if sub.publisher.description %}
+          <p class="text-muted small mb-0 mt-1">
+            {{ sub.publisher.description|truncatewords:20 }}
+          </p>
+          {% endif %}
+        </div>
+        <form method="post"
+              action="{% url 'news:toggle_subscription' %}"
+              class="ms-3 flex-shrink-0">
+          {% csrf_token %}
+          <input type="hidden" name="type" value="publisher">
+          <input type="hidden" name="id" value="{{ sub.publisher.pk }}">
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-bell-slash me-1"></i>Unsubscribe
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted small mb-4">
+      You are not following any publishers yet. Use the publisher cards below
+      to subscribe directly from this page.
+    </p>
+    {% endif %}
+
+    <h2 class="h5 mb-3">
+      <i class="bi bi-person-badge me-1"></i>Active Journalist Subscriptions
+    </h2>
+
+    {% if journalist_subs %}
+    <div class="list-group shadow-sm mb-5">
+      {% for sub in journalist_subs %}
+      <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+        <div>
+          <a href="{% url 'news:journalist_profile' sub.journalist.pk %}"
+             class="fw-semibold text-decoration-none">
+            {{ sub.journalist.public_name }}
+          </a>
+          <span class="badge bg-secondary ms-2 small">
+            R{{ sub.journalist.journalist_monthly_fee }}/month
+          </span>
+          {% if sub.journalist.bio %}
+          <p class="text-muted small mb-0 mt-1">
+            {{ sub.journalist.bio|truncatewords:20 }}
+          </p>
+          {% endif %}
+        </div>
+        <form method="post"
+              action="{% url 'news:toggle_subscription' %}"
+              class="ms-3 flex-shrink-0">
+          {% csrf_token %}
+          <input type="hidden" name="type" value="journalist">
+          <input type="hidden" name="id" value="{{ sub.journalist.pk }}">
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-bell-slash me-1"></i>Unfollow
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted small mb-5">
+      You are not following any journalists yet. Use the journalist cards
+      below to subscribe directly from this page.
+    </p>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 mb-0">
+        <i class="bi bi-grid-1x2 me-1"></i>Discover Publishers
+      </h2>
+      <span class="text-muted small">
+        Monthly fees are shown on every publisher card.
+      </span>
+    </div>
+
+    {% if available_publishers %}
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
+      {% for publisher in available_publishers %}
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+              <div>
+                <h3 class="h5 fw-bold mb-1">{{ publisher.name }}</h3>
+                <p class="text-muted small mb-0">
+                  <i class="bi bi-calendar3 me-1"></i>
+                  Partner since {{ publisher.created_at|date:"N Y" }}
+                </p>
+              </div>
+              <div class="text-end">
+                <span class="badge text-bg-dark mb-2">
+                  R{{ publisher.monthly_fee }}/month
+                </span>
+                {% if publisher.pk in subscribed_publisher_ids %}
+                <div>
+                  <span class="badge bg-success-subtle text-success-emphasis border">
+                    Subscribed
+                  </span>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            {% if publisher.description %}
+            <p class="small mb-4">{{ publisher.description }}</p>
+            {% else %}
+            <p class="small text-muted mb-4">
+              Subscribe to unlock articles from this publisher and receive
+              email alerts when new content is approved.
+            </p>
+            {% endif %}
+
+            <div class="d-flex flex-wrap gap-2">
+              <form method="post" action="{% url 'news:toggle_subscription' %}">
+                {% csrf_token %}
+                <input type="hidden" name="type" value="publisher">
+                <input type="hidden" name="id" value="{{ publisher.pk }}">
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                {% if publisher.pk in subscribed_publisher_ids %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-bell-slash me-1"></i>Unsubscribe
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-sm btn-success">
+                  <i class="bi bi-bell-fill me-1"></i>Subscribe
+                </button>
+                {% endif %}
+              </form>
+              <a href="{% url 'news:publisher_profile' publisher.pk %}"
+                 class="btn btn-sm btn-outline-dark">
+                <i class="bi bi-newspaper me-1"></i>View articles
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 mb-0">
+        <i class="bi bi-people me-1"></i>Discover Journalists
+      </h2>
+      <span class="text-muted small">
+        Compare journalist pricing before you subscribe.
+      </span>
+    </div>
+
+    {% if available_journalists %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+      {% for journalist in available_journalists %}
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+              <div class="d-flex align-items-center gap-3">
+                {% if journalist.profile_picture %}
+                <img src="{{ journalist.profile_picture.url }}"
+                     class="avatar-circle avatar-circle--sm border flex-shrink-0"
+                     alt="{{ journalist.public_name }}">
+                {% else %}
+                <div class="rounded-circle border d-flex align-items-center justify-content-center bg-light flex-shrink-0"
+                     style="width:56px;height:56px;">
+                  <i class="bi bi-person fs-4 text-muted"></i>
+                </div>
+                {% endif %}
+                <div>
+                  <h3 class="h6 fw-bold mb-1">{{ journalist.public_name }}</h3>
+                  <p class="text-muted small mb-0">
+                    R{{ journalist.journalist_monthly_fee }}/month
+                  </p>
+                </div>
+              </div>
+              {% if journalist.pk in subscribed_journalist_ids %}
+              <span class="badge bg-success-subtle text-success-emphasis border">
+                Subscribed
+              </span>
+              {% endif %}
+            </div>
+
+            {% if journalist.bio %}
+            <p class="small text-muted mb-4">{{ journalist.bio|truncatewords:24 }}</p>
+            {% else %}
+            <p class="small text-muted mb-4">
+              Subscribe to unlock this journalist's full articles and receive
+              approval alerts by email.
+            </p>
+            {% endif %}
+
+            <div class="d-flex flex-wrap gap-2">
+              <form method="post" action="{% url 'news:toggle_subscription' %}">
+                {% csrf_token %}
+                <input type="hidden" name="type" value="journalist">
+                <input type="hidden" name="id" value="{{ journalist.pk }}">
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                {% if journalist.pk in subscribed_journalist_ids %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-bell-slash me-1"></i>Unfollow
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-sm btn-success">
+                  <i class="bi bi-bell-fill me-1"></i>Subscribe
+                </button>
+                {% endif %}
+              </form>
+              <a href="{% url 'news:journalist_profile' journalist.pk %}"
+                 class="btn btn-sm btn-outline-dark">
+                <i class="bi bi-person-lines-fill me-1"></i>View profile
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

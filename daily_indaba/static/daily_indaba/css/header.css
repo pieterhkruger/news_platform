@@ -1,0 +1,242 @@
+/*
+ * Site chrome above the main page content.
+ * Active header shell, brand mark, account strip, and primary navigation.
+ */
+
+/* ==========================================================================
+   Brand Mark
+   ========================================================================== */
+/* Brand logo link that dims slightly on hover, confirming it is clickable without aggressive visual change. */
+/* Used in: base.html (daily_indaba) */
+.masthead-logo { display: block; transition: opacity .18s; }
+.masthead-logo:hover { opacity: .88; }
+
+/* ==========================================================================
+   Primary Nav Base
+   ========================================================================== */
+/* Used in: base.html (daily_indaba) */
+.nav-menu {
+  width: 100%;
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+/* Navigation link items with uppercase bold text and a gold underline on active and hover states. */
+.nav-links li a {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, .92);
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 0 1rem;
+  height: 46px;
+  transition: background .18s, color .18s;
+  border-bottom: 3px solid transparent;
+}
+
+.nav-links li a:hover,
+.nav-links li a.active {
+  background: var(--dark);
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.nav-desk a  { border-left: 2px solid rgba(255, 255, 255, .2); }
+.nav-editor a { border-left: 2px solid rgba(255, 255, 255, .2); }
+
+/* ==========================================================================
+   Mobile Toggle
+   ========================================================================== */
+/* Native details/summary powers the mobile menu; CSS only changes presentation. */
+/* Hidden by default; reveals as a hamburger-style menu trigger on narrow screens to collapse navigation. */
+/* Used in: base.html (daily_indaba) */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  gap: .45rem;
+  background: none;
+  border: none;
+  list-style: none;
+  padding: 0 1rem;
+  color: #fff;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  line-height: 46px;
+  cursor: pointer;
+}
+
+/* Remove the browser's built-in disclosure triangle for the custom label/icon. */
+.nav-toggle::-webkit-details-marker { display: none; }
+
+.nav-toggle span {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+/* ==========================================================================
+   Active Header Shell
+   ========================================================================== */
+/* Dark top bar with a gold bottom border, anchoring site identity and branding across all pages. */
+/* Used in: base.html (daily_indaba) */
+.site-header {
+  background: var(--dark);
+  padding: 0;
+  border-bottom: 4px solid var(--gold);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
+}
+
+/* Two-column grid: brand logo on the left, account strip and navigation on the right. */
+.site-header__inner {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: 124px;
+}
+
+/* Left header column housing the masthead logo, centered within the grid cell. */
+.site-header__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 1.35rem;
+  background: var(--dark);
+  border-right: 1px solid var(--dark-3);
+}
+
+.site-header__content {
+  min-width: 0;
+  background: var(--dark);
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+/* Top-right strip showing the current date and logged-in user controls side by side. */
+.site-header__account {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 0;
+  padding: .8rem 1.4rem .4rem;
+  background: var(--dark);
+  border-bottom: 1px solid var(--dark-3);
+  text-align: left;
+}
+
+.site-header__date {
+  color: var(--gold);
+  font-size: .84rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+/* Flex cluster pinning user controls (username and logout) to the right of the account strip. */
+.site-header__account-main {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  justify-content: flex-end;
+  gap: .7rem;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+/* Username link with ellipsis overflow, preventing long names from breaking the two-column header layout. */
+.site-header__profile-link {
+  display: inline-block;
+  max-width: 14rem;
+  /* Prevent long usernames from breaking the two-column header layout. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ddd;
+  font-size: .92rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.site-header__profile-link:hover { color: var(--gold); }
+.site-header__logout-form { margin: 0; }
+
+/* Unstyled logout button rendered as plain text, reducing visual weight beside the username link. */
+.site-header__logout-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: .84rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.site-header__logout-btn:hover { color: var(--gold); }
+.masthead-logo img { height: 112px; width: auto; }
+
+/* Bottom-right strip housing the primary navigation links, aligned flush to the header baseline. */
+.site-header__nav {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  background: var(--dark);
+  padding: 0 1rem .45rem;
+}
+
+/* Navigation block reset to static positioning and transparent background within the active header shell. */
+.primary-nav {
+  background: transparent;
+  position: static;
+  top: auto;
+  z-index: auto;
+  box-shadow: none;
+  width: 100%;
+  height: auto;
+}
+
+/* Flex container aligning navigation links to the bottom edge of the header content area. */
+.primary-nav__inner {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  padding: 0;
+}
+
+.nav-links {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  align-content: flex-end;
+  row-gap: .12rem;
+  min-width: 0;
+}
+
+.nav-links li a {
+  justify-content: center;
+  align-items: flex-end;
+  padding: .22rem .9rem .18rem;
+  min-height: 0;
+  height: auto;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.nav-links li a:hover,
+.nav-links li a.active {
+  background: rgba(255, 255, 255, .05);
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.nav-desk a,
+.nav-editor a {
+  border-left: 2px solid rgba(255, 255, 255, .18);
+}

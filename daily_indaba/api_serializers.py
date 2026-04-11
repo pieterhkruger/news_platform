@@ -40,7 +40,13 @@ from .views.helpers import _first_sentence, _user_has_full_access
 # so the required REST API can translate model data to/from JSON.
 # =============================================================================
 class UserSerializer(serializers.Serializer):
-    """Compact public representation of a platform user."""
+    """Compact read-only public representation of a platform user.
+
+    Exposes only the fields safe to share in nested API responses:
+    ``id``, ``username``, ``role``, and ``public_name``.
+    Used as a nested field inside :class:`ArticleSerializer` and
+    :class:`NewsletterSerializer`.
+    """
 
     # A plain Serializer is enough here because the API only exposes a tiny,
     # hand-picked public subset of user fields rather than the full model.
@@ -51,7 +57,12 @@ class UserSerializer(serializers.Serializer):
 
 
 class PublisherSerializer(serializers.ModelSerializer):
-    """Serializer for publisher metadata."""
+    """Serializer for publisher metadata.
+
+    Exposes ``id``, ``name``, ``description``, ``created_at``, and
+    ``monthly_fee``. Used as a read-only nested field inside
+    :class:`ArticleSerializer`.
+    """
 
     class Meta:
         model = Publisher
@@ -66,7 +77,12 @@ class PublisherSerializer(serializers.ModelSerializer):
 
 
 class NewsletterCategorySerializer(serializers.ModelSerializer):
-    """Serializer for shared editorial categories."""
+    """Serializer for shared editorial categories.
+
+    Exposes ``id``, ``name``, ``slug``, and ``description``. Used as a
+    read-only nested field inside :class:`ArticleSerializer` and
+    :class:`NewsletterSerializer`.
+    """
 
     class Meta:
         model = NewsletterCategory
@@ -74,7 +90,17 @@ class NewsletterCategorySerializer(serializers.ModelSerializer):
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    """Serializer for article list, detail, create, and update flows."""
+    """Serializer for article list, detail, create, and update flows.
+
+    Nests :class:`UserSerializer`, :class:`PublisherSerializer`, and
+    :class:`NewsletterCategorySerializer` for read operations. Write
+    operations accept ``publisher_id`` and ``category_id`` as plain
+    integer primary keys.
+
+    Content is paywall-gated: readers without an active subscription or
+    all-articles plan receive only the teaser sentence via
+    :meth:`to_representation`.
+    """
 
     author = UserSerializer(read_only=True)
     publisher = PublisherSerializer(read_only=True)
@@ -133,7 +159,17 @@ class ArticleSerializer(serializers.ModelSerializer):
         ]
 
     def _reader_has_full_access(self, instance):
-        """Return True when the request-context reader may read the full body.
+        """Return ``True`` when the request-context reader may read the full body.
+
+        Staff roles (journalist, editor, publisher) always have full access.
+        Readers are checked against their subscription plan and subscribed
+        journalist / publisher IDs passed in serializer context.
+
+        :param instance: The article being serialized.
+        :type instance: Article
+        :return: ``True`` if the current user may read the complete article
+            content; ``False`` if only the teaser should be returned.
+        :rtype: bool
         """
         request = self.context.get("request")
         user = getattr(request, "user", None)
@@ -170,14 +206,16 @@ class ArticleSerializer(serializers.ModelSerializer):
         return False
 
     def to_representation(self, instance):
-        """Customize DRF's inherited serializer output for article access.
+        """Customise DRF's serializer output to enforce the article paywall.
 
-        ``ModelSerializer`` inherits ``to_representation()`` from DRF's base
-        ``Serializer`` and would normally serialize the article fields as-is.
-        In this project, the serializer also receives ``context`` from the
-        view, and that context lets it distinguish between users who may see
-        the full article content and users who should receive only teaser
-        content.
+        Calls the parent implementation then appends ``teaser`` and
+        ``full_access`` fields. Readers without access have their ``content``
+        replaced with the teaser sentence.
+
+        :param instance: The article being serialized.
+        :type instance: Article
+        :return: Serialized article data with paywall gating applied.
+        :rtype: dict
         """
         data = super().to_representation(instance)
         teaser = _first_sentence(instance.content)
@@ -189,22 +227,21 @@ class ArticleSerializer(serializers.ModelSerializer):
         return data
 
     def validate(self, attrs):
-        """Add project-specific object-level validation before saving.
+        """Apply project-specific object-level validation before saving.
 
-        ``ModelSerializer`` inherits ``validate()`` from DRF's base
-        ``Serializer``, where the default implementation simply returns
-        ``attrs`` unchanged. That inherited behavior is too generic for this
-        project because article submissions must enforce cross-field business
-        rules that depend on the current user and the combination of submitted
-        values.
+        Enforces two cross-field business rules that cannot be expressed as
+        single-field validators:
 
-        Overriding the inherited hook makes the serializer reject invalid
-        newsroom states before the model is saved, specifically:
-        journalist users may publish only under affiliated publishers, and
-        Front Page articles must include an image. Those checks do not belong
-        to any single serializer field in isolation, so they need the
-        object-level ``validate()`` override rather than DRF's default
-        pass-through behavior.
+        - Front Page articles must include an image.
+        - Journalists may only publish under an affiliated publisher.
+
+        :param attrs: Deserialized and field-validated attribute dictionary.
+        :type attrs: dict
+        :raises serializers.ValidationError: If a Front Page article has no
+            image, or if a journalist submits a non-affiliated publisher.
+        :return: The validated attribute dictionary, unchanged when all
+            checks pass.
+        :rtype: dict
         """
         # self.context["request"] accesses the HTTP request passed when the
         # serializer was instantiated via context={"request": request}.
@@ -253,7 +290,13 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 
 class NewsletterSerializer(serializers.ModelSerializer):
-    """Serializer for newsletter list, detail, create, and update flows."""
+    """Serializer for newsletter list, detail, create, and update flows.
+
+    Nests :class:`UserSerializer` and :class:`NewsletterCategorySerializer`
+    for read operations. Articles are returned as a list of primary keys
+    (not full objects) to keep payloads compact; write operations accept
+    ``article_ids`` restricted to approved articles only.
+    """
 
     author = UserSerializer(read_only=True)
     category = NewsletterCategorySerializer(read_only=True)

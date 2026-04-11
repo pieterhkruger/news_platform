@@ -57,7 +57,20 @@ from .views import helpers as view_helpers
     # once per save. (The dispatch_uid is an arbitrary unique string.)
 )
 def capture_previous_article_approval_state(sender, instance, **kwargs):
-    """Cache the database approval state before an article save runs."""
+    """Cache the database approval state before an article save runs.
+
+    Attaches a ``_previous_approved`` attribute to *instance* so that the
+    matching :func:`notify_subscribers_after_article_approval` post-save
+    receiver can detect a real ``False → True`` approval transition.
+
+    :param sender: The model class that sent the signal (``Article``).
+    :type sender: type
+    :param instance: The ``Article`` instance about to be saved.
+    :type instance: Article
+    :param kwargs: Additional keyword arguments forwarded by Django's signal
+        dispatcher (e.g. ``raw``, ``using``).
+    :rtype: None
+    """
     # -----------------------------------------------------------------------
     # Handle brand-new Article rows that have no previous persisted state
     # -----------------------------------------------------------------------
@@ -96,7 +109,32 @@ def notify_subscribers_after_article_approval(
     created,
     **kwargs,
 ):
-    """Send approval side effects when an existing article becomes approved."""
+    """Send approval side effects when an existing article becomes approved.
+
+    Fires only on a confirmed ``False → True`` transition observed against the
+    database state captured by the pre-save receiver.  Brand-new inserts,
+    unchanged saves, and re-saves of already-approved articles are all skipped.
+
+    Side effects (in order):
+
+    1. Subscriber notification emails via
+       :func:`~daily_indaba.views.helpers._notify_subscribers`.
+    2. Mock external announcement POST via
+       :func:`~daily_indaba.announcement_client.post_article_approval_announcement`.
+    3. In-app :class:`~daily_indaba.models.ArticleNotification` rows via
+       :func:`_create_article_notifications`.
+
+    :param sender: The model class that sent the signal (``Article``).
+    :type sender: type
+    :param instance: The ``Article`` instance that was just saved.
+    :type instance: Article
+    :param created: ``True`` if this save created a new row; ``False`` for
+        updates.
+    :type created: bool
+    :param kwargs: Additional keyword arguments forwarded by Django's signal
+        dispatcher.
+    :rtype: None
+    """
     # -----------------------------------------------------------------------
     # Determine whether article has just been approved
     # -----------------------------------------------------------------------
@@ -133,17 +171,21 @@ def notify_subscribers_after_article_approval(
 def _create_article_notifications(article):
     """Create ArticleNotification rows for the author and all subscribers.
 
-    Called once per approval transition.  Uses bulk_create with
-    ignore_conflicts=True so a duplicate signal fire (e.g. in tests) is
+    Called once per approval transition.  Uses ``bulk_create`` with
+    ``ignore_conflicts=True`` so a duplicate signal fire (e.g. in tests) is
     harmless.
 
     Recipients:
+
     - The article's author (journalist).
     - Readers subscribed to the article's publisher.
     - Readers subscribed to the article's author directly.
 
-    These rows are the unread in-app announcement records described by the
-    ``ArticleNotification`` model docstring.
+    :param article: The newly approved article.
+    :type article: Article
+    :raises django.db.DatabaseError: Propagated if the bulk insert fails for a
+        reason other than a uniqueness conflict.
+    :rtype: None
     """
     recipient_ids = view_helpers._article_approval_recipient_ids(
         article,

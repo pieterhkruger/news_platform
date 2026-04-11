@@ -146,13 +146,14 @@ class Publisher(models.Model):
         # It is used for whole-instance or cross-field business rules that
         # single field validators cannot express. Unlike a database constraint,
         # this is application-level validation & depends on Django calling it.
-        """Validate cross-field / related-object business rules for Publisher.
+        """Validate cross-field business rules for a Publisher instance.
 
-        Django field validators only see one field at a time. This method can
-        inspect the whole Publisher instance, which is why it is the right
-        place to enforce rules such as "the linked account must have
-        role='publisher'" and "monthly_fee must satisfy the current pricing
-        policy".
+        Checks that the linked account has the publisher role and that
+        ``monthly_fee`` satisfies the current pricing policy.
+
+        :raises ValidationError: If the linked account is not a publisher
+            role, or if ``monthly_fee`` is outside the allowed range.
+        :rtype: None
         """
         super().clean()  # Cf. Guest, Chris; et al. (2026:461)
         if (
@@ -166,7 +167,12 @@ class Publisher(models.Model):
         validate_publisher_fee(self.monthly_fee)
 
     def save(self, *args, **kwargs):
-        """Persist the publisher after validating its configurable fee."""
+        """Persist the publisher after validating its configurable fee.
+
+        :raises ValidationError: If ``monthly_fee`` is outside the
+            policy-defined range.
+        :rtype: None
+        """
         # Re-check the configured fee here as a model-level safety net, even
         # when Publisher rows are saved programmatically rather than through a
         # validated form.
@@ -174,6 +180,10 @@ class Publisher(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
+        """Return the publisher's display name.
+
+        :rtype: str
+        """
         return self.name
 
 
@@ -342,12 +352,11 @@ class Article(models.Model):
         ordering = ["importance", "-publication_date", "-created_at"]
 
     def _validate_front_page_image_requirement(self):
-        """
-        Raise ValidationError when a Front Page article has no image.
+        """Raise ``ValidationError`` when a Front Page article has no image.
 
-        This image rule is a business decision for this capstone project's
-        presentation standards. It is not a direct requirement from the
-        assignment brief itself nor a neccessary requirement.
+        :raises ValidationError: If ``importance`` is ``FRONT_PAGE`` and
+            no image has been provided.
+        :rtype: None
         """
         if self.importance == self.FRONT_PAGE and not self.image:
             raise ValidationError(
@@ -361,8 +370,13 @@ class Article(models.Model):
     def approve(self, editor=None):
         """Mark the article as approved and stamp the publication date.
 
-        Only updates the in-memory instance.  The caller must call
-        :meth:`save` so the post-save notification hook can run.
+        Only updates the in-memory instance. The caller must call
+        :meth:`save` so the post-save notification signal fires.
+
+        :param editor: The editor authorising approval; stored in
+            ``approved_by`` when supplied.
+        :type editor: User or None
+        :rtype: None
         """
         self.approved = True
         self.status = self.STATUS_APPROVED
@@ -372,7 +386,13 @@ class Article(models.Model):
             self.approved_by = editor
 
     def return_to_journalist(self, reason=""):
-        """Move the article out of the approval queue and back to its author."""
+        """Move the article out of the approval queue and back to its author.
+
+        :param reason: Optional editor feedback stored in
+            ``editor_feedback``.
+        :type reason: str
+        :rtype: None
+        """
         self.approved = False
         self.status = self.STATUS_RETURNED
         self.publication_date = None
@@ -428,13 +448,16 @@ class Article(models.Model):
     # files behind in MEDIA_ROOT.
     # =========================================================================
     def save(self, *args, **kwargs):
-        """
-        Persist the article and retire the previous image once it is replaced.
+        """Persist the article and retire the previous image once it is replaced.
 
         Django keeps uploaded media files on disk separately from the database
         row, so updating an ImageField does not automatically remove the old
         file.  Cleaning up after commit prevents orphaned media from
         accumulating in ``MEDIA_ROOT/articles/images``.
+
+        :param args: Positional arguments forwarded to the parent ``save``.
+        :param kwargs: Keyword arguments forwarded to the parent ``save``.
+        :rtype: None
         """
         self._validate_front_page_image_requirement()
 
@@ -496,7 +519,14 @@ class Article(models.Model):
             # Cf. https://docs.djangoproject.com/en/5.2/topics/db/transactions/#performing-actions-after-commit
 
     def delete(self, *args, **kwargs):
-        """Delete the row and then prune its image if no other row uses it."""
+        """Delete the row and then prune its image if no other row uses it.
+
+        :param args: Positional arguments forwarded to the parent ``delete``.
+        :param kwargs: Keyword arguments forwarded to the parent ``delete``.
+        :return: A ``(count, detail_dict)`` tuple as returned by Django's
+            default ``Model.delete``.
+        :rtype: tuple
+        """
         # Capture the current file name before the row disappears from the DB.
         image_name = self.image.name or None
         # Remove the article row from the database:
@@ -525,6 +555,10 @@ class Article(models.Model):
         return result
 
     def __str__(self):
+        """Return the article title as its string representation.
+
+        :rtype: str
+        """
         return self.title
 
 
@@ -560,7 +594,12 @@ class NewsletterCategory(models.Model):
         verbose_name_plural = "editorial categories"
 
     def save(self, *args, **kwargs):
-        """Auto-generate :attr:`slug` from :attr:`name` if not set."""
+        """Auto-generate :attr:`slug` from :attr:`name` if not set.
+
+        :param args: Positional arguments forwarded to the parent ``save``.
+        :param kwargs: Keyword arguments forwarded to the parent ``save``.
+        :rtype: None
+        """
         # Overriding ``save()`` is the standard place to derive values such as
         # slugs immediately before persistence, so the stored row stays in sync
         # with the current name when no explicit slug was supplied.
@@ -573,6 +612,10 @@ class NewsletterCategory(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
+        """Return the category name as its string representation.
+
+        :rtype: str
+        """
         return self.name
 
 
@@ -641,7 +684,12 @@ class Newsletter(models.Model):
         ordering = ["-created_at"]
 
     def clean(self):
-        """Restrict newsletter authorship to journalists and editors."""
+        """Restrict newsletter authorship to journalists and editors.
+
+        :raises ValidationError: If the newsletter's author is not a journalist
+            or editor account.
+        :rtype: None
+        """
         super().clean()
         if self.author_id and getattr(self.author, "role", None) not in {
             "journalist",
@@ -657,7 +705,12 @@ class Newsletter(models.Model):
             )
 
     def save(self, *args, **kwargs):
-        """Persist the newsletter after applying role-aware validation."""
+        """Persist the newsletter after applying role-aware validation.
+
+        :param args: Positional arguments forwarded to the parent ``save``.
+        :param kwargs: Keyword arguments forwarded to the parent ``save``.
+        :rtype: None
+        """
         # Model.save() is reached by admin edits and direct ORM usage as well
         # as normal form submissions, so the authorship rule is enforced here
         # in addition to the view and serializer layers.
@@ -667,6 +720,10 @@ class Newsletter(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
+        """Return the newsletter title as its string representation.
+
+        :rtype: str
+        """
         return self.title
 
 
@@ -785,10 +842,15 @@ class Subscription(models.Model):
     def clean(self):
         """Enforce the subscription XOR rule across the two target fields.
 
-        This is another whole-instance rule: a subscription is only valid when
-        exactly one of ``publisher`` or ``journalist`` is set. A single-field
-        validator cannot see both foreign keys together, so ``clean()`` is the
-        correct place for this check.
+        A subscription is only valid when exactly one of ``publisher`` or
+        ``journalist`` is set. A single-field validator cannot see both
+        foreign keys together, so ``clean()`` is the correct place for this
+        check.
+
+        :raises ValidationError: If neither or both target fields are set,
+            if the reader is not a reader-role account, or if the journalist
+            target is not a journalist-role account.
+        :rtype: None
         """
         errors = {}
         if self.publisher is None and self.journalist is None:
@@ -822,7 +884,12 @@ class Subscription(models.Model):
             raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
-        """Persist the subscription after enforcing the role/XOR invariant."""
+        """Persist the subscription after enforcing the role/XOR invariant.
+
+        :param args: Positional arguments forwarded to the parent ``save``.
+        :param kwargs: Keyword arguments forwarded to the parent ``save``.
+        :rtype: None
+        """
         # full_clean() runs the model's clean() method plus Django's normal
         # field and constraint validation, which keeps direct ORM writes
         # aligned with the same rules enforced in forms and views.
@@ -830,6 +897,10 @@ class Subscription(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
+        """Return a human-readable summary of the subscription target.
+
+        :rtype: str
+        """
         target = self.publisher or self.journalist
         return f"{self.reader} \u2192 {target}"
 
@@ -907,12 +978,20 @@ class Comment(models.Model):
 
     @property
     def has_replies(self):
-        """Return True if at least one reply exists on this comment."""
+        """Return True if at least one reply exists on this comment.
+
+        :rtype: bool
+        """
         return self.replies.exists()
 
     @staticmethod
     def _word_count(text):
-        """Return the number of whitespace-separated words in *text*."""
+        """Return the number of whitespace-separated words in *text*.
+
+        :param text: The string to count.
+        :type text: str
+        :rtype: int
+        """
         return len(text.split())
 
     # ------------------------------------------------------------------
@@ -927,10 +1006,12 @@ class Comment(models.Model):
         target article, the author, and the author's existing comments on that
         article. A per-field validator cannot see that wider context.
 
-        Raises
-        ------
-        ValidationError
-            If any of the three business rules are violated.
+        :raises ValidationError: If the reply targets a different article than
+            its parent, if nesting exceeds :attr:`MAX_DEPTH`, if the author
+            already has :attr:`MAX_COMMENTS_PER_ARTICLE` comments on the
+            article, or if the combined word count would exceed
+            :attr:`MAX_WORDS_PER_ARTICLE`.
+        :rtype: None
         """
         if (
             self.parent is not None
@@ -990,7 +1071,12 @@ class Comment(models.Model):
             )
 
     def save(self, *args, **kwargs):
-        """Run full validation (including :meth:`clean`) before saving."""
+        """Run full validation (including :meth:`clean`) before saving.
+
+        :param args: Positional arguments forwarded to the parent ``save``.
+        :param kwargs: Keyword arguments forwarded to the parent ``save``.
+        :rtype: None
+        """
         # Django does NOT call full_clean() automatically before save(), so we
         # call it explicitly here to ensure the depth / word-count / comment-count
         # constraints in clean() are enforced even when comments are created
@@ -1002,6 +1088,10 @@ class Comment(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
+        """Return a readable summary of the comment (author, article, depth).
+
+        :rtype: str
+        """
         return (
             f"Comment by {self.author} on "
             f"'{self.article}' (depth {self.depth})"
@@ -1074,16 +1164,26 @@ class ArticleNotification(models.Model):
         ]
 
     def mark_seen(self):
-        """Stamp seen_at with the current time if not already seen."""
+        """Stamp :attr:`seen_at` with the current time if not already seen.
+
+        :rtype: None
+        """
         if self.seen_at is None:
             self.seen_at = timezone.now()
             self.save(update_fields=["seen_at"])
 
     @property
     def is_unread(self):
-        """Return True when the notification has not yet been viewed."""
+        """Return True when the notification has not yet been viewed.
+
+        :rtype: bool
+        """
         return self.seen_at is None
 
     def __str__(self):
+        """Return a debug-friendly summary of the notification state.
+
+        :rtype: str
+        """
         state = "unread" if self.is_unread else "seen"
         return f"Notification({self.recipient}, article={self.article_id}, {state})"

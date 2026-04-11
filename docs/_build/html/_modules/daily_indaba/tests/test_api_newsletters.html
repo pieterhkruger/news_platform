@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba.tests.test_api_newsletters &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">daily_indaba.tests.test_api_newsletters</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for daily_indaba.tests.test_api_newsletters</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Core newsletter API tests for The Daily Indaba.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">daily_indaba.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Newsletter</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoreNewsApiTestCase</span>
+
+
+<div class="viewcode-block" id="NewsletterApiTests">
+<a class="viewcode-back" href="../../../daily_indaba.tests.html#daily_indaba.tests.test_api_newsletters.NewsletterApiTests">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NewsletterApiTests</span><span class="p">(</span><span class="n">CoreNewsApiTestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retained core newsletter API permission and CRUD tests.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NewsletterApiTests.test_reader_can_list_newsletters_via_api">
+<a class="viewcode-back" href="../../../daily_indaba.tests.html#daily_indaba.tests.test_api_newsletters.NewsletterApiTests.test_reader_can_list_newsletters_via_api">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_reader_can_list_newsletters_via_api</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify authenticated readers can list newsletters through the API.&quot;&quot;&quot;</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ARRANGE: Authenticate as the reader who has newsletter view access</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader_token</span><span class="p">)</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ACT: Request the newsletter-list endpoint</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newsletter_list_url</span><span class="p">)</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ASSERT: Verify the response includes both newsletters created in</span>
+        <span class="c1">#         setUp</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># Checks: newsletter list endpoint returns HTTP 200 OK</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+        <span class="n">returned_titles</span> <span class="o">=</span> <span class="p">{</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">data</span><span class="p">}</span>
+        <span class="c1"># Checks: journalist&#39;s newsletter appears in the listed results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s2">&quot;Journalist morning briefing&quot;</span><span class="p">,</span> <span class="n">returned_titles</span><span class="p">)</span>
+        <span class="c1"># Checks: editor&#39;s newsletter appears in the listed results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s2">&quot;Editor oversight briefing&quot;</span><span class="p">,</span> <span class="n">returned_titles</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NewsletterApiTests.test_editor_can_create_newsletter_via_api">
+<a class="viewcode-back" href="../../../daily_indaba.tests.html#daily_indaba.tests.test_api_newsletters.NewsletterApiTests.test_editor_can_create_newsletter_via_api">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_editor_can_create_newsletter_via_api</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify an editor can create a newsletter through the API.&quot;&quot;&quot;</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ARRANGE: Authenticate as the editor and build a valid newsletter</span>
+        <span class="c1">#          payload referencing an approved article</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor_token</span><span class="p">)</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ACT: Submit the create request</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newsletter_list_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Editor API edition&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Created through the newsletter endpoint.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;category_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+                <span class="s2">&quot;article_ids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="o">.</span><span class="n">pk</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ASSERT: Verify the API creates the newsletter under the editor&#39;s</span>
+        <span class="c1">#         account and links the selected article</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># Checks: newsletter creation returns HTTP 201 Created for editors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">)</span>
+        <span class="n">newsletter</span> <span class="o">=</span> <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Editor API edition&quot;</span><span class="p">)</span>
+        <span class="c1"># Checks: created newsletter is attributed to the submitting editor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">newsletter</span><span class="o">.</span><span class="n">author</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">editor</span><span class="p">)</span>
+        <span class="c1"># Checks: created newsletter is linked to the submitted category</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">newsletter</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">)</span>
+        <span class="c1"># Checks: created newsletter includes the submitted approved article</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">newsletter</span><span class="o">.</span><span class="n">articles</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="o">.</span><span class="n">pk</span><span class="p">],</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NewsletterApiTests.test_reader_cannot_create_newsletter_via_api">
+<a class="viewcode-back" href="../../../daily_indaba.tests.html#daily_indaba.tests.test_api_newsletters.NewsletterApiTests.test_reader_cannot_create_newsletter_via_api">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_reader_cannot_create_newsletter_via_api</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify readers cannot create newsletters through the API.&quot;&quot;&quot;</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ARRANGE: Authenticate as the reader role, which is limited to</span>
+        <span class="c1">#          newsletter viewing rather than authoring</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader_token</span><span class="p">)</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ACT: Attempt the forbidden create request</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newsletter_list_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Reader API edition&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Should be rejected.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;category_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+                <span class="s2">&quot;article_ids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">approved_article</span><span class="o">.</span><span class="n">pk</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ASSERT: Verify the request is rejected and no newsletter row is</span>
+        <span class="c1">#         created</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># Checks: reader&#39;s create attempt returns HTTP 403 Forbidden</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">)</span>
+        <span class="c1"># Checks: no newsletter row is created after the rejected request</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span>
+            <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Reader API edition&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NewsletterApiTests.test_journalist_can_update_own_newsletter_via_patch">
+<a class="viewcode-back" href="../../../daily_indaba.tests.html#daily_indaba.tests.test_api_newsletters.NewsletterApiTests.test_journalist_can_update_own_newsletter_via_patch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_journalist_can_update_own_newsletter_via_patch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify a journalist can update their own newsletter through the API.&quot;&quot;&quot;</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ARRANGE: Authenticate as the journalist who authored the target</span>
+        <span class="c1">#          newsletter</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">journalist_token</span><span class="p">)</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ACT: Patch the journalist-owned newsletter</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;/api/newsletters/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">journalist_newsletter</span><span class="o">.</span><span class="n">pk</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Journalist API briefing updated&quot;</span><span class="p">},</span>
+            <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ASSERT: Verify the update succeeds and the stored title changes</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># Checks: journalist&#39;s PATCH on their own newsletter returns HTTP 200</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">journalist_newsletter</span><span class="o">.</span><span class="n">refresh_from_db</span><span class="p">()</span>
+        <span class="c1"># Checks: newsletter title is updated to the submitted value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">journalist_newsletter</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+            <span class="s2">&quot;Journalist API briefing updated&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NewsletterApiTests.test_editor_can_delete_newsletter_via_api">
+<a class="viewcode-back" href="../../../daily_indaba.tests.html#daily_indaba.tests.test_api_newsletters.NewsletterApiTests.test_editor_can_delete_newsletter_via_api">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_editor_can_delete_newsletter_via_api</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify an editor can delete a newsletter through the API.&quot;&quot;&quot;</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ARRANGE: Authenticate as the editor and target a newsletter</span>
+        <span class="c1">#          authored by another role</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">editor_token</span><span class="p">)</span>
+        <span class="n">target_pk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">journalist_newsletter</span><span class="o">.</span><span class="n">pk</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ACT: Issue the DELETE request against the newsletter-detail</span>
+        <span class="c1">#      endpoint</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/api/newsletters/</span><span class="si">{</span><span class="n">target_pk</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
+
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># ASSERT: Verify the row is removed and the API returns HTTP 204</span>
+        <span class="c1"># -----------------------------------------------------------------</span>
+        <span class="c1"># Checks: editor&#39;s DELETE returns HTTP 204 No Content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_204_NO_CONTENT</span><span class="p">)</span>
+        <span class="c1"># Checks: deleted newsletter row is removed from the database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">target_pk</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

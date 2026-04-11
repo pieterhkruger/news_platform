@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba.views.profiles &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">daily_indaba.views.profiles</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for daily_indaba.views.profiles</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Profile and publisher-management views for The Daily Indaba.</span>
+
+<span class="sd">Internal helper:</span>
+<span class="sd">- _build_publisher_page_context: Builds the shared template context</span>
+<span class="sd">  for both the public profile and owner dashboard publisher views.</span>
+
+<span class="sd">Publisher views:</span>
+<span class="sd">- publisher_profile: Public publisher profile showing approved</span>
+<span class="sd">  articles and subscription controls.</span>
+<span class="sd">- publisher_dashboard: Publisher account&#39;s management dashboard</span>
+<span class="sd">  (owner only); reuses the profile template with management controls.</span>
+<span class="sd">- publisher_manage_editors: Publisher assigns or removes affiliated</span>
+<span class="sd">  editors (POST only; owner only).</span>
+
+<span class="sd">Journalist views:</span>
+<span class="sd">- journalist_profile: Journalist&#39;s public profile with their approved</span>
+<span class="sd">  articles and a subscribe toggle for readers.</span>
+<span class="sd">- journalist_list: Public alphabetical directory of all journalists.</span>
+
+<span class="sd">Public directories:</span>
+<span class="sd">- publisher_list: Public alphabetical directory of all publishers.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Flash messages explain the result of publisher-management actions.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="c1"># Publisher dashboards are available only to signed-in accounts.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">login_required</span>
+<span class="c1"># Shortcuts for loading profile rows, redirecting, and rendering templates.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">render</span>
+
+<span class="c1"># Forms used when managing publisher editors and pricing.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublisherEditorAssignmentForm</span><span class="p">,</span> <span class="n">PublisherFeeForm</span>
+<span class="c1"># Publisher and Subscription power the public/source profile pages.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Publisher</span><span class="p">,</span> <span class="n">Subscription</span>
+<span class="c1"># Shared access helpers keep role checks and ownership rules consistent.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">User</span><span class="p">,</span>
+    <span class="n">_publisher_account_owns_publisher</span><span class="p">,</span>
+    <span class="n">_require_role</span><span class="p">,</span>
+    <span class="n">_user_can_manage_publisher_settings</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_publisher_page_context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">publisher</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_dashboard</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the template context shared by public and owner publisher views.&quot;&quot;&quot;</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Collect the publisher&#39;s public article data:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Show only approved articles on both the public profile and owner dashboard.</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="c1"># Build a QuerySet from the publisher -&gt; articles reverse relation.</span>
+        <span class="n">publisher</span><span class="o">.</span><span class="n">articles</span>
+        <span class="c1"># Add WHERE approved = true so unpublished articles stay hidden.</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Tell Django to join the author table up front for efficiency.</span>
+        <span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">)</span>
+        <span class="c1"># Add ORDER BY importance ASC, publication_date DESC.</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;importance&#39;</span><span class="p">,</span> <span class="s1">&#39;-publication_date&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Determine the current reader&#39;s subscription state:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Readers can subscribe to a publisher, so expose the current subscription state.</span>
+    <span class="n">is_subscribed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;reader&#39;</span><span class="p">:</span>
+        <span class="c1"># Build a queryset with WHERE reader_id = request.user.pk AND</span>
+        <span class="c1"># publisher_id = publisher.pk, then determine whether a matching</span>
+        <span class="c1"># subscription row exists.</span>
+        <span class="n">is_subscribed</span> <span class="o">=</span> <span class="n">Subscription</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">reader</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="n">publisher</span><span class="o">=</span><span class="n">publisher</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Determine which management controls should be shown:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Determine which management controls the current signed-in user should see.</span>
+    <span class="n">can_manage_editors</span> <span class="o">=</span> <span class="n">_publisher_account_owns_publisher</span><span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+        <span class="n">publisher</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">can_manage_settings</span> <span class="o">=</span> <span class="n">_user_can_manage_publisher_settings</span><span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+        <span class="n">publisher</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># Only owners/editors who may manage pricing get the fee form in context.</span>
+    <span class="n">fee_form</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">can_manage_settings</span><span class="p">:</span>
+        <span class="n">fee_form</span> <span class="o">=</span> <span class="n">PublisherFeeForm</span><span class="p">(</span>
+            <span class="n">initial</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;monthly_fee&#39;</span><span class="p">:</span> <span class="n">publisher</span><span class="o">.</span><span class="n">monthly_fee</span><span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Only the publisher account owner may change editor assignments.</span>
+    <span class="n">editor_assignment_form</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">can_manage_editors</span><span class="p">:</span>
+        <span class="n">editor_assignment_form</span> <span class="o">=</span> <span class="n">PublisherEditorAssignmentForm</span><span class="p">(</span>
+            <span class="n">initial</span><span class="o">=</span><span class="p">{</span>
+                <span class="c1"># Add ORDER BY first_name ASC, last_name ASC, username ASC for</span>
+                <span class="c1"># the initial many-to-many editor selection list.</span>
+                <span class="s1">&#39;editors&#39;</span><span class="p">:</span> <span class="n">publisher</span><span class="o">.</span><span class="n">editors</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+                    <span class="s1">&#39;first_name&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;last_name&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;username&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Assemble the shared publisher-page context:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Package all shared template values in one place so both profile views stay aligned.</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">publisher</span><span class="p">,</span>
+        <span class="s1">&#39;articles&#39;</span><span class="p">:</span> <span class="n">articles</span><span class="p">,</span>
+        <span class="s1">&#39;is_subscribed&#39;</span><span class="p">:</span> <span class="n">is_subscribed</span><span class="p">,</span>
+        <span class="s1">&#39;fee_form&#39;</span><span class="p">:</span> <span class="n">fee_form</span><span class="p">,</span>
+        <span class="c1"># Add ORDER BY first_name ASC, last_name ASC, username ASC for the</span>
+        <span class="c1"># assigned-editors display list.</span>
+        <span class="s1">&#39;assigned_editors&#39;</span><span class="p">:</span> <span class="n">publisher</span><span class="o">.</span><span class="n">editors</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+            <span class="s1">&#39;first_name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;last_name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;username&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;can_manage_editors&#39;</span><span class="p">:</span> <span class="n">can_manage_editors</span><span class="p">,</span>
+        <span class="s1">&#39;editor_assignment_form&#39;</span><span class="p">:</span> <span class="n">editor_assignment_form</span><span class="p">,</span>
+        <span class="s1">&#39;is_dashboard&#39;</span><span class="p">:</span> <span class="n">is_dashboard</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<div class="viewcode-block" id="publisher_profile">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.profiles.publisher_profile">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">publisher_profile</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display a publisher&#39;s public profile and its approved articles.&quot;&quot;&quot;</span>
+    <span class="c1"># Load the publisher plus related account/editor rows used by the template.</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+        <span class="c1"># Tell Django to join the account table and prefetch the many-to-many</span>
+        <span class="c1"># editors relation up front for efficiency.</span>
+        <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;account&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;editors&#39;</span><span class="p">),</span>
+        <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s1">&#39;news/publisher_profile.html&#39;</span><span class="p">,</span>
+        <span class="n">_build_publisher_page_context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">publisher</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="publisher_dashboard">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.profiles.publisher_dashboard">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">publisher_dashboard</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display the signed-in publisher account&#39;s management dashboard.&quot;&quot;&quot;</span>
+    <span class="c1"># Only publisher accounts should reach their management dashboard.</span>
+    <span class="k">if</span> <span class="n">_require_role</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;publisher&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Resolve the publisher record owned by the signed-in publisher account.</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+        <span class="c1"># Tell Django to join the account table and prefetch the many-to-many</span>
+        <span class="c1"># editors relation up front for efficiency.</span>
+        <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;account&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;editors&#39;</span><span class="p">),</span>
+        <span class="n">account</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s1">&#39;news/publisher_profile.html&#39;</span><span class="p">,</span>
+        <span class="n">_build_publisher_page_context</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="n">publisher</span><span class="p">,</span>
+            <span class="n">is_dashboard</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="publisher_manage_editors">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.profiles.publisher_manage_editors">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">publisher_manage_editors</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow a publisher account to assign or remove affiliated editors.&quot;&quot;&quot;</span>
+    <span class="c1"># Only publisher accounts may change which editors are attached to a publisher.</span>
+    <span class="k">if</span> <span class="n">_require_role</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;publisher&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Restrict the target publisher to the one owned by the current account.</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+        <span class="c1"># Prefetch the editors relation so the management template and form can</span>
+        <span class="c1"># reuse those rows without extra queries.</span>
+        <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;editors&#39;</span><span class="p">),</span>
+        <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+        <span class="n">account</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># This endpoint only processes the submitted assignment form.</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:publisher_dashboard&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Bind the submitted editor selections and replace the current many-to-many set.</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">PublisherEditorAssignmentForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+        <span class="n">publisher</span><span class="o">.</span><span class="n">editors</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;editors&#39;</span><span class="p">])</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;Publisher editor assignments updated.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;Could not update the editor assignments.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:publisher_dashboard&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="journalist_profile">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.profiles.journalist_profile">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">journalist_profile</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display a journalist&#39;s profile and their approved articles.&quot;&quot;&quot;</span>
+    <span class="c1"># Load the requested journalist account and ensure the role matches.</span>
+    <span class="n">journalist</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+        <span class="n">User</span><span class="p">,</span>
+        <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+        <span class="n">role</span><span class="o">=</span><span class="s1">&#39;journalist&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># Public journalist profiles show only approved articles.</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="c1"># Build a QuerySet from the journalist -&gt; articles reverse relation.</span>
+        <span class="n">journalist</span><span class="o">.</span><span class="n">articles</span>
+        <span class="c1"># Add WHERE approved = true so unpublished articles stay hidden.</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Tell Django to join the publisher table up front for efficiency.</span>
+        <span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;publisher&#39;</span><span class="p">)</span>
+        <span class="c1"># Add ORDER BY importance ASC, publication_date DESC.</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;importance&#39;</span><span class="p">,</span> <span class="s1">&#39;-publication_date&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># Readers can subscribe directly to an individual journalist feed.</span>
+    <span class="n">is_subscribed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;reader&#39;</span><span class="p">:</span>
+        <span class="c1"># Build a queryset with WHERE reader_id = request.user.pk AND</span>
+        <span class="c1"># journalist_id = journalist.pk, then determine whether a matching</span>
+        <span class="c1"># subscription row exists.</span>
+        <span class="n">is_subscribed</span> <span class="o">=</span> <span class="n">Subscription</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">reader</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="n">journalist</span><span class="o">=</span><span class="n">journalist</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+
+    <span class="c1"># Render the journalist bio plus their approved article feed.</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;news/journalist_profile.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;journalist&#39;</span><span class="p">:</span> <span class="n">journalist</span><span class="p">,</span>
+        <span class="s1">&#39;articles&#39;</span><span class="p">:</span> <span class="n">articles</span><span class="p">,</span>
+        <span class="s1">&#39;is_subscribed&#39;</span><span class="p">:</span> <span class="n">is_subscribed</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="journalist_list">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.profiles.journalist_list">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">journalist_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Public directory of all journalists on the platform.&quot;&quot;&quot;</span>
+    <span class="c1"># List every journalist alphabetically for the public directory page.</span>
+    <span class="n">journalists</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">User</span><span class="o">.</span><span class="n">objects</span>
+        <span class="c1"># Add WHERE role = &#39;journalist&#39;.</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s1">&#39;journalist&#39;</span><span class="p">)</span>
+        <span class="c1"># Add ORDER BY first_name ASC, last_name ASC.</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;first_name&#39;</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;news/journalist_list.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;journalists&#39;</span><span class="p">:</span> <span class="n">journalists</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="publisher_list">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.profiles.publisher_list">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">publisher_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Public directory of all publishers on the platform.&quot;&quot;&quot;</span>
+    <span class="c1"># List all publishers alphabetically for the public directory page.</span>
+    <span class="c1"># Add ORDER BY name ASC.</span>
+    <span class="n">publishers</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;news/publisher_list.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;publishers&#39;</span><span class="p">:</span> <span class="n">publishers</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

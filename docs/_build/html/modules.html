@@ -1,0 +1,905 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="daily_indaba package" href="daily_indaba.html" />
+    <link rel="prev" title="daily_indaba documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">daily_indaba</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html">daily_indaba package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html">accounts package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">daily_indaba</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="daily-indaba">
+<h1>daily_indaba<a class="headerlink" href="#daily-indaba" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daily_indaba.html">daily_indaba package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.management.html">daily_indaba.management package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.management.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.management.html#module-daily_indaba.management">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.migrations.html">daily_indaba.migrations package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.migrations.html#module-daily_indaba.migrations.0001_initial">daily_indaba.migrations.0001_initial module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.migrations.html#module-daily_indaba.migrations">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.seeding.html">daily_indaba.seeding package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.seeding.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.seeding.html#module-daily_indaba.seeding.accounts">daily_indaba.seeding.accounts module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.seeding.html#module-daily_indaba.seeding.content">daily_indaba.seeding.content module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.seeding.html#module-daily_indaba.seeding.demo_news">daily_indaba.seeding.demo_news module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.seeding.html#module-daily_indaba.seeding.helpers">daily_indaba.seeding.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.seeding.html#module-daily_indaba.seeding">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.tests.html">daily_indaba.tests package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.tests.html#module-daily_indaba.tests.base">daily_indaba.tests.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.tests.html#module-daily_indaba.tests.test_api_articles">daily_indaba.tests.test_api_articles module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.tests.html#module-daily_indaba.tests.test_api_newsletters">daily_indaba.tests.test_api_newsletters module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.tests.html#module-daily_indaba.tests">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.views.html">daily_indaba.views package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#module-daily_indaba.views.articles">daily_indaba.views.articles module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#module-daily_indaba.views.comments">daily_indaba.views.comments module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#module-daily_indaba.views.dashboards">daily_indaba.views.dashboards module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#module-daily_indaba.views.helpers">daily_indaba.views.helpers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#module-daily_indaba.views.newsletters">daily_indaba.views.newsletters module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#module-daily_indaba.views.notifications">daily_indaba.views.notifications module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#module-daily_indaba.views.profiles">daily_indaba.views.profiles module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#module-daily_indaba.views.static_pages">daily_indaba.views.static_pages module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.views.html#module-daily_indaba.views">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.admin">daily_indaba.admin module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.ArticleAdmin"><code class="docutils literal notranslate"><span class="pre">ArticleAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.ArticleAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">ArticleAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.ArticleAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">ArticleAdmin.list_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.ArticleAdmin.media"><code class="docutils literal notranslate"><span class="pre">ArticleAdmin.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.ArticleAdmin.readonly_fields"><code class="docutils literal notranslate"><span class="pre">ArticleAdmin.readonly_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.ArticleAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">ArticleAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.CommentAdmin"><code class="docutils literal notranslate"><span class="pre">CommentAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.CommentAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">CommentAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.CommentAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">CommentAdmin.list_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.CommentAdmin.media"><code class="docutils literal notranslate"><span class="pre">CommentAdmin.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.CommentAdmin.readonly_fields"><code class="docutils literal notranslate"><span class="pre">CommentAdmin.readonly_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.CommentAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">CommentAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.NewsletterAdmin"><code class="docutils literal notranslate"><span class="pre">NewsletterAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.NewsletterAdmin.filter_horizontal"><code class="docutils literal notranslate"><span class="pre">NewsletterAdmin.filter_horizontal</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.NewsletterAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">NewsletterAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.NewsletterAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">NewsletterAdmin.list_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.NewsletterAdmin.media"><code class="docutils literal notranslate"><span class="pre">NewsletterAdmin.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.NewsletterCategoryAdmin"><code class="docutils literal notranslate"><span class="pre">NewsletterCategoryAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.NewsletterCategoryAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">NewsletterCategoryAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.NewsletterCategoryAdmin.media"><code class="docutils literal notranslate"><span class="pre">NewsletterCategoryAdmin.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.NewsletterCategoryAdmin.prepopulated_fields"><code class="docutils literal notranslate"><span class="pre">NewsletterCategoryAdmin.prepopulated_fields</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.PublisherAdmin"><code class="docutils literal notranslate"><span class="pre">PublisherAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.PublisherAdmin.filter_horizontal"><code class="docutils literal notranslate"><span class="pre">PublisherAdmin.filter_horizontal</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.PublisherAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">PublisherAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.PublisherAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">PublisherAdmin.list_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.PublisherAdmin.media"><code class="docutils literal notranslate"><span class="pre">PublisherAdmin.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.PublisherAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">PublisherAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.SubscriptionAdmin"><code class="docutils literal notranslate"><span class="pre">SubscriptionAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.SubscriptionAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">SubscriptionAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.SubscriptionAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">SubscriptionAdmin.list_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.SubscriptionAdmin.media"><code class="docutils literal notranslate"><span class="pre">SubscriptionAdmin.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.admin.SubscriptionAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">SubscriptionAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.announcement_client">daily_indaba.announcement_client module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#background">Background</a></li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#call-path">Call path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.announcement_client.build_article_announcement_payload"><code class="docutils literal notranslate"><span class="pre">build_article_announcement_payload()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.announcement_client.post_article_approval_announcement"><code class="docutils literal notranslate"><span class="pre">post_article_approval_announcement()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.api_permissions">daily_indaba.api_permissions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanAccessSubscribedArticles"><code class="docutils literal notranslate"><span class="pre">CanAccessSubscribedArticles</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanAccessSubscribedArticles.has_permission"><code class="docutils literal notranslate"><span class="pre">CanAccessSubscribedArticles.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanAccessSubscribedArticles.message"><code class="docutils literal notranslate"><span class="pre">CanAccessSubscribedArticles.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanApproveArticle"><code class="docutils literal notranslate"><span class="pre">CanApproveArticle</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanApproveArticle.has_object_permission"><code class="docutils literal notranslate"><span class="pre">CanApproveArticle.has_object_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanApproveArticle.has_permission"><code class="docutils literal notranslate"><span class="pre">CanApproveArticle.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanApproveArticle.message"><code class="docutils literal notranslate"><span class="pre">CanApproveArticle.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanCreateArticle"><code class="docutils literal notranslate"><span class="pre">CanCreateArticle</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanCreateArticle.has_permission"><code class="docutils literal notranslate"><span class="pre">CanCreateArticle.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanCreateArticle.message"><code class="docutils literal notranslate"><span class="pre">CanCreateArticle.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanCreateNewsletter"><code class="docutils literal notranslate"><span class="pre">CanCreateNewsletter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanCreateNewsletter.has_permission"><code class="docutils literal notranslate"><span class="pre">CanCreateNewsletter.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanCreateNewsletter.message"><code class="docutils literal notranslate"><span class="pre">CanCreateNewsletter.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanDeleteArticle"><code class="docutils literal notranslate"><span class="pre">CanDeleteArticle</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanDeleteArticle.has_object_permission"><code class="docutils literal notranslate"><span class="pre">CanDeleteArticle.has_object_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanDeleteArticle.has_permission"><code class="docutils literal notranslate"><span class="pre">CanDeleteArticle.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanDeleteArticle.message"><code class="docutils literal notranslate"><span class="pre">CanDeleteArticle.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanDeleteNewsletter"><code class="docutils literal notranslate"><span class="pre">CanDeleteNewsletter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanDeleteNewsletter.has_object_permission"><code class="docutils literal notranslate"><span class="pre">CanDeleteNewsletter.has_object_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanDeleteNewsletter.has_permission"><code class="docutils literal notranslate"><span class="pre">CanDeleteNewsletter.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanDeleteNewsletter.message"><code class="docutils literal notranslate"><span class="pre">CanDeleteNewsletter.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanUpdateArticle"><code class="docutils literal notranslate"><span class="pre">CanUpdateArticle</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanUpdateArticle.has_object_permission"><code class="docutils literal notranslate"><span class="pre">CanUpdateArticle.has_object_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanUpdateArticle.has_permission"><code class="docutils literal notranslate"><span class="pre">CanUpdateArticle.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanUpdateArticle.message"><code class="docutils literal notranslate"><span class="pre">CanUpdateArticle.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanUpdateNewsletter"><code class="docutils literal notranslate"><span class="pre">CanUpdateNewsletter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanUpdateNewsletter.has_object_permission"><code class="docutils literal notranslate"><span class="pre">CanUpdateNewsletter.has_object_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanUpdateNewsletter.has_permission"><code class="docutils literal notranslate"><span class="pre">CanUpdateNewsletter.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.CanUpdateNewsletter.message"><code class="docutils literal notranslate"><span class="pre">CanUpdateNewsletter.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.HasArticleViewPermission"><code class="docutils literal notranslate"><span class="pre">HasArticleViewPermission</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.HasArticleViewPermission.has_permission"><code class="docutils literal notranslate"><span class="pre">HasArticleViewPermission.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.HasArticleViewPermission.message"><code class="docutils literal notranslate"><span class="pre">HasArticleViewPermission.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.HasNewsletterViewPermission"><code class="docutils literal notranslate"><span class="pre">HasNewsletterViewPermission</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.HasNewsletterViewPermission.has_permission"><code class="docutils literal notranslate"><span class="pre">HasNewsletterViewPermission.has_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_permissions.HasNewsletterViewPermission.message"><code class="docutils literal notranslate"><span class="pre">HasNewsletterViewPermission.message</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.api_serializers">daily_indaba.api_serializers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.ArticleSerializer"><code class="docutils literal notranslate"><span class="pre">ArticleSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.ArticleSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">ArticleSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.ArticleSerializer.to_representation"><code class="docutils literal notranslate"><span class="pre">ArticleSerializer.to_representation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.ArticleSerializer.validate"><code class="docutils literal notranslate"><span class="pre">ArticleSerializer.validate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.NewsletterCategorySerializer"><code class="docutils literal notranslate"><span class="pre">NewsletterCategorySerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.NewsletterCategorySerializer.Meta"><code class="docutils literal notranslate"><span class="pre">NewsletterCategorySerializer.Meta</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.NewsletterSerializer"><code class="docutils literal notranslate"><span class="pre">NewsletterSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.NewsletterSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">NewsletterSerializer.Meta</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.PublisherSerializer"><code class="docutils literal notranslate"><span class="pre">PublisherSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.PublisherSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">PublisherSerializer.Meta</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_serializers.UserSerializer"><code class="docutils literal notranslate"><span class="pre">UserSerializer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.api_urls">daily_indaba.api_urls module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.api_views">daily_indaba.api_views module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ApiRootView"><code class="docutils literal notranslate"><span class="pre">ApiRootView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ApiRootView.authentication_classes"><code class="docutils literal notranslate"><span class="pre">ApiRootView.authentication_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ApiRootView.get"><code class="docutils literal notranslate"><span class="pre">ApiRootView.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ApiRootView.permission_classes"><code class="docutils literal notranslate"><span class="pre">ApiRootView.permission_classes</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleApproveAPIView"><code class="docutils literal notranslate"><span class="pre">ArticleApproveAPIView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleApproveAPIView.get_permissions"><code class="docutils literal notranslate"><span class="pre">ArticleApproveAPIView.get_permissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleApproveAPIView.post"><code class="docutils literal notranslate"><span class="pre">ArticleApproveAPIView.post()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleDetailAPIView"><code class="docutils literal notranslate"><span class="pre">ArticleDetailAPIView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleDetailAPIView.delete"><code class="docutils literal notranslate"><span class="pre">ArticleDetailAPIView.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleDetailAPIView.get"><code class="docutils literal notranslate"><span class="pre">ArticleDetailAPIView.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleDetailAPIView.get_object_for_read"><code class="docutils literal notranslate"><span class="pre">ArticleDetailAPIView.get_object_for_read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleDetailAPIView.get_object_for_write"><code class="docutils literal notranslate"><span class="pre">ArticleDetailAPIView.get_object_for_write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleDetailAPIView.get_permissions"><code class="docutils literal notranslate"><span class="pre">ArticleDetailAPIView.get_permissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleDetailAPIView.patch"><code class="docutils literal notranslate"><span class="pre">ArticleDetailAPIView.patch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleDetailAPIView.put"><code class="docutils literal notranslate"><span class="pre">ArticleDetailAPIView.put()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleListCreateAPIView"><code class="docutils literal notranslate"><span class="pre">ArticleListCreateAPIView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleListCreateAPIView.get"><code class="docutils literal notranslate"><span class="pre">ArticleListCreateAPIView.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleListCreateAPIView.get_permissions"><code class="docutils literal notranslate"><span class="pre">ArticleListCreateAPIView.get_permissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.ArticleListCreateAPIView.post"><code class="docutils literal notranslate"><span class="pre">ArticleListCreateAPIView.post()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.MockAnnouncementAPIView"><code class="docutils literal notranslate"><span class="pre">MockAnnouncementAPIView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.MockAnnouncementAPIView.authentication_classes"><code class="docutils literal notranslate"><span class="pre">MockAnnouncementAPIView.authentication_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.MockAnnouncementAPIView.parser_classes"><code class="docutils literal notranslate"><span class="pre">MockAnnouncementAPIView.parser_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.MockAnnouncementAPIView.permission_classes"><code class="docutils literal notranslate"><span class="pre">MockAnnouncementAPIView.permission_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.MockAnnouncementAPIView.post"><code class="docutils literal notranslate"><span class="pre">MockAnnouncementAPIView.post()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterDetailAPIView"><code class="docutils literal notranslate"><span class="pre">NewsletterDetailAPIView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterDetailAPIView.delete"><code class="docutils literal notranslate"><span class="pre">NewsletterDetailAPIView.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterDetailAPIView.get"><code class="docutils literal notranslate"><span class="pre">NewsletterDetailAPIView.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterDetailAPIView.get_object"><code class="docutils literal notranslate"><span class="pre">NewsletterDetailAPIView.get_object()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterDetailAPIView.get_permissions"><code class="docutils literal notranslate"><span class="pre">NewsletterDetailAPIView.get_permissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterDetailAPIView.patch"><code class="docutils literal notranslate"><span class="pre">NewsletterDetailAPIView.patch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterDetailAPIView.put"><code class="docutils literal notranslate"><span class="pre">NewsletterDetailAPIView.put()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterListCreateAPIView"><code class="docutils literal notranslate"><span class="pre">NewsletterListCreateAPIView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterListCreateAPIView.get"><code class="docutils literal notranslate"><span class="pre">NewsletterListCreateAPIView.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterListCreateAPIView.get_permissions"><code class="docutils literal notranslate"><span class="pre">NewsletterListCreateAPIView.get_permissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.NewsletterListCreateAPIView.post"><code class="docutils literal notranslate"><span class="pre">NewsletterListCreateAPIView.post()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.SubscribedArticleListAPIView"><code class="docutils literal notranslate"><span class="pre">SubscribedArticleListAPIView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.SubscribedArticleListAPIView.get"><code class="docutils literal notranslate"><span class="pre">SubscribedArticleListAPIView.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.SubscribedArticleListAPIView.get_permissions"><code class="docutils literal notranslate"><span class="pre">SubscribedArticleListAPIView.get_permissions()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.TokenLoginView"><code class="docutils literal notranslate"><span class="pre">TokenLoginView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.TokenLoginView.parser_classes"><code class="docutils literal notranslate"><span class="pre">TokenLoginView.parser_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.TokenLoginView.permission_classes"><code class="docutils literal notranslate"><span class="pre">TokenLoginView.permission_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.TokenLoginView.post"><code class="docutils literal notranslate"><span class="pre">TokenLoginView.post()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.TokenLogoutView"><code class="docutils literal notranslate"><span class="pre">TokenLogoutView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.api_views.TokenLogoutView.post"><code class="docutils literal notranslate"><span class="pre">TokenLogoutView.post()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.apps">daily_indaba.apps module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.apps.DailyIndabaConfig"><code class="docutils literal notranslate"><span class="pre">DailyIndabaConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.apps.DailyIndabaConfig.default_auto_field"><code class="docutils literal notranslate"><span class="pre">DailyIndabaConfig.default_auto_field</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.apps.DailyIndabaConfig.name"><code class="docutils literal notranslate"><span class="pre">DailyIndabaConfig.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.apps.DailyIndabaConfig.ready"><code class="docutils literal notranslate"><span class="pre">DailyIndabaConfig.ready()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.bootstrap">daily_indaba.bootstrap module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.bootstrap.seed_demo_news_if_fresh"><code class="docutils literal notranslate"><span class="pre">seed_demo_news_if_fresh()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.editorial_workflows">daily_indaba.editorial_workflows module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.editorial_workflows.publish_article"><code class="docutils literal notranslate"><span class="pre">publish_article()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.editorial_workflows.return_article_for_revision"><code class="docutils literal notranslate"><span class="pre">return_article_for_revision()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.forms">daily_indaba.forms module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.ArticleForm"><code class="docutils literal notranslate"><span class="pre">ArticleForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.ArticleForm.Meta"><code class="docutils literal notranslate"><span class="pre">ArticleForm.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.ArticleForm.base_fields"><code class="docutils literal notranslate"><span class="pre">ArticleForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.ArticleForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">ArticleForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.ArticleForm.media"><code class="docutils literal notranslate"><span class="pre">ArticleForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.CommentForm"><code class="docutils literal notranslate"><span class="pre">CommentForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.CommentForm.base_fields"><code class="docutils literal notranslate"><span class="pre">CommentForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.CommentForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">CommentForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.CommentForm.media"><code class="docutils literal notranslate"><span class="pre">CommentForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.JournalistFeeForm"><code class="docutils literal notranslate"><span class="pre">JournalistFeeForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.JournalistFeeForm.base_fields"><code class="docutils literal notranslate"><span class="pre">JournalistFeeForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.JournalistFeeForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">JournalistFeeForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.JournalistFeeForm.media"><code class="docutils literal notranslate"><span class="pre">JournalistFeeForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.NewsletterForm"><code class="docutils literal notranslate"><span class="pre">NewsletterForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.NewsletterForm.Meta"><code class="docutils literal notranslate"><span class="pre">NewsletterForm.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.NewsletterForm.base_fields"><code class="docutils literal notranslate"><span class="pre">NewsletterForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.NewsletterForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">NewsletterForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.NewsletterForm.media"><code class="docutils literal notranslate"><span class="pre">NewsletterForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.PublisherEditorAssignmentForm"><code class="docutils literal notranslate"><span class="pre">PublisherEditorAssignmentForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.PublisherEditorAssignmentForm.base_fields"><code class="docutils literal notranslate"><span class="pre">PublisherEditorAssignmentForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.PublisherEditorAssignmentForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">PublisherEditorAssignmentForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.PublisherEditorAssignmentForm.media"><code class="docutils literal notranslate"><span class="pre">PublisherEditorAssignmentForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.PublisherFeeForm"><code class="docutils literal notranslate"><span class="pre">PublisherFeeForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.PublisherFeeForm.base_fields"><code class="docutils literal notranslate"><span class="pre">PublisherFeeForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.PublisherFeeForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">PublisherFeeForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.PublisherFeeForm.media"><code class="docutils literal notranslate"><span class="pre">PublisherFeeForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.RejectionForm"><code class="docutils literal notranslate"><span class="pre">RejectionForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.RejectionForm.base_fields"><code class="docutils literal notranslate"><span class="pre">RejectionForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.RejectionForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">RejectionForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.forms.RejectionForm.media"><code class="docutils literal notranslate"><span class="pre">RejectionForm.media</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.media_files">daily_indaba.media_files module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.media_files.delete_field_file_if_unreferenced"><code class="docutils literal notranslate"><span class="pre">delete_field_file_if_unreferenced()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.models">daily_indaba.models module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#models">Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article"><code class="docutils literal notranslate"><span class="pre">Article</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.title"><code class="docutils literal notranslate"><span class="pre">Article.title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.content"><code class="docutils literal notranslate"><span class="pre">Article.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.created_at"><code class="docutils literal notranslate"><span class="pre">Article.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.publication_date"><code class="docutils literal notranslate"><span class="pre">Article.publication_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.approved"><code class="docutils literal notranslate"><span class="pre">Article.approved</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.status"><code class="docutils literal notranslate"><span class="pre">Article.status</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.approved_by"><code class="docutils literal notranslate"><span class="pre">Article.approved_by</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.editor_feedback"><code class="docutils literal notranslate"><span class="pre">Article.editor_feedback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.importance"><code class="docutils literal notranslate"><span class="pre">Article.importance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.image"><code class="docutils literal notranslate"><span class="pre">Article.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.disclaimer"><code class="docutils literal notranslate"><span class="pre">Article.disclaimer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.author"><code class="docutils literal notranslate"><span class="pre">Article.author</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.publisher"><code class="docutils literal notranslate"><span class="pre">Article.publisher</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.category"><code class="docutils literal notranslate"><span class="pre">Article.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Article.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.FRONT_PAGE"><code class="docutils literal notranslate"><span class="pre">Article.FRONT_PAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.IMPORTANCE_CHOICES"><code class="docutils literal notranslate"><span class="pre">Article.IMPORTANCE_CHOICES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Article.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.STANDARD"><code class="docutils literal notranslate"><span class="pre">Article.STANDARD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.STATUS_APPROVED"><code class="docutils literal notranslate"><span class="pre">Article.STATUS_APPROVED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.STATUS_CHOICES"><code class="docutils literal notranslate"><span class="pre">Article.STATUS_CHOICES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.STATUS_PENDING"><code class="docutils literal notranslate"><span class="pre">Article.STATUS_PENDING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.STATUS_RETURNED"><code class="docutils literal notranslate"><span class="pre">Article.STATUS_RETURNED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.TOP_STORY"><code class="docutils literal notranslate"><span class="pre">Article.TOP_STORY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.approve"><code class="docutils literal notranslate"><span class="pre">Article.approve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id0"><code class="docutils literal notranslate"><span class="pre">Article.approved</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id1"><code class="docutils literal notranslate"><span class="pre">Article.approved_by</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.approved_by_id"><code class="docutils literal notranslate"><span class="pre">Article.approved_by_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id2"><code class="docutils literal notranslate"><span class="pre">Article.author</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.author_id"><code class="docutils literal notranslate"><span class="pre">Article.author_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id3"><code class="docutils literal notranslate"><span class="pre">Article.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.category_id"><code class="docutils literal notranslate"><span class="pre">Article.category_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.clean"><code class="docutils literal notranslate"><span class="pre">Article.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.comments"><code class="docutils literal notranslate"><span class="pre">Article.comments</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id4"><code class="docutils literal notranslate"><span class="pre">Article.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id5"><code class="docutils literal notranslate"><span class="pre">Article.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.delete"><code class="docutils literal notranslate"><span class="pre">Article.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id6"><code class="docutils literal notranslate"><span class="pre">Article.disclaimer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id7"><code class="docutils literal notranslate"><span class="pre">Article.editor_feedback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.get_importance_display"><code class="docutils literal notranslate"><span class="pre">Article.get_importance_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.get_next_by_created_at"><code class="docutils literal notranslate"><span class="pre">Article.get_next_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.get_previous_by_created_at"><code class="docutils literal notranslate"><span class="pre">Article.get_previous_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.get_status_display"><code class="docutils literal notranslate"><span class="pre">Article.get_status_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.id"><code class="docutils literal notranslate"><span class="pre">Article.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id8"><code class="docutils literal notranslate"><span class="pre">Article.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id9"><code class="docutils literal notranslate"><span class="pre">Article.importance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.newsletters"><code class="docutils literal notranslate"><span class="pre">Article.newsletters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.notifications"><code class="docutils literal notranslate"><span class="pre">Article.notifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.objects"><code class="docutils literal notranslate"><span class="pre">Article.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id10"><code class="docutils literal notranslate"><span class="pre">Article.publication_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id11"><code class="docutils literal notranslate"><span class="pre">Article.publisher</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.publisher_id"><code class="docutils literal notranslate"><span class="pre">Article.publisher_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.resubmit_for_approval"><code class="docutils literal notranslate"><span class="pre">Article.resubmit_for_approval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.return_to_journalist"><code class="docutils literal notranslate"><span class="pre">Article.return_to_journalist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Article.save"><code class="docutils literal notranslate"><span class="pre">Article.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id12"><code class="docutils literal notranslate"><span class="pre">Article.status</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id13"><code class="docutils literal notranslate"><span class="pre">Article.title</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification"><code class="docutils literal notranslate"><span class="pre">ArticleNotification</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.article"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.article</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.recipient"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.recipient</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.seen_at"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.seen_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.created_at"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id14"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.article</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.article_id"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.article_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id15"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.get_next_by_created_at"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.get_next_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.get_previous_by_created_at"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.get_previous_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.id"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.is_unread"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.is_unread</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.mark_seen"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.mark_seen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.objects"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id16"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.recipient</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.ArticleNotification.recipient_id"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.recipient_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id17"><code class="docutils literal notranslate"><span class="pre">ArticleNotification.seen_at</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment"><code class="docutils literal notranslate"><span class="pre">Comment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.article"><code class="docutils literal notranslate"><span class="pre">Comment.article</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.author"><code class="docutils literal notranslate"><span class="pre">Comment.author</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.parent"><code class="docutils literal notranslate"><span class="pre">Comment.parent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.depth"><code class="docutils literal notranslate"><span class="pre">Comment.depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.body"><code class="docutils literal notranslate"><span class="pre">Comment.body</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.created_at"><code class="docutils literal notranslate"><span class="pre">Comment.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Comment.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.MAX_COMMENTS_PER_ARTICLE"><code class="docutils literal notranslate"><span class="pre">Comment.MAX_COMMENTS_PER_ARTICLE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.MAX_DEPTH"><code class="docutils literal notranslate"><span class="pre">Comment.MAX_DEPTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.MAX_WORDS_PER_ARTICLE"><code class="docutils literal notranslate"><span class="pre">Comment.MAX_WORDS_PER_ARTICLE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Comment.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id18"><code class="docutils literal notranslate"><span class="pre">Comment.article</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.article_id"><code class="docutils literal notranslate"><span class="pre">Comment.article_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id19"><code class="docutils literal notranslate"><span class="pre">Comment.author</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.author_id"><code class="docutils literal notranslate"><span class="pre">Comment.author_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id20"><code class="docutils literal notranslate"><span class="pre">Comment.body</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.clean"><code class="docutils literal notranslate"><span class="pre">Comment.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id21"><code class="docutils literal notranslate"><span class="pre">Comment.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id22"><code class="docutils literal notranslate"><span class="pre">Comment.depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.get_next_by_created_at"><code class="docutils literal notranslate"><span class="pre">Comment.get_next_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.get_previous_by_created_at"><code class="docutils literal notranslate"><span class="pre">Comment.get_previous_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.has_replies"><code class="docutils literal notranslate"><span class="pre">Comment.has_replies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.id"><code class="docutils literal notranslate"><span class="pre">Comment.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.objects"><code class="docutils literal notranslate"><span class="pre">Comment.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id23"><code class="docutils literal notranslate"><span class="pre">Comment.parent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.parent_id"><code class="docutils literal notranslate"><span class="pre">Comment.parent_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.replies"><code class="docutils literal notranslate"><span class="pre">Comment.replies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Comment.save"><code class="docutils literal notranslate"><span class="pre">Comment.save()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter"><code class="docutils literal notranslate"><span class="pre">Newsletter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.title"><code class="docutils literal notranslate"><span class="pre">Newsletter.title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.description"><code class="docutils literal notranslate"><span class="pre">Newsletter.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.created_at"><code class="docutils literal notranslate"><span class="pre">Newsletter.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.author"><code class="docutils literal notranslate"><span class="pre">Newsletter.author</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.category"><code class="docutils literal notranslate"><span class="pre">Newsletter.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.articles"><code class="docutils literal notranslate"><span class="pre">Newsletter.articles</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Newsletter.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Newsletter.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id24"><code class="docutils literal notranslate"><span class="pre">Newsletter.articles</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id25"><code class="docutils literal notranslate"><span class="pre">Newsletter.author</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.author_id"><code class="docutils literal notranslate"><span class="pre">Newsletter.author_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id26"><code class="docutils literal notranslate"><span class="pre">Newsletter.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.category_id"><code class="docutils literal notranslate"><span class="pre">Newsletter.category_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.clean"><code class="docutils literal notranslate"><span class="pre">Newsletter.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id27"><code class="docutils literal notranslate"><span class="pre">Newsletter.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id28"><code class="docutils literal notranslate"><span class="pre">Newsletter.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.get_next_by_created_at"><code class="docutils literal notranslate"><span class="pre">Newsletter.get_next_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.get_previous_by_created_at"><code class="docutils literal notranslate"><span class="pre">Newsletter.get_previous_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.id"><code class="docutils literal notranslate"><span class="pre">Newsletter.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.objects"><code class="docutils literal notranslate"><span class="pre">Newsletter.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Newsletter.save"><code class="docutils literal notranslate"><span class="pre">Newsletter.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id29"><code class="docutils literal notranslate"><span class="pre">Newsletter.title</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.name"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.slug"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.slug</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.description"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.articles"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.articles</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id30"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.id"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id31"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.newsletters"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.newsletters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.objects"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.NewsletterCategory.save"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id32"><code class="docutils literal notranslate"><span class="pre">NewsletterCategory.slug</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher"><code class="docutils literal notranslate"><span class="pre">Publisher</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.name"><code class="docutils literal notranslate"><span class="pre">Publisher.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.description"><code class="docutils literal notranslate"><span class="pre">Publisher.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.created_at"><code class="docutils literal notranslate"><span class="pre">Publisher.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.account"><code class="docutils literal notranslate"><span class="pre">Publisher.account</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.curates_independent_journalists"><code class="docutils literal notranslate"><span class="pre">Publisher.curates_independent_journalists</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.editors"><code class="docutils literal notranslate"><span class="pre">Publisher.editors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.journalists"><code class="docutils literal notranslate"><span class="pre">Publisher.journalists</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Publisher.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Publisher.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id33"><code class="docutils literal notranslate"><span class="pre">Publisher.account</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.account_id"><code class="docutils literal notranslate"><span class="pre">Publisher.account_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.articles"><code class="docutils literal notranslate"><span class="pre">Publisher.articles</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.clean"><code class="docutils literal notranslate"><span class="pre">Publisher.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id34"><code class="docutils literal notranslate"><span class="pre">Publisher.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id35"><code class="docutils literal notranslate"><span class="pre">Publisher.curates_independent_journalists</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id36"><code class="docutils literal notranslate"><span class="pre">Publisher.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id37"><code class="docutils literal notranslate"><span class="pre">Publisher.editors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.get_next_by_created_at"><code class="docutils literal notranslate"><span class="pre">Publisher.get_next_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.get_previous_by_created_at"><code class="docutils literal notranslate"><span class="pre">Publisher.get_previous_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.id"><code class="docutils literal notranslate"><span class="pre">Publisher.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id38"><code class="docutils literal notranslate"><span class="pre">Publisher.journalists</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.monthly_fee"><code class="docutils literal notranslate"><span class="pre">Publisher.monthly_fee</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id39"><code class="docutils literal notranslate"><span class="pre">Publisher.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.objects"><code class="docutils literal notranslate"><span class="pre">Publisher.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.save"><code class="docutils literal notranslate"><span class="pre">Publisher.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.subscribed_readers"><code class="docutils literal notranslate"><span class="pre">Publisher.subscribed_readers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Publisher.subscriptions"><code class="docutils literal notranslate"><span class="pre">Publisher.subscriptions</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription"><code class="docutils literal notranslate"><span class="pre">Subscription</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.reader"><code class="docutils literal notranslate"><span class="pre">Subscription.reader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.publisher"><code class="docutils literal notranslate"><span class="pre">Subscription.publisher</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.journalist"><code class="docutils literal notranslate"><span class="pre">Subscription.journalist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.created_at"><code class="docutils literal notranslate"><span class="pre">Subscription.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Subscription.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Subscription.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.clean"><code class="docutils literal notranslate"><span class="pre">Subscription.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id40"><code class="docutils literal notranslate"><span class="pre">Subscription.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.get_next_by_created_at"><code class="docutils literal notranslate"><span class="pre">Subscription.get_next_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.get_previous_by_created_at"><code class="docutils literal notranslate"><span class="pre">Subscription.get_previous_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.id"><code class="docutils literal notranslate"><span class="pre">Subscription.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id41"><code class="docutils literal notranslate"><span class="pre">Subscription.journalist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.journalist_id"><code class="docutils literal notranslate"><span class="pre">Subscription.journalist_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.objects"><code class="docutils literal notranslate"><span class="pre">Subscription.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id42"><code class="docutils literal notranslate"><span class="pre">Subscription.publisher</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.publisher_id"><code class="docutils literal notranslate"><span class="pre">Subscription.publisher_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#id43"><code class="docutils literal notranslate"><span class="pre">Subscription.reader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.reader_id"><code class="docutils literal notranslate"><span class="pre">Subscription.reader_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="daily_indaba.html#daily_indaba.models.Subscription.save"><code class="docutils literal notranslate"><span class="pre">Subscription.save()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.role_groups">daily_indaba.role_groups module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.role_groups.sync_role_groups"><code class="docutils literal notranslate"><span class="pre">sync_role_groups()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.signals">daily_indaba.signals module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.signals.capture_previous_article_approval_state"><code class="docutils literal notranslate"><span class="pre">capture_previous_article_approval_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#daily_indaba.signals.notify_subscribers_after_article_approval"><code class="docutils literal notranslate"><span class="pre">notify_subscribers_after_article_approval()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba.urls">daily_indaba.urls module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#support-core-requirements-of-capstone-project">Support core requirements of Capstone project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#good-to-have-additions">Good-to-have additions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#useful-extensions-beyond-core-requirements">Useful extensions beyond core requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="daily_indaba.html#extra-features-added">Extra features added</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="daily_indaba.html#module-daily_indaba">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="accounts.html">accounts package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.migrations.html">accounts.migrations package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#module-accounts.migrations.0001_initial">accounts.migrations.0001_initial module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#module-accounts.migrations">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.tests.html">accounts.tests package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.tests.html#module-accounts.tests.base">accounts.tests.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.tests.html#module-accounts.tests.test_roles">accounts.tests.test_roles module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.tests.html#module-accounts.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#module-accounts.admin">accounts.admin module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.admin.SubscriptionPricingPolicyAdmin"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicyAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.SubscriptionPricingPolicyAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicyAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.SubscriptionPricingPolicyAdmin.media"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicyAdmin.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.SubscriptionPricingPolicyAdmin.readonly_fields"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicyAdmin.readonly_fields</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.admin.TermsAcceptanceAdmin"><code class="docutils literal notranslate"><span class="pre">TermsAcceptanceAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.TermsAcceptanceAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">TermsAcceptanceAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.TermsAcceptanceAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">TermsAcceptanceAdmin.list_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.TermsAcceptanceAdmin.media"><code class="docutils literal notranslate"><span class="pre">TermsAcceptanceAdmin.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.TermsAcceptanceAdmin.readonly_fields"><code class="docutils literal notranslate"><span class="pre">TermsAcceptanceAdmin.readonly_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.TermsAcceptanceAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">TermsAcceptanceAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.admin.UserAdmin"><code class="docutils literal notranslate"><span class="pre">UserAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.UserAdmin.add_fieldsets"><code class="docutils literal notranslate"><span class="pre">UserAdmin.add_fieldsets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.UserAdmin.fieldsets"><code class="docutils literal notranslate"><span class="pre">UserAdmin.fieldsets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.UserAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">UserAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.UserAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">UserAdmin.list_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.UserAdmin.media"><code class="docutils literal notranslate"><span class="pre">UserAdmin.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.admin.UserAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">UserAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#module-accounts.apps">accounts.apps module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.apps.AccountsConfig"><code class="docutils literal notranslate"><span class="pre">AccountsConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.apps.AccountsConfig.default_auto_field"><code class="docutils literal notranslate"><span class="pre">AccountsConfig.default_auto_field</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.apps.AccountsConfig.name"><code class="docutils literal notranslate"><span class="pre">AccountsConfig.name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#module-accounts.forms">accounts.forms module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.forms.PasswordResetConfirmForm"><code class="docutils literal notranslate"><span class="pre">PasswordResetConfirmForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.PasswordResetConfirmForm.base_fields"><code class="docutils literal notranslate"><span class="pre">PasswordResetConfirmForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.PasswordResetConfirmForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">PasswordResetConfirmForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.PasswordResetConfirmForm.media"><code class="docutils literal notranslate"><span class="pre">PasswordResetConfirmForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.forms.PasswordResetRequestForm"><code class="docutils literal notranslate"><span class="pre">PasswordResetRequestForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.PasswordResetRequestForm.base_fields"><code class="docutils literal notranslate"><span class="pre">PasswordResetRequestForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.PasswordResetRequestForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">PasswordResetRequestForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.PasswordResetRequestForm.media"><code class="docutils literal notranslate"><span class="pre">PasswordResetRequestForm.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.PasswordResetRequestForm.send_mail"><code class="docutils literal notranslate"><span class="pre">PasswordResetRequestForm.send_mail()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.forms.ProfileUpdateForm"><code class="docutils literal notranslate"><span class="pre">ProfileUpdateForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.ProfileUpdateForm.Meta"><code class="docutils literal notranslate"><span class="pre">ProfileUpdateForm.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.ProfileUpdateForm.base_fields"><code class="docutils literal notranslate"><span class="pre">ProfileUpdateForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.ProfileUpdateForm.clean"><code class="docutils literal notranslate"><span class="pre">ProfileUpdateForm.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.ProfileUpdateForm.clean_display_name"><code class="docutils literal notranslate"><span class="pre">ProfileUpdateForm.clean_display_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.ProfileUpdateForm.clean_email"><code class="docutils literal notranslate"><span class="pre">ProfileUpdateForm.clean_email()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.ProfileUpdateForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">ProfileUpdateForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.ProfileUpdateForm.media"><code class="docutils literal notranslate"><span class="pre">ProfileUpdateForm.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.ProfileUpdateForm.save"><code class="docutils literal notranslate"><span class="pre">ProfileUpdateForm.save()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.forms.RegistrationForm"><code class="docutils literal notranslate"><span class="pre">RegistrationForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.RegistrationForm.Meta"><code class="docutils literal notranslate"><span class="pre">RegistrationForm.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.RegistrationForm.base_fields"><code class="docutils literal notranslate"><span class="pre">RegistrationForm.base_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.RegistrationForm.clean"><code class="docutils literal notranslate"><span class="pre">RegistrationForm.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.RegistrationForm.clean_email"><code class="docutils literal notranslate"><span class="pre">RegistrationForm.clean_email()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.RegistrationForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">RegistrationForm.declared_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.RegistrationForm.media"><code class="docutils literal notranslate"><span class="pre">RegistrationForm.media</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.forms.RegistrationForm.save"><code class="docutils literal notranslate"><span class="pre">RegistrationForm.save()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#module-accounts.models">accounts.models module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.DEFAULT_SLUG"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.DEFAULT_SLUG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.all_articles_monthly_fee"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.all_articles_monthly_fee</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.clean"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.id"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.journalist_default_fee"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.journalist_default_fee</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.journalist_max_fee"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.journalist_max_fee</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.journalist_min_fee"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.journalist_min_fee</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.objects"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.publisher_default_fee"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.publisher_default_fee</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.publisher_max_fee"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.publisher_max_fee</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.publisher_min_fee"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.publisher_min_fee</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.save"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.SubscriptionPricingPolicy.slug"><code class="docutils literal notranslate"><span class="pre">SubscriptionPricingPolicy.slug</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.accepted_at"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.accepted_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.get_next_by_accepted_at"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.get_next_by_accepted_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.get_previous_by_accepted_at"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.get_previous_by_accepted_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.id"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.objects"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.record_for"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.record_for()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.role"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.role</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.terms_version"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.terms_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.user"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.TermsAcceptance.user_id"><code class="docutils literal notranslate"><span class="pre">TermsAcceptance.user_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">User.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">User.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.ROLE_CHOICES"><code class="docutils literal notranslate"><span class="pre">User.ROLE_CHOICES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.all_articles_plan"><code class="docutils literal notranslate"><span class="pre">User.all_articles_plan</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.approved_articles"><code class="docutils literal notranslate"><span class="pre">User.approved_articles</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.article_notifications"><code class="docutils literal notranslate"><span class="pre">User.article_notifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.articles"><code class="docutils literal notranslate"><span class="pre">User.articles</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.assign_to_role_group"><code class="docutils literal notranslate"><span class="pre">User.assign_to_role_group()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.auth_token"><code class="docutils literal notranslate"><span class="pre">User.auth_token</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.bio"><code class="docutils literal notranslate"><span class="pre">User.bio</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.clean"><code class="docutils literal notranslate"><span class="pre">User.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.comments"><code class="docutils literal notranslate"><span class="pre">User.comments</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.date_joined"><code class="docutils literal notranslate"><span class="pre">User.date_joined</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.display_name"><code class="docutils literal notranslate"><span class="pre">User.display_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.editor_publishers"><code class="docutils literal notranslate"><span class="pre">User.editor_publishers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.email"><code class="docutils literal notranslate"><span class="pre">User.email</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.first_name"><code class="docutils literal notranslate"><span class="pre">User.first_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.get_next_by_date_joined"><code class="docutils literal notranslate"><span class="pre">User.get_next_by_date_joined()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.get_previous_by_date_joined"><code class="docutils literal notranslate"><span class="pre">User.get_previous_by_date_joined()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.get_role_display"><code class="docutils literal notranslate"><span class="pre">User.get_role_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.groups"><code class="docutils literal notranslate"><span class="pre">User.groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.id"><code class="docutils literal notranslate"><span class="pre">User.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.is_active"><code class="docutils literal notranslate"><span class="pre">User.is_active</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.is_editor"><code class="docutils literal notranslate"><span class="pre">User.is_editor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.is_journalist"><code class="docutils literal notranslate"><span class="pre">User.is_journalist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.is_publisher"><code class="docutils literal notranslate"><span class="pre">User.is_publisher</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.is_reader"><code class="docutils literal notranslate"><span class="pre">User.is_reader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.is_staff"><code class="docutils literal notranslate"><span class="pre">User.is_staff</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.is_superuser"><code class="docutils literal notranslate"><span class="pre">User.is_superuser</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.journalist_monthly_fee"><code class="docutils literal notranslate"><span class="pre">User.journalist_monthly_fee</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.journalist_publishers"><code class="docutils literal notranslate"><span class="pre">User.journalist_publishers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.journalist_subscriptions"><code class="docutils literal notranslate"><span class="pre">User.journalist_subscriptions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.last_login"><code class="docutils literal notranslate"><span class="pre">User.last_login</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.last_name"><code class="docutils literal notranslate"><span class="pre">User.last_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.logentry_set"><code class="docutils literal notranslate"><span class="pre">User.logentry_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.managed_publisher"><code class="docutils literal notranslate"><span class="pre">User.managed_publisher</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.newsletters"><code class="docutils literal notranslate"><span class="pre">User.newsletters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.password"><code class="docutils literal notranslate"><span class="pre">User.password</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.profile_picture"><code class="docutils literal notranslate"><span class="pre">User.profile_picture</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.profile_picture_url"><code class="docutils literal notranslate"><span class="pre">User.profile_picture_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.public_name"><code class="docutils literal notranslate"><span class="pre">User.public_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.role"><code class="docutils literal notranslate"><span class="pre">User.role</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.save"><code class="docutils literal notranslate"><span class="pre">User.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.subscribed_journalists"><code class="docutils literal notranslate"><span class="pre">User.subscribed_journalists</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.subscribed_publishers"><code class="docutils literal notranslate"><span class="pre">User.subscribed_publishers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.subscriber_readers"><code class="docutils literal notranslate"><span class="pre">User.subscriber_readers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.subscriptions"><code class="docutils literal notranslate"><span class="pre">User.subscriptions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.terms_acceptance"><code class="docutils literal notranslate"><span class="pre">User.terms_acceptance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.user_permissions"><code class="docutils literal notranslate"><span class="pre">User.user_permissions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.models.User.username"><code class="docutils literal notranslate"><span class="pre">User.username</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.get_all_articles_monthly_fee"><code class="docutils literal notranslate"><span class="pre">get_all_articles_monthly_fee()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.get_default_journalist_monthly_fee"><code class="docutils literal notranslate"><span class="pre">get_default_journalist_monthly_fee()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.get_default_publisher_monthly_fee"><code class="docutils literal notranslate"><span class="pre">get_default_publisher_monthly_fee()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.get_journalist_fee_bounds"><code class="docutils literal notranslate"><span class="pre">get_journalist_fee_bounds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.get_publisher_fee_bounds"><code class="docutils literal notranslate"><span class="pre">get_publisher_fee_bounds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.get_subscription_pricing_policy"><code class="docutils literal notranslate"><span class="pre">get_subscription_pricing_policy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.validate_journalist_fee"><code class="docutils literal notranslate"><span class="pre">validate_journalist_fee()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.models.validate_publisher_fee"><code class="docutils literal notranslate"><span class="pre">validate_publisher_fee()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#module-accounts.urls">accounts.urls module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#url-structure-by-implementation-classification">URL structure by implementation classification</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#core-requirements">Core requirements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#derived-requirements">Derived requirements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#good-to-haves">Good-to-haves</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#nice-extensions">Nice extensions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#optional-features">Optional features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#approved-support-functionality">Approved support functionality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#module-accounts.utils">accounts.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.utils.get_safe_next_url"><code class="docutils literal notranslate"><span class="pre">get_safe_next_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.utils.get_safe_redirect_url"><code class="docutils literal notranslate"><span class="pre">get_safe_redirect_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.utils.get_safe_referrer_url"><code class="docutils literal notranslate"><span class="pre">get_safe_referrer_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.utils.send_email_with_fallback"><code class="docutils literal notranslate"><span class="pre">send_email_with_fallback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.utils.send_password_reset_email"><code class="docutils literal notranslate"><span class="pre">send_password_reset_email()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#module-accounts.views">accounts.views module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaLoginView"><code class="docutils literal notranslate"><span class="pre">DailyIndabaLoginView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaLoginView.get_success_url"><code class="docutils literal notranslate"><span class="pre">DailyIndabaLoginView.get_success_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaLoginView.redirect_authenticated_user"><code class="docutils literal notranslate"><span class="pre">DailyIndabaLoginView.redirect_authenticated_user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaLoginView.template_name"><code class="docutils literal notranslate"><span class="pre">DailyIndabaLoginView.template_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordChangeView"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordChangeView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordChangeView.success_url"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordChangeView.success_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordChangeView.template_name"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordChangeView.template_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetConfirmView"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetConfirmView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetConfirmView.form_class"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetConfirmView.form_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetConfirmView.success_url"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetConfirmView.success_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetConfirmView.template_name"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetConfirmView.template_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetView"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetView.email_template_name"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetView.email_template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetView.form_class"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetView.form_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetView.html_email_template_name"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetView.html_email_template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetView.subject_template_name"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetView.subject_template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetView.success_url"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetView.success_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.html#accounts.views.DailyIndabaPasswordResetView.template_name"><code class="docutils literal notranslate"><span class="pre">DailyIndabaPasswordResetView.template_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.views.account_profile"><code class="docutils literal notranslate"><span class="pre">account_profile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.views.register_user"><code class="docutils literal notranslate"><span class="pre">register_user()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.views.subscriptions"><code class="docutils literal notranslate"><span class="pre">subscriptions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.views.terms_and_conditions"><code class="docutils literal notranslate"><span class="pre">terms_and_conditions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="accounts.html#accounts.views.update_profile"><code class="docutils literal notranslate"><span class="pre">update_profile()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.html#module-accounts">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="daily_indaba documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="daily_indaba.html" class="btn btn-neutral float-right" title="daily_indaba package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

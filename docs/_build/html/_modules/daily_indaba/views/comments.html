@@ -1,0 +1,247 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba.views.comments &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">daily_indaba.views.comments</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for daily_indaba.views.comments</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Comment views for The Daily Indaba.</span>
+
+<span class="sd">Reader-only; all views require login and the &#39;reader&#39; role.</span>
+
+<span class="sd">- post_comment: Post a new comment or threaded reply on an approved</span>
+<span class="sd">  article; requires an active subscription or all-articles plan.</span>
+<span class="sd">- comment_confirm_delete: Render a confirmation page before deleting</span>
+<span class="sd">  the reader&#39;s own comment thread.</span>
+<span class="sd">- comment_delete: Delete the reader&#39;s own comment thread (POST only).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Flash messages survive the redirect back to the article detail page.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="c1"># ValidationError lets the view surface model-level comment rules cleanly.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="c1"># Only signed-in users may post or delete comments.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">login_required</span>
+<span class="c1"># Shortcuts for loading rows or returning the browser to the detail page.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">render</span>
+<span class="c1"># State-changing comment actions should only accept POST requests.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">require_POST</span>
+
+<span class="c1"># Form used for validating new comments and replies.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">CommentForm</span>
+<span class="c1"># Article is the discussion target; Comment stores the threaded discussion rows.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Article</span><span class="p">,</span> <span class="n">Comment</span>
+<span class="c1"># Shared helpers centralise access checks used across the news views.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">_user_has_full_access</span><span class="p">,</span> <span class="n">_require_role</span>
+
+
+<div class="viewcode-block" id="post_comment">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.comments.post_comment">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="nd">@require_POST</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">post_comment</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a comment or reply on an article (readers only).</span>
+
+<span class="sd">    On validation failure the user is redirected back to the article</span>
+<span class="sd">    with an error message rather than re-rendering the form, to keep</span>
+<span class="sd">    the detail view simple.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Only readers may post comments on articles.</span>
+    <span class="k">if</span> <span class="n">_require_role</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;reader&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Load the approved article that the new comment belongs to.</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span> <span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Check that this reader has enough access to participate in discussion.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_user_has_full_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">article</span><span class="p">):</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;You need an active subscription or All-Articles plan to comment on this article.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:article_detail&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+
+    <span class="c1"># Bind the submitted form data to the comment form.</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+        <span class="c1"># Treat the submission as a top-level comment unless a reply target was supplied.</span>
+        <span class="c1"># Start with no parent (top-level comment) unless a parent_id is provided.</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">parent_id</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;parent_id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent_id</span><span class="p">:</span>
+            <span class="c1"># Use .first() so an invalid/tampered parent_id simply behaves like</span>
+            <span class="c1"># &quot;no parent&quot; instead of raising an extra 404 here.</span>
+            <span class="c1"># If replying, find the parent comment in the same article.</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">Comment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>  <span class="c1"># Build a queryset with WHERE</span>
+                <span class="n">pk</span><span class="o">=</span><span class="n">parent_id</span><span class="p">,</span> <span class="n">article</span><span class="o">=</span><span class="n">article</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>  <span class="c1"># Return the first matching Comment row or None.</span>
+
+        <span class="c1"># Create the comment instance with all required fields set explicitly.</span>
+        <span class="n">comment</span> <span class="o">=</span> <span class="n">Comment</span><span class="p">(</span>
+            <span class="n">article</span><span class="o">=</span><span class="n">article</span><span class="p">,</span>
+            <span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span>
+            <span class="n">body</span><span class="o">=</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Attempt to save the comment, allowing model validation to run.</span>
+            <span class="n">comment</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="c1"># If successful, show success message.</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Comment posted.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># If model validation fails, show the error messages.</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">messages</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If form validation fails, show a generic error message.</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Your comment could not be saved.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Always redirect back to the article detail page after processing.</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:article_detail&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="comment_confirm_delete">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.comments.comment_confirm_delete">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">comment_confirm_delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_pk</span><span class="p">,</span> <span class="n">comment_pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a confirmation page before deleting a reader comment thread.&quot;&quot;&quot;</span>
+    <span class="c1"># Only readers may delete their own comments.</span>
+    <span class="k">if</span> <span class="n">_require_role</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;reader&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+
+    <span class="n">comment</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+        <span class="n">Comment</span><span class="p">,</span>
+        <span class="n">pk</span><span class="o">=</span><span class="n">comment_pk</span><span class="p">,</span>
+        <span class="n">article_id</span><span class="o">=</span><span class="n">article_pk</span><span class="p">,</span>
+        <span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s1">&#39;news/comment_confirm_delete.html&#39;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="n">comment</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="comment_delete">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.comments.comment_delete">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="nd">@require_POST</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">comment_delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_pk</span><span class="p">,</span> <span class="n">comment_pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow a reader to delete their own comment thread.&quot;&quot;&quot;</span>
+    <span class="c1"># Only readers may delete their own comments.</span>
+    <span class="k">if</span> <span class="n">_require_role</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;reader&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Fetch the reader&#39;s own comment on the specified article.</span>
+    <span class="n">comment</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+        <span class="n">Comment</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">comment_pk</span><span class="p">,</span> <span class="n">article_id</span><span class="o">=</span><span class="n">article_pk</span><span class="p">,</span>
+        <span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># Read this before deletion so the success message can explain whether the</span>
+    <span class="c1"># delete also removed nested replies.</span>
+    <span class="n">had_replies</span> <span class="o">=</span> <span class="n">comment</span><span class="o">.</span><span class="n">has_replies</span>
+    <span class="n">comment</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">had_replies</span><span class="p">:</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Your comment and its replies have been deleted.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Your comment has been deleted.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:article_detail&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">article_pk</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

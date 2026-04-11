@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba.management.commands.seed_demo_news &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">daily_indaba.management.commands.seed_demo_news</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for daily_indaba.management.commands.seed_demo_news</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Opt-in demo data seeding for The Daily Indaba local showcase environments.</span>
+
+<span class="sd">  * Reads a single custom-format JSON file from</span>
+<span class="sd">    ``daily_indaba/seed_data/default_news_data.json``.</span>
+<span class="sd">  * Uses ``get_or_create`` throughout - safe to run multiple times.</span>
+<span class="sd">  * Accepts ``--password`` (plain text) for all demo accounts so that</span>
+<span class="sd">    no password hash is stored in source control.</span>
+<span class="sd">  * Accepts ``--update-existing`` to refresh fields on already-seeded</span>
+<span class="sd">    records to match the current JSON snapshot.</span>
+<span class="sd">  * Calls ``assign_to_role_group()`` after every user creation / update</span>
+<span class="sd">    so Django auth groups stay in sync.</span>
+
+<span class="sd">Usage</span>
+<span class="sd">-----</span>
+<span class="sd">  python manage.py seed_demo_news</span>
+<span class="sd">  python manage.py seed_demo_news --password indaba2026</span>
+<span class="sd">  python manage.py seed_demo_news --update-existing</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># BaseCommand is the thin Django CLI entrypoint. The heavy lifting now lives in</span>
+<span class="c1"># the seeding package so the command itself can stay focused on argument</span>
+<span class="c1"># parsing and terminal output.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.management.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCommand</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">daily_indaba.seeding.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">_pick_approval_editor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daily_indaba.seeding.demo_news</span><span class="w"> </span><span class="kn">import</span> <span class="n">DemoNewsSeeder</span><span class="p">,</span> <span class="n">SeedDependencies</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">daily_indaba.seeding.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_COMMENT_SEED_CUTOFF</span><span class="p">,</span>
+    <span class="n">_attach_image</span><span class="p">,</span>
+    <span class="n">_attach_profile_picture</span><span class="p">,</span>
+    <span class="n">_load_article_content</span><span class="p">,</span>
+    <span class="n">_load_seed_data</span><span class="p">,</span>
+    <span class="n">_resolve_comment_created_at</span> <span class="k">as</span> <span class="n">_base_resolve_comment_created_at</span><span class="p">,</span>
+    <span class="n">_stable_seed_value</span><span class="p">,</span>
+    <span class="n">_sync_article_image</span> <span class="k">as</span> <span class="n">_base_sync_article_image</span><span class="p">,</span>
+    <span class="n">_sync_profile_picture</span> <span class="k">as</span> <span class="n">_base_sync_profile_picture</span><span class="p">,</span>
+    <span class="n">_to_aware_seed_datetime</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_sync_article_image</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">update_existing</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Command-level wrapper for article image syncing.</span>
+
+<span class="sd">    This keeps the historical patch point inside the command module intact for</span>
+<span class="sd">    tests that monkeypatch ``_attach_image`` here rather than in the seeding</span>
+<span class="sd">    service module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_base_sync_article_image</span><span class="p">(</span>
+        <span class="n">article</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">update_existing</span><span class="p">,</span>
+        <span class="n">attach_image_func</span><span class="o">=</span><span class="n">_attach_image</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_sync_profile_picture</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">update_existing</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Command-level wrapper for profile-picture syncing.</span>
+
+<span class="sd">    The wrapper mirrors the old command-module patch point so tests can swap in</span>
+<span class="sd">    a fake ``_attach_profile_picture`` implementation without reaching into the</span>
+<span class="sd">    new seeding package.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_base_sync_profile_picture</span><span class="p">(</span>
+        <span class="n">user</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">update_existing</span><span class="p">,</span>
+        <span class="n">attach_profile_picture_func</span><span class="o">=</span><span class="n">_attach_profile_picture</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_comment_created_at</span><span class="p">(</span><span class="n">comment_data</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">last_comment_at</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Command-level wrapper for comment timestamp generation.</span>
+
+<span class="sd">    The wrapper passes the command module&#39;s helper aliases into the service</span>
+<span class="sd">    implementation so tests can continue patching helpers on this module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_base_resolve_comment_created_at</span><span class="p">(</span>
+        <span class="n">comment_data</span><span class="p">,</span>
+        <span class="n">article</span><span class="p">,</span>
+        <span class="n">parent</span><span class="p">,</span>
+        <span class="n">last_comment_at</span><span class="p">,</span>
+        <span class="n">to_aware_seed_datetime_func</span><span class="o">=</span><span class="n">_to_aware_seed_datetime</span><span class="p">,</span>
+        <span class="n">stable_seed_value_func</span><span class="o">=</span><span class="n">_stable_seed_value</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="o">=</span><span class="n">_COMMENT_SEED_CUTOFF</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="Command">
+<a class="viewcode-back" href="../../../../daily_indaba.management.commands.html#daily_indaba.management.commands.seed_demo_news.Command">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+    <span class="c1"># Because this file lives under management/commands/, Django exposes the</span>
+    <span class="c1"># class as `python manage.py seed_demo_news`. Django calls add_arguments()</span>
+    <span class="c1"># first to define CLI flags, then handle() to execute the command body.</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Seed opt-in demo users, publishers, articles, newsletters, &quot;</span>
+        <span class="s2">&quot;subscriptions and comments for The Daily Indaba.&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="Command.add_arguments">
+<a class="viewcode-back" href="../../../../daily_indaba.management.commands.html#daily_indaba.management.commands.seed_demo_news.Command.add_arguments">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--password&quot;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="s2">&quot;demo1234&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;Shared plain-text password set on every demo user &quot;</span>
+                <span class="s2">&quot;account. Default: demo1234.&quot;</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--update-existing&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;Overwrite existing demo records to match the current &quot;</span>
+                <span class="s2">&quot;JSON snapshot.&quot;</span>
+            <span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Command.handle">
+<a class="viewcode-back" href="../../../../daily_indaba.management.commands.html#daily_indaba.management.commands.seed_demo_news.Command.handle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the extracted seeding service and print the final one-line summary.</span>
+
+<span class="sd">        The command intentionally stays thin: it parses CLI options, injects</span>
+<span class="sd">        the command module&#39;s helper aliases for backwards-compatible test</span>
+<span class="sd">        patching, and then delegates the actual seeding workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">seeder</span> <span class="o">=</span> <span class="n">DemoNewsSeeder</span><span class="p">(</span>
+            <span class="n">dependencies</span><span class="o">=</span><span class="n">SeedDependencies</span><span class="p">(</span>
+                <span class="n">load_seed_data</span><span class="o">=</span><span class="n">_load_seed_data</span><span class="p">,</span>
+                <span class="n">load_article_content</span><span class="o">=</span><span class="n">_load_article_content</span><span class="p">,</span>
+                <span class="n">sync_article_image</span><span class="o">=</span><span class="n">_sync_article_image</span><span class="p">,</span>
+                <span class="n">sync_profile_picture</span><span class="o">=</span><span class="n">_sync_profile_picture</span><span class="p">,</span>
+                <span class="n">pick_approval_editor</span><span class="o">=</span><span class="n">_pick_approval_editor</span><span class="p">,</span>
+                <span class="n">resolve_comment_created_at</span><span class="o">=</span><span class="n">_resolve_comment_created_at</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">seeder</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">password</span><span class="o">=</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">],</span>
+            <span class="n">update_existing</span><span class="o">=</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;update_existing&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">success_message</span><span class="p">()))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

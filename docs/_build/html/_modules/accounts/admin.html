@@ -1,0 +1,186 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>accounts.admin &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">accounts.admin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for accounts.admin</h1><div class="highlight"><pre>
+<span></span><span class="c1"># admin is Django&#39;s built-in administration site.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin</span>
+<span class="c1"># BaseUserAdmin provides Django&#39;s stock auth-user admin screens; extending it</span>
+<span class="c1"># is the standard way to add custom user-model fields without rebuilding the</span>
+<span class="c1"># whole admin from scratch.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.admin</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserAdmin</span> <span class="k">as</span> <span class="n">BaseUserAdmin</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubscriptionPricingPolicy</span><span class="p">,</span> <span class="n">TermsAcceptance</span><span class="p">,</span> <span class="n">User</span>
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CORE REQUIREMENT - Administrators must be able to manage user accounts</span>
+<span class="c1"># through Django admin, including role and profile fields.</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="UserAdmin">
+<a class="viewcode-back" href="../../accounts.html#accounts.admin.UserAdmin">[docs]</a>
+<span class="nd">@admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserAdmin</span><span class="p">(</span><span class="n">BaseUserAdmin</span><span class="p">):</span>
+    <span class="c1"># Extend the stock auth admin layout with the extra profile fields defined</span>
+    <span class="c1"># on the project&#39;s custom User model.</span>
+    <span class="n">fieldsets</span> <span class="o">=</span> <span class="n">BaseUserAdmin</span><span class="o">.</span><span class="n">fieldsets</span> <span class="o">+</span> <span class="p">(</span>
+        <span class="p">(</span>
+            <span class="s2">&quot;Daily Indaba Profile&quot;</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;bio&quot;</span><span class="p">,</span> <span class="s2">&quot;profile_picture&quot;</span>
+            <span class="p">)},</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="c1"># add_fieldsets controls the admin&#39;s &quot;create user&quot; screen, which is</span>
+    <span class="c1"># separate from the normal &quot;change user&quot; fieldset layout above.</span>
+    <span class="n">add_fieldsets</span> <span class="o">=</span> <span class="n">BaseUserAdmin</span><span class="o">.</span><span class="n">add_fieldsets</span> <span class="o">+</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;Daily Indaba Profile&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,)}),</span>
+    <span class="p">)</span>
+    <span class="c1"># list_display chooses the columns shown on the user changelist page.</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;email&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;is_staff&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;is_superuser&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;date_joined&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># list_filter adds right-sidebar drill-down filters in the admin UI.</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;is_staff&quot;</span><span class="p">,</span> <span class="s2">&quot;is_superuser&quot;</span><span class="p">,</span> <span class="s2">&quot;is_active&quot;</span>
+    <span class="p">)</span>
+    <span class="c1"># search_fields enables the admin search box to query these columns.</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;first_name&quot;</span><span class="p">,</span> <span class="s2">&quot;last_name&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># DERIVED REQUIREMENT - Expose persisted terms-acceptance records in admin so</span>
+<span class="c1"># consent state can be reviewed without inspecting the database manually.</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="TermsAcceptanceAdmin">
+<a class="viewcode-back" href="../../accounts.html#accounts.admin.TermsAcceptanceAdmin">[docs]</a>
+<span class="nd">@admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">TermsAcceptance</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TermsAcceptanceAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="c1"># readonly_fields prevents staff from editing the audit trail manually.</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;terms_version&quot;</span><span class="p">,</span> <span class="s2">&quot;accepted_at&quot;</span><span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;terms_version&quot;</span><span class="p">)</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;user__username&quot;</span><span class="p">,</span> <span class="s2">&quot;user__email&quot;</span><span class="p">)</span>
+    <span class="n">readonly_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;terms_version&quot;</span><span class="p">,</span> <span class="s2">&quot;accepted_at&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SubscriptionPricingPolicyAdmin">
+<a class="viewcode-back" href="../../accounts.html#accounts.admin.SubscriptionPricingPolicyAdmin">[docs]</a>
+<span class="nd">@admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">SubscriptionPricingPolicy</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubscriptionPricingPolicyAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="c1"># The slug identifies the singleton-style pricing row and should remain</span>
+    <span class="c1"># stable once created.</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;slug&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;journalist_min_fee&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;journalist_default_fee&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;journalist_max_fee&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;publisher_min_fee&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;publisher_default_fee&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;publisher_max_fee&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;all_articles_monthly_fee&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">readonly_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;slug&quot;</span><span class="p">,)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

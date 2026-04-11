@@ -1,0 +1,242 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba.role_groups &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">daily_indaba.role_groups</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for daily_indaba.role_groups</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Shared role-group definitions and sync helpers for Daily Indaba.</span>
+
+<span class="sd">Both the post_migrate signal and the create_role_groups management command use</span>
+<span class="sd">the functions in this module. That keeps the group names, permission</span>
+<span class="sd">definitions, and ORM logic in one place so future permission changes only need</span>
+<span class="sd">to be made once.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># To get the active custom user model from Django settings.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_user_model</span>  <span class="c1"># Cf. Mele (2025:372)</span>
+<span class="c1"># Group stores named bundles of permissions; Permission rows live in</span>
+<span class="c1"># Django&#39;s `auth_permission` table and are created during migrate.</span>
+<span class="c1"># Cf.: https://docs.djangoproject.com/en/5.2/topics/auth/default/#groups</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Group</span><span class="p">,</span> <span class="n">Permission</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CORE REQUIREMENT - Define the Readers, Journalists, Editors, and Publishers</span>
+<span class="c1"># groups plus their model-permission codenames so the brief&#39;s role matrix is</span>
+<span class="c1"># explicit in one central module.</span>
+<span class="c1"># =============================================================================</span>
+<span class="n">READER_GROUP_NAME</span> <span class="o">=</span> <span class="s2">&quot;Readers&quot;</span>
+<span class="n">JOURNALIST_GROUP_NAME</span> <span class="o">=</span> <span class="s2">&quot;Journalists&quot;</span>
+<span class="n">EDITOR_GROUP_NAME</span> <span class="o">=</span> <span class="s2">&quot;Editors&quot;</span>
+<span class="n">PUBLISHER_GROUP_NAME</span> <span class="o">=</span> <span class="s2">&quot;Publishers&quot;</span>
+
+<span class="n">READER_PERMISSION_CODENAMES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;view_article&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;view_newsletter&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">JOURNALIST_PERMISSION_CODENAMES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;add_article&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;change_article&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;delete_article&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;view_article&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;add_newsletter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;change_newsletter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;delete_newsletter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;view_newsletter&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">EDITOR_PERMISSION_CODENAMES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;add_newsletter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;change_article&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;delete_article&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;view_article&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;change_newsletter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;delete_newsletter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;view_newsletter&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">PUBLISHER_PERMISSION_CODENAMES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;change_publisher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;view_publisher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;view_article&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;view_newsletter&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">ROLE_GROUPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s2">&quot;reader&quot;</span><span class="p">,</span> <span class="n">READER_GROUP_NAME</span><span class="p">,</span> <span class="n">READER_PERMISSION_CODENAMES</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;journalist&quot;</span><span class="p">,</span> <span class="n">JOURNALIST_GROUP_NAME</span><span class="p">,</span> <span class="n">JOURNALIST_PERMISSION_CODENAMES</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;editor&quot;</span><span class="p">,</span> <span class="n">EDITOR_GROUP_NAME</span><span class="p">,</span> <span class="n">EDITOR_PERMISSION_CODENAMES</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;publisher&quot;</span><span class="p">,</span> <span class="n">PUBLISHER_GROUP_NAME</span><span class="p">,</span> <span class="n">PUBLISHER_PERMISSION_CODENAMES</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="c1"># Keeping the role -&gt; group -&gt; permission mapping in one tuple lets both the</span>
+<span class="c1"># post_migrate hook and the management command iterate the exact same source</span>
+<span class="c1"># of truth.</span>
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># DERIVED REQUIREMENT - Synchronise role groups idempotently so every migrate</span>
+<span class="c1"># run can rebuild the authorisation baseline without manual admin setup.</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="sync_role_groups">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.role_groups.sync_role_groups">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sync_role_groups</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create or update every Daily Indaba role group and return a summary.</span>
+
+<span class="sd">    The helper is idempotent: it can run after every migrate without creating</span>
+<span class="sd">    duplicate groups or memberships.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">_sync_one_group</span><span class="p">(</span>
+            <span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">,</span>
+            <span class="n">group_name</span><span class="o">=</span><span class="n">group_name</span><span class="p">,</span>
+            <span class="n">codenames</span><span class="o">=</span><span class="n">codenames</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">role</span><span class="p">,</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">codenames</span> <span class="ow">in</span> <span class="n">ROLE_GROUPS</span>
+    <span class="p">]</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_sync_one_group</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">role</span><span class="p">,</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">codenames</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Synchronise one role group and return a summary dict.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        role: Internal `User.role` value used to select matching users.</span>
+<span class="sd">        group_name: Django auth-group name to create or update.</span>
+<span class="sd">        codenames: Permission codenames that should belong to the group.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Cf. Mele (2025:373). get_user_model() returns the custom user model used</span>
+    <span class="c1"># here to distinguish between reader, journalist, and editor accounts:</span>
+    <span class="n">User</span> <span class="o">=</span> <span class="n">get_user_model</span><span class="p">()</span>
+
+    <span class="c1"># get_or_create() makes repeated sync runs idempotent - safe after every</span>
+    <span class="c1"># migrate and safe from the manual `create_role_groups` command too:</span>
+    <span class="n">group</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">group_name</span><span class="p">)</span>
+    <span class="c1"># Permissions must be fetched as database rows, not supplied as bare</span>
+    <span class="c1"># codename strings, because Group.permissions is a ManyToMany relation.</span>
+
+    <span class="c1"># Look in the auth_permission table:</span>
+    <span class="n">permissions</span> <span class="o">=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="c1"># Filter by the related django_content_type table</span>
+        <span class="c1"># where row has app_label = &#39;daily_indaba</span>
+        <span class="n">content_type__app_label</span><span class="o">=</span><span class="s2">&quot;daily_indaba&quot;</span><span class="p">,</span>
+        <span class="c1"># Cf. Example code: M06T06 – Django – eCommerce Application Part 1\</span>
+        <span class="c1">#         Examples\AuthLog\grabsomore\views.py</span>
+        <span class="c1"># Filter by auth_permission&#39;s codename field:</span>
+        <span class="n">codename__in</span><span class="o">=</span><span class="n">codenames</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># `.set(...)` replaces the group&#39;s full permission membership in one step,</span>
+    <span class="c1"># which removes drift if the codename list changes later.</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">permissions</span><span class="p">)</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>  <span class="c1"># Build a queryset with WHERE</span>
+        <span class="n">role</span><span class="o">=</span><span class="n">role</span>  <span class="c1"># role = role</span>
+    <span class="p">)</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">user_set</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
+    <span class="c1"># `group.user_set` is the reverse ManyToMany manager for `User.groups`.</span>
+    <span class="c1"># Updating from the group side bulk-syncs every matching user to the role.</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">role</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">group_name</span><span class="p">,</span>
+        <span class="s2">&quot;created&quot;</span><span class="p">:</span> <span class="n">created</span><span class="p">,</span>
+        <span class="s2">&quot;permission_count&quot;</span><span class="p">:</span> <span class="n">permissions</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+        <span class="s2">&quot;user_count&quot;</span><span class="p">:</span> <span class="n">users</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+    <span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

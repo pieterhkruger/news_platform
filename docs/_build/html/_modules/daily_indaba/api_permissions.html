@@ -1,0 +1,630 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba.api_permissions &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">daily_indaba.api_permissions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for daily_indaba.api_permissions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Permission policy layer for the Daily Indaba REST API.</span>
+
+<span class="sd">This module gathers the custom Django REST framework permission classes used by</span>
+<span class="sd">the article and newsletter endpoints. The aim is to keep the API&#39;s access</span>
+<span class="sd">rules in one place so the views can declare *which* policy applies without</span>
+<span class="sd">repeating the underlying role checks, Django model-permission checks, or</span>
+<span class="sd">object-scope decisions in every action.</span>
+
+<span class="sd">The implementation deliberately combines three layers of authorisation:</span>
+
+<span class="sd">- authentication: anonymous requests are rejected before any role-specific</span>
+<span class="sd">  behaviour is considered;</span>
+<span class="sd">- Django permissions: ``user.has_perm(...)`` enforces the same permission model</span>
+<span class="sd">  carried by the synchronised role groups;</span>
+<span class="sd">- object scope: article and newsletter ownership, editorial oversight, and</span>
+<span class="sd">  publisher-assignment rules are enforced against the concrete record being</span>
+<span class="sd">  accessed.</span>
+
+<span class="sd">This split mirrors DRF&#39;s own permission flow, where ``has_permission(...)``</span>
+<span class="sd">runs before the view resolves the object and ``has_object_permission(...)``</span>
+<span class="sd">runs after the object is available. Keeping that logic here makes the API</span>
+<span class="sd">behaviour easier to review against the capstone requirements and keeps the</span>
+<span class="sd">browser and API layers aligned on the same editorial boundaries.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">permissions</span>
+<span class="c1"># Cf. https://www.django-rest-framework.org/api-guide/permissions/#custom-permissions</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.views.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">_editor_can_manage_article</span>
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># DERIVED REQUIREMENT - Keep the REST API authorisation rules in one module so</span>
+<span class="c1"># article and newsletter endpoints can share the same role, group-permission,</span>
+<span class="c1"># and object-scope decisions without duplicating them in every view method.</span>
+<span class="c1"># =============================================================================</span>
+<span class="n">APP_LABEL</span> <span class="o">=</span> <span class="s2">&quot;daily_indaba&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_has_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">codename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``True`` when *user* holds the named model permission.</span>
+
+<span class="sd">    :param user: The user to check.</span>
+<span class="sd">    :type user: User</span>
+<span class="sd">    :param codename: The bare permission codename (without app label),</span>
+<span class="sd">        e.g. ``&quot;view_article&quot;``.</span>
+<span class="sd">    :type codename: str</span>
+<span class="sd">    :return: ``True`` if authenticated and the permission is held;</span>
+<span class="sd">        ``False`` otherwise.</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># user.has_perm(...) resolves both direct and group-derived permissions, so</span>
+    <span class="c1"># this helper lets DRF enforce the same Django auth model configured in the</span>
+    <span class="c1"># synchronised role groups.</span>
+    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">APP_LABEL</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">codename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># READ PERMISSIONS</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="HasArticleViewPermission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.HasArticleViewPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HasArticleViewPermission</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Require the standard article-view permission.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You do not have permission to view articles.&quot;</span>
+
+<div class="viewcode-block" id="HasArticleViewPermission.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.HasArticleViewPermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user holds the ``view_article`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user may view articles.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Request-level read access is controlled entirely by the standard</span>
+        <span class="c1"># Django model permission for articles.</span>
+        <span class="k">return</span> <span class="n">_has_permission</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;view_article&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="HasNewsletterViewPermission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.HasNewsletterViewPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HasNewsletterViewPermission</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Require the standard newsletter-view permission.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You do not have permission to view newsletters.&quot;</span>
+
+<div class="viewcode-block" id="HasNewsletterViewPermission.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.HasNewsletterViewPermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user holds the ``view_newsletter`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user may view newsletters.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Readers, journalists, editors, and publishers all flow through the</span>
+        <span class="c1"># same newsletter view permission rather than ad-hoc role checks.</span>
+        <span class="k">return</span> <span class="n">_has_permission</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;view_newsletter&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># ARTICLE WRITE / APPROVAL PERMISSIONS</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="CanCreateArticle">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanCreateArticle">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanCreateArticle</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow article creation only for journalists with the right permission.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Only journalists can create articles.&quot;</span>
+
+<div class="viewcode-block" id="CanCreateArticle.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanCreateArticle.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user is an authenticated journalist with</span>
+<span class="sd">        the ``add_article`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user may create articles.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># Article creation is limited to journalist accounts that also carry</span>
+        <span class="c1"># the expected Django model permission from the Journalists group.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span>
+            <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;journalist&quot;</span>
+            <span class="ow">and</span> <span class="n">_has_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;add_article&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CanAccessSubscribedArticles">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanAccessSubscribedArticles">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanAccessSubscribedArticles</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow the subscribed-feed endpoint only for readers.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Only readers can access subscribed articles.&quot;</span>
+
+<div class="viewcode-block" id="CanAccessSubscribedArticles.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanAccessSubscribedArticles.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user is an authenticated reader with</span>
+<span class="sd">        the ``view_article`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user may access the subscribed article feed.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># The subscribed feed is a reader-specific view on top of the normal</span>
+        <span class="c1"># article visibility rules, so the endpoint remains closed to other</span>
+        <span class="c1"># authenticated roles.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span>
+            <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;reader&quot;</span>
+            <span class="ow">and</span> <span class="n">_has_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;view_article&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CanUpdateArticle">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanUpdateArticle">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanUpdateArticle</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow article updates only for permitted journalists or editors.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You are not allowed to update articles.&quot;</span>
+
+<div class="viewcode-block" id="CanUpdateArticle.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanUpdateArticle.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user is a journalist or editor with the</span>
+<span class="sd">        ``change_article`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user&#39;s role and permission allow updates.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># DRF evaluates has_permission(...) before looking up the target object.</span>
+        <span class="c1"># That keeps obvious role rejections cheap and makes the error message</span>
+        <span class="c1"># explicit before any article-specific scope logic runs.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;reader&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Readers cannot update articles.&quot;</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;journalist&quot;</span><span class="p">,</span> <span class="s2">&quot;editor&quot;</span><span class="p">}</span> <span class="ow">and</span> <span class="n">_has_permission</span><span class="p">(</span>
+            <span class="n">user</span><span class="p">,</span>
+            <span class="s2">&quot;change_article&quot;</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="CanUpdateArticle.has_object_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanUpdateArticle.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enforce ownership and scope rules for article updates.</span>
+
+<span class="sd">        Journalists may only update their own unapproved articles. Editors</span>
+<span class="sd">        may update any article within their curation scope.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :param obj: The article being updated.</span>
+<span class="sd">        :type obj: Article</span>
+<span class="sd">        :return: ``True`` if the user may update this specific article.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;journalist&quot;</span><span class="p">:</span>
+            <span class="c1"># Journalists are limited to their own drafts; once an article is</span>
+            <span class="c1"># approved, later editorial changes belong to the editor workflow.</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">author</span> <span class="o">!=</span> <span class="n">user</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You can only update your own articles.&quot;</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">approved</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Approved articles cannot be edited by journalists.&quot;</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;editor&quot;</span><span class="p">:</span>
+            <span class="c1"># Editors may edit across authors, but only for articles that fall</span>
+            <span class="c1"># inside the publisher scope they curate.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_editor_can_manage_article</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You are not assigned to curate this article.&quot;</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Readers cannot update articles.&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CanDeleteArticle">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanDeleteArticle">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanDeleteArticle</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow article deletion only for permitted journalists or editors.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You are not allowed to delete articles.&quot;</span>
+
+<div class="viewcode-block" id="CanDeleteArticle.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanDeleteArticle.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user is a journalist or editor with the</span>
+<span class="sd">        ``delete_article`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user&#39;s role and permission allow deletion.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># Delete uses the same role split as update, but maps to Django&#39;s</span>
+        <span class="c1"># delete permission so the group layer remains meaningful at runtime.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;reader&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Readers cannot delete articles.&quot;</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;journalist&quot;</span><span class="p">,</span> <span class="s2">&quot;editor&quot;</span><span class="p">}</span> <span class="ow">and</span> <span class="n">_has_permission</span><span class="p">(</span>
+            <span class="n">user</span><span class="p">,</span>
+            <span class="s2">&quot;delete_article&quot;</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="CanDeleteArticle.has_object_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanDeleteArticle.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enforce ownership and scope rules for article deletion.</span>
+
+<span class="sd">        Journalists may only delete their own unapproved articles. Editors</span>
+<span class="sd">        may delete any article within their curation scope.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :param obj: The article being deleted.</span>
+<span class="sd">        :type obj: Article</span>
+<span class="sd">        :return: ``True`` if the user may delete this specific article.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;journalist&quot;</span><span class="p">:</span>
+            <span class="c1"># Journalists may remove only their own unapproved work. Once an</span>
+            <span class="c1"># article is approved, removal becomes an editorial action rather</span>
+            <span class="c1"># than an author-draft action.</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">author</span> <span class="o">!=</span> <span class="n">user</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You can only delete your own articles.&quot;</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">approved</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Approved articles cannot be deleted by journalists.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;editor&quot;</span><span class="p">:</span>
+            <span class="c1"># Editors may delete within the same curation scope used elsewhere.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_editor_can_manage_article</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You are not assigned to curate this article.&quot;</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Readers cannot delete articles.&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CanApproveArticle">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanApproveArticle">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanApproveArticle</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow article approval only for editors.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Only editors can approve articles.&quot;</span>
+
+<div class="viewcode-block" id="CanApproveArticle.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanApproveArticle.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user is an authenticated editor with the</span>
+<span class="sd">        ``change_article`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user may approve articles.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># Approval is an editor-only action and deliberately reuses the normal</span>
+        <span class="c1"># article change permission from the Editors group.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span>
+            <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;editor&quot;</span>
+            <span class="ow">and</span> <span class="n">_has_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;change_article&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CanApproveArticle.has_object_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanApproveArticle.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Restrict approval to articles within the editor&#39;s curation scope.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :param obj: The article to be approved.</span>
+<span class="sd">        :type obj: Article</span>
+<span class="sd">        :return: ``True`` if the editor curates the article&#39;s publisher.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Editors cannot approve articles outside the publishers they curate.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_editor_can_manage_article</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You are not assigned to curate this article.&quot;</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># NEWSLETTER WRITE PERMISSIONS</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="CanCreateNewsletter">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanCreateNewsletter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanCreateNewsletter</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow newsletter creation only for journalists or editors.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Only journalists and editors can create newsletters.&quot;</span>
+
+<div class="viewcode-block" id="CanCreateNewsletter.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanCreateNewsletter.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user is a journalist or editor with the</span>
+<span class="sd">        ``add_newsletter`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user may create newsletters.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># Both journalists and editors may author newsletters, but the API</span>
+        <span class="c1"># still checks the concrete Django permission rather than trusting the</span>
+        <span class="c1"># role field alone.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span>
+            <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;journalist&quot;</span><span class="p">,</span> <span class="s2">&quot;editor&quot;</span><span class="p">}</span>
+            <span class="ow">and</span> <span class="n">_has_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;add_newsletter&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CanUpdateNewsletter">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanUpdateNewsletter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanUpdateNewsletter</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow newsletter updates for editors or the owning journalist.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You are not allowed to update newsletters.&quot;</span>
+
+<div class="viewcode-block" id="CanUpdateNewsletter.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanUpdateNewsletter.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user is a journalist or editor with the</span>
+<span class="sd">        ``change_newsletter`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user&#39;s role and permission allow updates.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># Request-level gate: only the two authoring roles may continue to</span>
+        <span class="c1"># the object-level ownership or editor-oversight check.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span>
+            <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;journalist&quot;</span><span class="p">,</span> <span class="s2">&quot;editor&quot;</span><span class="p">}</span>
+            <span class="ow">and</span> <span class="n">_has_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;change_newsletter&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CanUpdateNewsletter.has_object_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanUpdateNewsletter.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enforce ownership rules for newsletter updates.</span>
+
+<span class="sd">        Editors may update any newsletter. Journalists may only update</span>
+<span class="sd">        newsletters they authored.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :param obj: The newsletter being updated.</span>
+<span class="sd">        :type obj: Newsletter</span>
+<span class="sd">        :return: ``True`` if the user may update this specific newsletter.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># Editors retain global newsletter oversight across authors.</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;editor&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># Journalists may only edit newsletters they authored themselves.</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">author</span> <span class="o">!=</span> <span class="n">user</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You can only update your own newsletters.&quot;</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CanDeleteNewsletter">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanDeleteNewsletter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanDeleteNewsletter</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">BasePermission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow newsletter deletion for editors or the owning journalist.&quot;&quot;&quot;</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You are not allowed to delete newsletters.&quot;</span>
+
+<div class="viewcode-block" id="CanDeleteNewsletter.has_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanDeleteNewsletter.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Grant access when the user is a journalist or editor with the</span>
+<span class="sd">        ``delete_newsletter`` permission.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :return: ``True`` if the user&#39;s role and permission allow deletion.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># Delete mirrors update so the role and permission story stays</span>
+        <span class="c1"># consistent across newsletter write operations.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span>
+            <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;journalist&quot;</span><span class="p">,</span> <span class="s2">&quot;editor&quot;</span><span class="p">}</span>
+            <span class="ow">and</span> <span class="n">_has_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;delete_newsletter&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CanDeleteNewsletter.has_object_permission">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_permissions.CanDeleteNewsletter.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enforce ownership rules for newsletter deletion.</span>
+
+<span class="sd">        Editors may delete any newsletter. Journalists may only delete</span>
+<span class="sd">        newsletters they authored.</span>
+
+<span class="sd">        :param request: The current HTTP request.</span>
+<span class="sd">        :type request: HttpRequest</span>
+<span class="sd">        :param view: The DRF view being accessed.</span>
+<span class="sd">        :param obj: The newsletter being deleted.</span>
+<span class="sd">        :type obj: Newsletter</span>
+<span class="sd">        :return: ``True`` if the user may delete this specific newsletter.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="c1"># Editors may delete any newsletter; journalists are limited to their</span>
+        <span class="c1"># own authored editions.</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;editor&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">author</span> <span class="o">!=</span> <span class="n">user</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;You can only delete your own newsletters.&quot;</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

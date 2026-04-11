@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba.editorial_workflows &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">daily_indaba.editorial_workflows</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for daily_indaba.editorial_workflows</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Editorial workflow services for Daily Indaba articles.</span>
+
+<span class="sd">This module centralises the two article-review transitions that both the web</span>
+<span class="sd">views and REST API need to perform:</span>
+
+<span class="sd">- ``publish_article()`` marks an article as approved/published, records the</span>
+<span class="sd">  approving editor, stamps the publication metadata, and persists the fields</span>
+<span class="sd">  that trigger the approval signal side effects.</span>
+<span class="sd">- ``return_article_for_revision()`` moves an unapproved article back to the</span>
+<span class="sd">  journalist, clears publication metadata, stores editor feedback, and</span>
+<span class="sd">  persists the same editorial workflow fields consistently.</span>
+
+<span class="sd">Keeping those state transitions here prevents the browser and API layers from</span>
+<span class="sd">duplicating or drifting apart on the exact fields updated during editorial</span>
+<span class="sd">review.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># DERIVED REQUIREMENT - Centralise article-publication orchestration so the web</span>
+<span class="c1"># UI and REST API cannot drift apart on approval side-effects or validation.</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="publish_article">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.editorial_workflows.publish_article">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">publish_article</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">editor</span><span class="p">):</span>
+    <span class="c1"># Developer&#39;s note: the bare ``*`` ends positional parameters, which makes</span>
+    <span class="c1"># ``editor`` keyword-only. That keeps the call sites explicit about the</span>
+    <span class="c1"># role of the approving user object. Cf.:</span>
+    <span class="c1"># https://docs.python.org/3/glossary.html#term-parameter</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Approve *article* and persist the editorial decision.</span>
+
+<span class="sd">    Subscriber emails and the mock approval-announcement POST are dispatched by</span>
+<span class="sd">    the article&#39;s post-save signal once the row transitions from</span>
+<span class="sd">    ``approved=False`` to ``approved=True``. Keeping the save here centralised</span>
+<span class="sd">    ensures the web UI and API use the same approval semantics without</span>
+<span class="sd">    duplicating that state change.</span>
+
+<span class="sd">    :param article: The article to approve. Must not already be approved.</span>
+<span class="sd">    :type article: Article</span>
+<span class="sd">    :param editor: The editor authorising the approval (keyword-only).</span>
+<span class="sd">    :type editor: User</span>
+<span class="sd">    :raises ValidationError: If *article* is already approved.</span>
+<span class="sd">    :return: The updated article instance.</span>
+<span class="sd">    :rtype: Article</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">approved</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;This article has already been approved.&quot;</span><span class="p">)</span>
+
+    <span class="n">article</span><span class="o">.</span><span class="n">approve</span><span class="p">(</span><span class="n">editor</span><span class="o">=</span><span class="n">editor</span><span class="p">)</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+        <span class="n">update_fields</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;approved&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;publication_date&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;approved_by&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;editor_feedback&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">article</span></div>
+
+
+
+<div class="viewcode-block" id="return_article_for_revision">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.editorial_workflows.return_article_for_revision">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">return_article_for_revision</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="c1"># Developer&#39;s note: the bare ``*`` ends positional parameters, which makes</span>
+    <span class="c1"># ``reason`` keyword-only. That keeps the call sites explicit about the</span>
+    <span class="c1"># purpose of the editor feedback text. Cf.:</span>
+    <span class="c1"># https://docs.python.org/3/glossary.html#term-parameter</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return *article* to its journalist and persist the editor feedback.</span>
+
+<span class="sd">    Clearing the publication fields in one shared helper ensures the browser</span>
+<span class="sd">    workflow and the API apply the same editorial-review semantics when an</span>
+<span class="sd">    article is sent back for revision.</span>
+
+<span class="sd">    :param article: The article to return. Must not already be approved.</span>
+<span class="sd">    :type article: Article</span>
+<span class="sd">    :param reason: Optional editor feedback shown to the journalist</span>
+<span class="sd">        (keyword-only). Defaults to an empty string.</span>
+<span class="sd">    :type reason: str</span>
+<span class="sd">    :raises ValidationError: If *article* is already approved.</span>
+<span class="sd">    :return: The updated article instance.</span>
+<span class="sd">    :rtype: Article</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">approved</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
+            <span class="s2">&quot;Approved articles cannot be returned for revision.&quot;</span><span class="p">)</span>
+
+    <span class="n">article</span><span class="o">.</span><span class="n">return_to_journalist</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">)</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+        <span class="n">update_fields</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;approved&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;publication_date&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;approved_by&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;editor_feedback&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">article</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

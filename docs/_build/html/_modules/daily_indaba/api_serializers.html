@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba.api_serializers &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">daily_indaba.api_serializers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for daily_indaba.api_serializers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">DRF (Django REST Framework) serializers for the Daily Indaba API.</span>
+
+<span class="sd">Serializers convert between Python model instances and JSON for the REST API</span>
+<span class="sd">and validate incoming data before it reaches the model layer.</span>
+
+<span class="sd">Two base classes are used:</span>
+<span class="sd">  serializers.Serializer      — manual field declaration; no model link.</span>
+<span class="sd">  serializers.ModelSerializer — auto-generates fields from the model Meta,</span>
+<span class="sd">                                similar to a Django ModelForm.</span>
+<span class="sd">Cf.: https://www.django-rest-framework.org/api-guide/serializers/</span>
+
+<span class="sd">Serializers defined in this module:</span>
+<span class="sd">UserSerializer              — read-only public subset of a user (id, username,</span>
+<span class="sd">                            role, public_name); used as a nested field in</span>
+<span class="sd">                            Article and Newsletter serializers.</span>
+<span class="sd">PublisherSerializer         — publisher metadata (name, description, fee);</span>
+<span class="sd">                            used as a nested read field in ArticleSerializer.</span>
+<span class="sd">NewsletterCategorySerializer— editorial category (name, slug, description);</span>
+<span class="sd">                            nested read field in Article and Newsletter.</span>
+<span class="sd">ArticleSerializer           — full article CRUD; nests the three serializers</span>
+<span class="sd">                            above for reads, accepts FK integers on writes,</span>
+<span class="sd">                            enforces paywall redaction and journalist/</span>
+<span class="sd">                            publisher affiliation rules.</span>
+<span class="sd">NewsletterSerializer        — newsletter CRUD; nests UserSerializer and</span>
+<span class="sd">                            NewsletterCategorySerializer for reads, returns</span>
+<span class="sd">                            article PKs (not full objects) to keep payloads</span>
+<span class="sd">                            compact, and restricts linked articles to</span>
+<span class="sd">                            approved ones only.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Article</span><span class="p">,</span> <span class="n">Newsletter</span><span class="p">,</span> <span class="n">NewsletterCategory</span><span class="p">,</span> <span class="n">Publisher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.views.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">_first_sentence</span><span class="p">,</span> <span class="n">_user_has_full_access</span>
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CORE REQUIREMENT - Serializers for User, Publisher, Article, and Newsletter</span>
+<span class="c1"># so the required REST API can translate model data to/from JSON.</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="UserSerializer">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.UserSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">Serializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compact read-only public representation of a platform user.</span>
+
+<span class="sd">    Exposes only the fields safe to share in nested API responses:</span>
+<span class="sd">    ``id``, ``username``, ``role``, and ``public_name``.</span>
+<span class="sd">    Used as a nested field inside :class:`ArticleSerializer` and</span>
+<span class="sd">    :class:`NewsletterSerializer`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># A plain Serializer is enough here because the API only exposes a tiny,</span>
+    <span class="c1"># hand-picked public subset of user fields rather than the full model.</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">public_name</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PublisherSerializer">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.PublisherSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PublisherSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializer for publisher metadata.</span>
+
+<span class="sd">    Exposes ``id``, ``name``, ``description``, ``created_at``, and</span>
+<span class="sd">    ``monthly_fee``. Used as a read-only nested field inside</span>
+<span class="sd">    :class:`ArticleSerializer`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PublisherSerializer.Meta">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.PublisherSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Publisher</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;monthly_fee&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">read_only_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;created_at&quot;</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NewsletterCategorySerializer">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.NewsletterCategorySerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NewsletterCategorySerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializer for shared editorial categories.</span>
+
+<span class="sd">    Exposes ``id``, ``name``, ``slug``, and ``description``. Used as a</span>
+<span class="sd">    read-only nested field inside :class:`ArticleSerializer` and</span>
+<span class="sd">    :class:`NewsletterSerializer`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NewsletterCategorySerializer.Meta">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.NewsletterCategorySerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">NewsletterCategory</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;slug&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ArticleSerializer">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.ArticleSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArticleSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializer for article list, detail, create, and update flows.</span>
+
+<span class="sd">    Nests :class:`UserSerializer`, :class:`PublisherSerializer`, and</span>
+<span class="sd">    :class:`NewsletterCategorySerializer` for read operations. Write</span>
+<span class="sd">    operations accept ``publisher_id`` and ``category_id`` as plain</span>
+<span class="sd">    integer primary keys.</span>
+
+<span class="sd">    Content is paywall-gated: readers without an active subscription or</span>
+<span class="sd">    all-articles plan receive only the teaser sentence via</span>
+<span class="sd">    :meth:`to_representation`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">author</span> <span class="o">=</span> <span class="n">UserSerializer</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">PublisherSerializer</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">NewsletterCategorySerializer</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">approved_by</span> <span class="o">=</span> <span class="n">UserSerializer</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Developer&#39;s note: two separate fields handle the publisher relationship:</span>
+    <span class="c1">#   publisher    (read_only above) — nested serializer;</span>
+    <span class="c1">#                                    returns full object on GET.</span>
+    <span class="c1">#   publisher_id (write_only below) — PrimaryKeyRelatedField;</span>
+    <span class="c1">#                                     accepts an integer</span>
+    <span class="c1">#                PK on POST/PUT/PATCH so clients don&#39;t need to send a</span>
+    <span class="c1">#                   full object.</span>
+    <span class="c1"># source=&quot;publisher&quot; maps the write field back to model&#39;s &#39;publisher&#39; FK.</span>
+    <span class="c1"># Cf.: https://www.django-rest-framework.org/api-guide/fields/#primarykeyrelatedfield</span>
+    <span class="n">publisher_id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">PrimaryKeyRelatedField</span><span class="p">(</span>
+        <span class="n">source</span><span class="o">=</span><span class="s2">&quot;publisher&quot;</span><span class="p">,</span>
+        <span class="c1"># Allow only Publisher rows that exist in the database.</span>
+        <span class="n">queryset</span><span class="o">=</span><span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+        <span class="n">write_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Hides publisher_id from GET responses.</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">category_id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">PrimaryKeyRelatedField</span><span class="p">(</span>
+        <span class="n">source</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">,</span>
+        <span class="c1"># Allow only NewsletterCategory rows that exist in the database.</span>
+        <span class="n">queryset</span><span class="o">=</span><span class="n">NewsletterCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+        <span class="n">write_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Hides category_id from GET responses.</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="ArticleSerializer.Meta">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.ArticleSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Article</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;publisher&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;publisher_id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;category&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;category_id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;publication_date&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;approved&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;approved_by&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;importance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;image&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;disclaimer&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">read_only_fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1"># The client must not be able to forge authorship timestamps or</span>
+            <span class="c1"># self-approve content through the API payload.</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;publication_date&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;approved&quot;</span><span class="p">,</span>
+        <span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reader_has_full_access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return ``True`` when the request-context reader may read the full body.</span>
+
+<span class="sd">        Staff roles (journalist, editor, publisher) always have full access.</span>
+<span class="sd">        Readers are checked against their subscription plan and subscribed</span>
+<span class="sd">        journalist / publisher IDs passed in serializer context.</span>
+
+<span class="sd">        :param instance: The article being serialized.</span>
+<span class="sd">        :type instance: Article</span>
+<span class="sd">        :return: ``True`` if the current user may read the complete article</span>
+<span class="sd">            content; ``False`` if only the teaser should be returned.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># If there is no current user here, keep the full article text.</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># ---------------------------------------------------</span>
+        <span class="c1"># Access to full body text on account of user role:</span>
+        <span class="c1"># ---------------------------------------------------</span>
+        <span class="c1"># Journalists, editors, and publishers can always read the full</span>
+        <span class="c1"># article.</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;journalist&quot;</span><span class="p">,</span> <span class="s2">&quot;editor&quot;</span><span class="p">,</span> <span class="s2">&quot;publisher&quot;</span><span class="p">}:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># ---------------------------------------------------</span>
+        <span class="c1"># Reader access to full body text based on subscription plans:</span>
+        <span class="c1"># ---------------------------------------------------</span>
+        <span class="n">reader_access</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reader_access&quot;</span><span class="p">)</span>
+        <span class="c1"># If the view did not pass in the reader&#39;s access info, use the usual</span>
+        <span class="c1"># full-article check.</span>
+        <span class="k">if</span> <span class="n">reader_access</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_user_has_full_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
+        <span class="c1"># Readers on the all-articles plan can read every article.</span>
+        <span class="k">if</span> <span class="n">reader_access</span><span class="p">[</span><span class="s2">&quot;all_articles_plan&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># Readers subscribed to this writer can read the full article.</span>
+        <span class="k">if</span> <span class="n">instance</span><span class="o">.</span><span class="n">author_id</span> <span class="ow">in</span> <span class="n">reader_access</span><span class="p">[</span><span class="s2">&quot;journalist_ids&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># Readers subscribed to this publisher can also read the full article.</span>
+        <span class="k">if</span> <span class="n">instance</span><span class="o">.</span><span class="n">publisher_id</span> <span class="ow">in</span> <span class="n">reader_access</span><span class="p">[</span><span class="s2">&quot;publisher_ids&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># Everyone else only gets the teaser.</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="ArticleSerializer.to_representation">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.ArticleSerializer.to_representation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_representation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Customise DRF&#39;s serializer output to enforce the article paywall.</span>
+
+<span class="sd">        Calls the parent implementation then appends ``teaser`` and</span>
+<span class="sd">        ``full_access`` fields. Readers without access have their ``content``</span>
+<span class="sd">        replaced with the teaser sentence.</span>
+
+<span class="sd">        :param instance: The article being serialized.</span>
+<span class="sd">        :type instance: Article</span>
+<span class="sd">        :return: Serialized article data with paywall gating applied.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_representation</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">teaser</span> <span class="o">=</span> <span class="n">_first_sentence</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">full_access</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader_has_full_access</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;teaser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">teaser</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;full_access&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_access</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">full_access</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">teaser</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="ArticleSerializer.validate">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.ArticleSerializer.validate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply project-specific object-level validation before saving.</span>
+
+<span class="sd">        Enforces two cross-field business rules that cannot be expressed as</span>
+<span class="sd">        single-field validators:</span>
+
+<span class="sd">        - Front Page articles must include an image.</span>
+<span class="sd">        - Journalists may only publish under an affiliated publisher.</span>
+
+<span class="sd">        :param attrs: Deserialized and field-validated attribute dictionary.</span>
+<span class="sd">        :type attrs: dict</span>
+<span class="sd">        :raises serializers.ValidationError: If a Front Page article has no</span>
+<span class="sd">            image, or if a journalist submits a non-affiliated publisher.</span>
+<span class="sd">        :return: The validated attribute dictionary, unchanged when all</span>
+<span class="sd">            checks pass.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># self.context[&quot;request&quot;] accesses the HTTP request passed when the</span>
+        <span class="c1"># serializer was instantiated via context={&quot;request&quot;: request}.</span>
+        <span class="c1"># This is the standard DRF pattern for accessing request.user inside</span>
+        <span class="c1"># a serializer&#39;s validate() method.</span>
+        <span class="c1"># Cf.: https://www.django-rest-framework.org/api-guide/serializers/#passing-additional-context-to-the-serializer</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">]</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">publisher</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;publisher&quot;</span><span class="p">)</span>
+        <span class="n">importance</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;importance&quot;</span><span class="p">,</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s2">&quot;importance&quot;</span><span class="p">,</span> <span class="n">Article</span><span class="o">.</span><span class="n">STANDARD</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+        <span class="c1"># -------------------------------------------------------------</span>
+        <span class="c1"># Validation: Front Page articles must have an image</span>
+        <span class="c1"># -------------------------------------------------------------</span>
+        <span class="k">if</span> <span class="n">importance</span> <span class="o">==</span> <span class="n">Article</span><span class="o">.</span><span class="n">FRONT_PAGE</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">image</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s2">&quot;Front Page articles require a rubric image.&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="c1"># -------------------------------------------------------------</span>
+        <span class="c1"># Validation: Journalist can only publish under a publisher they</span>
+        <span class="c1">#             are affiliated with.</span>
+        <span class="c1"># -------------------------------------------------------------</span>
+        <span class="k">if</span> <span class="n">publisher</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;journalist&quot;</span><span class="p">:</span>
+            <span class="c1"># Build a queryset with WHERE pk = publisher.pk on the journalist&#39;s</span>
+            <span class="c1"># affiliated-publishers relation, then determine whether that</span>
+            <span class="c1"># affiliation exists.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">journalist_publishers</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">publisher</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;publisher_id&quot;</span><span class="p">:</span> <span class="p">(</span>
+                            <span class="s2">&quot;You can only publish under an affiliated &quot;</span>
+                            <span class="s2">&quot;publisher.&quot;</span>
+                        <span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">attrs</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NewsletterSerializer">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.NewsletterSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NewsletterSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializer for newsletter list, detail, create, and update flows.</span>
+
+<span class="sd">    Nests :class:`UserSerializer` and :class:`NewsletterCategorySerializer`</span>
+<span class="sd">    for read operations. Articles are returned as a list of primary keys</span>
+<span class="sd">    (not full objects) to keep payloads compact; write operations accept</span>
+<span class="sd">    ``article_ids`` restricted to approved articles only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">author</span> <span class="o">=</span> <span class="n">UserSerializer</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">NewsletterCategorySerializer</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Mirror the Article serializer pattern: return a nested category object on</span>
+    <span class="c1"># GET, but accept a plain category primary key on POST/PUT/PATCH.</span>
+    <span class="n">category_id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">PrimaryKeyRelatedField</span><span class="p">(</span>
+        <span class="n">source</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">,</span>
+        <span class="c1"># Allow only NewsletterCategory rows that exist in the database.</span>
+        <span class="n">queryset</span><span class="o">=</span><span class="n">NewsletterCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+        <span class="n">write_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># Read responses keep newsletter payloads compact by returning only article</span>
+    <span class="c1"># primary keys instead of nesting full article objects here.</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">PrimaryKeyRelatedField</span><span class="p">(</span><span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># many=True on PrimaryKeyRelatedField handles a ManyToManyField — it</span>
+    <span class="c1"># accepts a list of PKs on write and returns a list on read.</span>
+    <span class="c1"># queryset= restricts valid values to approved articles (server-side</span>
+    <span class="c1"># validation).</span>
+    <span class="n">article_ids</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">PrimaryKeyRelatedField</span><span class="p">(</span>
+        <span class="n">source</span><span class="o">=</span><span class="s2">&quot;articles&quot;</span><span class="p">,</span>
+        <span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="c1"># Allow only approved Article rows to be attached to a newsletter.</span>
+        <span class="n">queryset</span><span class="o">=</span><span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">write_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="NewsletterSerializer.Meta">
+<a class="viewcode-back" href="../../daily_indaba.html#daily_indaba.api_serializers.NewsletterSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Newsletter</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;category&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;category_id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;articles&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;article_ids&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">read_only_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;created_at&quot;</span><span class="p">,</span> <span class="s2">&quot;author&quot;</span><span class="p">]</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

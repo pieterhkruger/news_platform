@@ -1,0 +1,674 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>daily_indaba.views.articles &mdash; daily_indaba 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">daily_indaba</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">daily_indaba</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">daily_indaba.views.articles</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for daily_indaba.views.articles</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Article views for The Daily Indaba.</span>
+
+<span class="sd">Public views:</span>
+<span class="sd">- home: Home page showing the 8 most recent approved articles with</span>
+<span class="sd">  teasers; accessible to all visitors.</span>
+
+<span class="sd">Authenticated article views:</span>
+<span class="sd">- article_list: Approved article listing with optional importance</span>
+<span class="sd">  filter; editors also see pending articles in their scope.</span>
+<span class="sd">- article_detail: Single article with threaded comments; full content</span>
+<span class="sd">  gated by subscription or staff role.</span>
+
+<span class="sd">Journalist/editor management views:</span>
+<span class="sd">- article_create: Journalist creates a new article (pending approval).</span>
+<span class="sd">- article_edit: Journalist edits their own unapproved article, or</span>
+<span class="sd">  editor edits any article in their scope.</span>
+<span class="sd">- article_delete: Journalist deletes their own unapproved article, or editor</span>
+<span class="sd">  deletes any article in their scope; confirmation page on GET.</span>
+
+<span class="sd">Editorial workflow views (POST only):</span>
+<span class="sd">- article_approve: Editor approves a pending article; triggers</span>
+<span class="sd">  subscriber notification emails.</span>
+<span class="sd">- article_reject: Editor returns a pending article for revision;</span>
+<span class="sd">  optionally emails the journalist a rejection reason.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+<span class="c1"># Q objects allow complex ORM queries combining conditions with | (OR) and</span>
+<span class="c1"># &amp; (AND) operators, making it possible to filter on multiple fields in one</span>
+<span class="c1"># .filter() call.</span>
+<span class="c1"># Guest et al. illustrate this `Q(... ) | Q(... )` / `Q(... ) &amp; Q(... )`</span>
+<span class="c1"># pattern as Django&#39;s way of expressing SQL-style OR/AND logic in WHERE</span>
+<span class="c1"># clauses. See: Guest, Chris et al., Web Development with Django 6,</span>
+<span class="c1"># Packt, pp. 186-188.</span>
+<span class="c1"># Cf.: https://docs.djangoproject.com/en/5.2/topics/db/queries/</span>
+<span class="c1">#      #complex-lookups-with-q-objects</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">render</span>
+<span class="c1"># @require_POST rejects GET requests with HTTP 405 Method Not Allowed.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">require_POST</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">accounts.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_all_articles_monthly_fee</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">accounts.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">send_email_with_fallback</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..forms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ArticleForm</span><span class="p">,</span>
+    <span class="n">CommentForm</span><span class="p">,</span>
+    <span class="n">RejectionForm</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Article</span><span class="p">,</span> <span class="n">Comment</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..editorial_workflows</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">publish_article</span><span class="p">,</span>
+    <span class="n">return_article_for_revision</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">IMPORTANCE_LABELS</span><span class="p">,</span>
+    <span class="n">SITE_DESCRIPTION</span><span class="p">,</span>
+    <span class="n">_editor_can_manage_article</span><span class="p">,</span>
+    <span class="n">_filter_articles_for_editor</span><span class="p">,</span>
+    <span class="n">_first_sentence</span><span class="p">,</span>
+    <span class="n">_user_has_full_access</span><span class="p">,</span>
+    <span class="n">_limit_publisher_choices</span><span class="p">,</span>
+    <span class="n">_require_role</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CORE REQUIREMENT - Public-facing approved-article browsing so visitors and</span>
+<span class="c1"># readers can discover published news content from the site home page onward.</span>
+<span class="c1"># =============================================================================</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Public views</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="home">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.articles.home">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the public home page.</span>
+
+<span class="sd">    Accessible to all visitors (no login required).  Displays a</span>
+<span class="sd">    one-sentence site description and the eight most recent approved</span>
+<span class="sd">    articles, each shown with its title and the first sentence of its</span>
+<span class="sd">    content only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Build a QuerySet for the public homepage articles.</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Article</span><span class="o">.</span><span class="n">objects</span>
+        <span class="c1"># Add WHERE approved = true so only published articles are included.</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Tell Django to join these related tables up front for efficiency.</span>
+        <span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="s1">&#39;publisher&#39;</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">)</span>
+        <span class="c1"># Add ORDER BY importance ASC, publication_date DESC.</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;importance&#39;</span><span class="p">,</span> <span class="s1">&#39;-publication_date&#39;</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]</span>
+        <span class="c1"># Slice the QuerySet so the SQL includes LIMIT 8.</span>
+    <span class="p">)</span>
+    <span class="c1"># Pair each article with its first-sentence teaser for the home cards.</span>
+    <span class="n">teasers</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;article&#39;</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span> <span class="s1">&#39;teaser&#39;</span><span class="p">:</span> <span class="n">_first_sentence</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">content</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">articles</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;news/home.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;site_description&#39;</span><span class="p">:</span> <span class="n">SITE_DESCRIPTION</span><span class="p">,</span>
+        <span class="s1">&#39;teasers&#39;</span><span class="p">:</span> <span class="n">teasers</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Article views</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CORE REQUIREMENT - Authenticated article listing/detail views so readers can</span>
+<span class="c1"># view articles and editors/journalists can inspect content appropriate to</span>
+<span class="c1"># their role and approval state.</span>
+<span class="c1"># =============================================================================</span>
+
+<div class="viewcode-block" id="article_list">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.articles.article_list">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">article_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the authenticated article listing page.</span>
+
+<span class="sd">    Supports filtering by importance level (GET param ``importance``).</span>
+<span class="sd">    The left sidebar displays importance-level links mirroring the</span>
+<span class="sd">    eCommerce category panel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Read the optional importance filter from the query string.</span>
+    <span class="n">importance_param</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;importance&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="c1"># Build the base QuerySet for the article list:</span>
+    <span class="n">query_set</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span>
+        <span class="c1"># Tell Django to join these related tables up front for efficiency.</span>
+        <span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="s1">&#39;publisher&#39;</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;approved_by&#39;</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;editor&#39;</span><span class="p">:</span>
+        <span class="c1"># For editors, include both pending and approved articles they can</span>
+        <span class="c1"># manage.</span>
+        <span class="n">query_set</span> <span class="o">=</span> <span class="n">_filter_articles_for_editor</span><span class="p">(</span>
+            <span class="n">query_set</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+            <span class="c1"># Add ORDER BY approved ASC, importance ASC, publication_date DESC,</span>
+            <span class="c1"># created_at DESC.</span>
+            <span class="s1">&#39;approved&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;importance&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;-publication_date&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;-created_at&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># For other users, only show approved articles.</span>
+        <span class="n">query_set</span> <span class="o">=</span> <span class="n">query_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="c1"># Add WHERE approved = true.</span>
+            <span class="n">approved</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+            <span class="c1"># Add ORDER BY importance ASC, publication_date DESC.</span>
+            <span class="s1">&#39;importance&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;-publication_date&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">selected_importance</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">importance_param</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Try to convert the importance parameter to an integer.</span>
+            <span class="n">selected_importance</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">importance_param</span><span class="p">)</span>
+            <span class="c1"># Add WHERE importance = selected_importance.</span>
+            <span class="n">query_set</span> <span class="o">=</span> <span class="n">query_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">importance</span><span class="o">=</span><span class="n">selected_importance</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># If the parameter is not a valid integer, ignore it.</span>
+            <span class="n">selected_importance</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;news/article_list.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;articles&#39;</span><span class="p">:</span> <span class="n">query_set</span><span class="p">,</span>
+        <span class="s1">&#39;importance_labels&#39;</span><span class="p">:</span> <span class="n">IMPORTANCE_LABELS</span><span class="p">,</span>
+        <span class="s1">&#39;selected_importance&#39;</span><span class="p">:</span> <span class="n">selected_importance</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="article_detail">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.articles.article_detail">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">article_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a single article with its threaded comment section.</span>
+
+<span class="sd">    Readers without a qualifying subscription see only the title, teaser</span>
+<span class="sd">    (first sentence), and a subscribe prompt.  Full access requires an</span>
+<span class="sd">    active :class:`~daily_indaba.models.Subscription` to the article&#39;s</span>
+<span class="sd">    author or publisher, or the all-articles flat-rate plan.  Journalists</span>
+<span class="sd">    and editors always have full access.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Determine which article this user is allowed to read:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Build the base QuerySet for article-detail lookups:</span>
+    <span class="n">article_qs</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span>
+        <span class="c1"># Tell Django to join these related tables up front for efficiency.</span>
+        <span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="s1">&#39;publisher&#39;</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;approved_by&#39;</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;editor&#39;</span><span class="p">:</span>
+        <span class="c1"># Editors may only read articles that fall inside their curation scope.</span>
+        <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+            <span class="n">_filter_articles_for_editor</span><span class="p">(</span><span class="n">article_qs</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span>
+            <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;journalist&#39;</span><span class="p">:</span>
+        <span class="c1"># This `Q(approved=True) | Q(author=request.user)` clause is another</span>
+        <span class="c1"># direct example of the OR composition described by Guest et al.,</span>
+        <span class="c1"># Web Development with Django 6, pp. 186-188.</span>
+        <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+            <span class="c1"># Add WHERE approved = true OR author_id = request.user.pk.</span>
+            <span class="n">article_qs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Q</span><span class="p">(</span><span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+            <span class="c1"># Readers may only fetch rows where pk = the requested article ID</span>
+            <span class="c1"># AND approved = true.</span>
+            <span class="n">article_qs</span><span class="p">,</span>
+            <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+            <span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Determine whether the user has full access to this article:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="n">full_access</span> <span class="o">=</span> <span class="n">_user_has_full_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>
+    <span class="n">teaser</span> <span class="o">=</span> <span class="n">_first_sentence</span><span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Prepare subscription and discussion data for the page:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Prepare subscription information for readers who don&#39;t have full access.</span>
+    <span class="n">subscribe_fee_info</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_access</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;reader&#39;</span><span class="p">:</span>
+        <span class="n">subscribe_fee_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;journalist&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="p">,</span>
+            <span class="s1">&#39;journalist_fee&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">journalist_monthly_fee</span><span class="p">,</span>
+            <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="p">,</span>
+            <span class="s1">&#39;publisher_fee&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">monthly_fee</span> <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">publisher</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="c1"># Keep reader discussion behind the same access gate as the full article.</span>
+    <span class="n">comment_roots</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">comment_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">reply_parent</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">full_access</span><span class="p">:</span>
+        <span class="n">all_comments</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="c1"># Add WHERE article_id = article.pk through the reverse relation.</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">comments</span>
+            <span class="c1"># Tell Django to join the author table up front for efficiency.</span>
+            <span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">)</span>
+            <span class="c1"># Add ORDER BY created_at ASC so comments render oldest-first.</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;created_at&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">comments_by_id</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_comments</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_comments</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_comments</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">parent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># This is a root comment (no parent).</span>
+                <span class="n">comment_roots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">c</span><span class="o">.</span><span class="n">parent_id</span> <span class="ow">in</span> <span class="n">comments_by_id</span><span class="p">:</span>
+                <span class="c1"># This is a reply, add it to its parent&#39;s children.</span>
+                <span class="n">comments_by_id</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">parent_id</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">comment_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_comments</span><span class="p">)</span>
+
+        <span class="n">reply_to_param</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reply_to&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reply_to_param</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;reader&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">reply_to_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">reply_to_param</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="n">reply_to_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="n">candidate</span> <span class="o">=</span> <span class="n">comments_by_id</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reply_to_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">candidate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">candidate</span><span class="o">.</span><span class="n">depth</span> <span class="o">&lt;</span> <span class="n">Comment</span><span class="o">.</span><span class="n">MAX_DEPTH</span><span class="p">:</span>
+                <span class="n">reply_parent</span> <span class="o">=</span> <span class="n">candidate</span>
+
+    <span class="c1"># Only show comment form to readers who have full access to the article.</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;reader&#39;</span> <span class="ow">and</span> <span class="n">full_access</span><span class="p">:</span>
+        <span class="n">initial</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;parent_id&#39;</span><span class="p">:</span> <span class="n">reply_parent</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">if</span> <span class="n">reply_parent</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">comment_form</span> <span class="o">=</span> <span class="n">CommentForm</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">initial</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">comment_form</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Render the article detail page:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;news/article_detail.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;article&#39;</span><span class="p">:</span> <span class="n">article</span><span class="p">,</span>
+        <span class="s1">&#39;full_access&#39;</span><span class="p">:</span> <span class="n">full_access</span><span class="p">,</span>
+        <span class="s1">&#39;teaser&#39;</span><span class="p">:</span> <span class="n">teaser</span><span class="p">,</span>
+        <span class="s1">&#39;all_articles_fee&#39;</span><span class="p">:</span> <span class="n">get_all_articles_monthly_fee</span><span class="p">(),</span>
+        <span class="s1">&#39;subscribe_fee_info&#39;</span><span class="p">:</span> <span class="n">subscribe_fee_info</span><span class="p">,</span>
+        <span class="s1">&#39;comment_roots&#39;</span><span class="p">:</span> <span class="n">comment_roots</span><span class="p">,</span>
+        <span class="s1">&#39;comment_count&#39;</span><span class="p">:</span> <span class="n">comment_count</span><span class="p">,</span>
+        <span class="s1">&#39;comment_form&#39;</span><span class="p">:</span> <span class="n">comment_form</span><span class="p">,</span>
+        <span class="s1">&#39;reply_parent&#39;</span><span class="p">:</span> <span class="n">reply_parent</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CORE REQUIREMENT - Journalists must be able to create, edit, and delete</span>
+<span class="c1"># their own articles, while editors can intervene across the article workflow.</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="article_create">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.articles.article_create">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">article_create</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow a journalist to create a new article.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_require_role</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;journalist&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="c1"># Guest et al. present file uploads as the standard Django forms</span>
+        <span class="c1"># pattern of binding POST data together with request.FILES so uploaded</span>
+        <span class="c1"># media validates and saves through the ModelForm / ImageField pair.</span>
+        <span class="c1"># See Web Development with Django 6, Packt, pp. 509-523.</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticleForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">)</span>
+        <span class="n">_limit_publisher_choices</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">article</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">approved</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">STATUS_PENDING</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Article saved. Awaiting approval.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:journalist_dashboard&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticleForm</span><span class="p">()</span>
+        <span class="n">_limit_publisher_choices</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;news/article_form.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+        <span class="s1">&#39;form_title&#39;</span><span class="p">:</span> <span class="s1">&#39;Write New Article&#39;</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="article_edit">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.articles.article_edit">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">article_edit</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow a journalist to edit their own unapproved article,</span>
+<span class="sd">    or an editor to edit any article.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;journalist&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="ow">or</span> <span class="n">article</span><span class="o">.</span><span class="n">approved</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;You cannot edit this article.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:journalist_dashboard&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">!=</span> <span class="s1">&#39;editor&#39;</span><span class="p">:</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Access denied.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">_editor_can_manage_article</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">article</span><span class="p">):</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;You are not assigned to curate this article.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:editor_dashboard&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="c1"># File uploads in Django forms require request.FILES alongside the POST</span>
+        <span class="c1"># payload; this keeps article-image updates on the normal ModelForm</span>
+        <span class="c1"># validation path described by Guest et al.  See Web Development with</span>
+        <span class="c1"># Django 6, Packt, pp. 509-523.</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticleForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">article</span><span class="p">)</span>
+        <span class="n">_limit_publisher_choices</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">article</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">resubmitted</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;journalist&#39;</span>
+                <span class="ow">and</span> <span class="n">article</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">Article</span><span class="o">.</span><span class="n">STATUS_RETURNED</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">resubmitted</span><span class="p">:</span>
+                <span class="n">article</span><span class="o">.</span><span class="n">resubmit_for_approval</span><span class="p">()</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">resubmitted</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                    <span class="n">request</span><span class="p">,</span>
+                    <span class="s2">&quot;Article updated and resubmitted for approval.&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Article updated.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:article_detail&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ArticleForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">article</span><span class="p">)</span>
+        <span class="n">_limit_publisher_choices</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;news/article_form.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+        <span class="s1">&#39;form_title&#39;</span><span class="p">:</span> <span class="s1">&#39;Edit Article&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;article&#39;</span><span class="p">:</span> <span class="n">article</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="article_delete">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.articles.article_delete">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">article_delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow a journalist (own unapproved article only) or editor to delete an</span>
+<span class="sd">    article.  Renders a confirmation page on GET; deletes on POST.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Load the article selected for deletion.</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Article</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;journalist&#39;</span><span class="p">:</span>
+        <span class="c1"># Journalists may only delete articles they authored themselves while</span>
+        <span class="c1"># those articles are still unapproved drafts.</span>
+        <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span> <span class="o">!=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;You cannot delete this article.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:journalist_dashboard&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">approved</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="s2">&quot;Approved articles cannot be deleted by journalists.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:journalist_dashboard&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">!=</span> <span class="s1">&#39;editor&#39;</span><span class="p">:</span>
+        <span class="c1"># Readers and other roles cannot delete articles.</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Access denied.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">_editor_can_manage_article</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">article</span><span class="p">):</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;You are not assigned to curate this article.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:editor_dashboard&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="c1"># Only delete after the confirmation form is submitted.</span>
+        <span class="n">article</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Article deleted.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;editor&#39;</span><span class="p">:</span>
+            <span class="c1"># Editors return to the editorial dashboard after deletion.</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:editor_dashboard&#39;</span><span class="p">)</span>
+        <span class="c1"># Journalists return to their personal desk after deletion.</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:journalist_dashboard&#39;</span><span class="p">)</span>
+
+    <span class="c1"># On GET, render the confirmation page instead of deleting immediately.</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;news/article_confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;article&#39;</span><span class="p">:</span> <span class="n">article</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<span class="c1"># =============================================================================</span>
+<span class="c1"># CORE REQUIREMENT - Editors must be able to approve or reject pending article</span>
+<span class="c1"># submissions so only editorially cleared content becomes publicly visible.</span>
+<span class="c1"># =============================================================================</span>
+<div class="viewcode-block" id="article_approve">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.articles.article_approve">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="nd">@require_POST</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">article_approve</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Approve an article (editor only).</span>
+
+<span class="sd">    Sets ``approved=True`` and ``publication_date``.  Subscriber emails are</span>
+<span class="sd">    dispatched by the article&#39;s post-save signal after the approval is saved.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Only editors may approve pending articles.</span>
+    <span class="k">if</span> <span class="n">_require_role</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;editor&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Load the still-unapproved article chosen in the approval queue:</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+        <span class="n">Article</span><span class="p">,</span>
+        <span class="c1"># Add WHERE pk = the requested article ID AND approved = false AND</span>
+        <span class="c1"># status = pending.</span>
+        <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+        <span class="n">approved</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="n">Article</span><span class="o">.</span><span class="n">STATUS_PENDING</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_editor_can_manage_article</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">article</span><span class="p">):</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;You are not assigned to curate this article.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:approval_queue&#39;</span><span class="p">)</span>
+    <span class="c1"># Run the shared publish workflow so web and API behaviour stay aligned.</span>
+    <span class="n">publish_article</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">editor</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot; approved and published.&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:approval_queue&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="article_reject">
+<a class="viewcode-back" href="../../../daily_indaba.views.html#daily_indaba.views.articles.article_reject">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="nd">@require_POST</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">article_reject</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject (return) an article submission (editor only).</span>
+
+<span class="sd">    The article leaves the approval queue and is marked as returned so the</span>
+<span class="sd">    journalist can revise and resubmit it. If a reason is supplied it is</span>
+<span class="sd">    emailed to the journalist and stored on the article for in-app display.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Ensure the editor may act on this pending article:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Only editors may return articles for revision.</span>
+    <span class="k">if</span> <span class="n">_require_role</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;editor&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:home&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Load the still-unapproved article being returned to its author:</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+        <span class="n">Article</span><span class="p">,</span>
+        <span class="c1"># Add WHERE pk = the requested article ID AND approved = false AND</span>
+        <span class="c1"># status = pending.</span>
+        <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+        <span class="n">approved</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="n">Article</span><span class="o">.</span><span class="n">STATUS_PENDING</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_editor_can_manage_article</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">article</span><span class="p">):</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="s2">&quot;You are not assigned to curate this article.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:approval_queue&#39;</span><span class="p">)</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Obtain the rejection reason from the submitted form:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Bind the optional rejection reason from the approval-queue form.</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">RejectionForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+    <span class="n">reason</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reason&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Return the article to the journalist for revision:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="n">return_article_for_revision</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">)</span>
+
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Notify the journalist and return to the approval queue:</span>
+    <span class="c1"># ----------------------------------------------------------------------</span>
+    <span class="c1"># Send the rejection email only when a reason was supplied and email exists.</span>
+    <span class="k">if</span> <span class="n">reason</span> <span class="ow">and</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">email</span><span class="p">:</span>
+        <span class="n">send_email_with_fallback</span><span class="p">(</span>
+            <span class="n">subject</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Article returned: </span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">body</span><span class="o">=</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Your article &quot;</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot; has been &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;returned by the editor.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Reason: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Please revise and resubmit.&#39;</span>
+            <span class="p">),</span>
+            <span class="n">recipient_list</span><span class="o">=</span><span class="p">[</span><span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">email</span><span class="p">],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;article rejection email&quot;</span><span class="p">,</span>
+            <span class="n">console_heading</span><span class="o">=</span><span class="s2">&quot;ARTICLE REJECTION&quot;</span><span class="p">,</span>
+            <span class="n">log_context</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;article_id=</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">pk</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Show a warning message and return the editor to the approval queue.</span>
+    <span class="n">messages</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot; returned to the journalist.&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;news:approval_queue&#39;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Pieter Kruger.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

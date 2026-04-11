@@ -34,6 +34,14 @@ def publish_article(article, *, editor):
     ``approved=False`` to ``approved=True``. Keeping the save here centralised
     ensures the web UI and API use the same approval semantics without
     duplicating that state change.
+
+    :param article: The article to approve. Must not already be approved.
+    :type article: Article
+    :param editor: The editor authorising the approval (keyword-only).
+    :type editor: User
+    :raises ValidationError: If *article* is already approved.
+    :return: The updated article instance.
+    :rtype: Article
     """
     if article.approved:
         raise ValidationError("This article has already been approved.")
@@ -61,6 +69,15 @@ def return_article_for_revision(article, *, reason=""):
     Clearing the publication fields in one shared helper ensures the browser
     workflow and the API apply the same editorial-review semantics when an
     article is sent back for revision.
+
+    :param article: The article to return. Must not already be approved.
+    :type article: Article
+    :param reason: Optional editor feedback shown to the journalist
+        (keyword-only). Defaults to an empty string.
+    :type reason: str
+    :raises ValidationError: If *article* is already approved.
+    :return: The updated article instance.
+    :rtype: Article
     """
     if article.approved:
         raise ValidationError(

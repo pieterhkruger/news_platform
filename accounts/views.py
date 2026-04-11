@@ -56,7 +56,15 @@ REGISTRATION_ROLES = {choice[0] for choice in User.ROLE_CHOICES}
 
 
 def _normalise_registration_role(raw_role):
-    """Return a safe registration role, defaulting to ``reader``."""
+    """Return a safe registration role, defaulting to ``reader``.
+
+    :param raw_role: The role string supplied by the request (e.g. from a
+        query parameter or POST field).
+    :type raw_role: str
+    :return: A validated role from ``REGISTRATION_ROLES``, or ``"reader"``
+        when *raw_role* is absent or unrecognised.
+    :rtype: str
+    """
     if raw_role in REGISTRATION_ROLES:
         return raw_role
     return "reader"
@@ -68,16 +76,20 @@ def _normalise_registration_role(raw_role):
 # reopening open-redirect risk.
 # =============================================================================
 def _get_post_auth_redirect(request, user):
-    """
-    Return the default post-login/register redirect URL for the
-    authenticated user.
+    """Return the default post-login/register redirect URL for *user*.
 
     Journalists land on their desk dashboard; editors land on the editorial
-    dashboard.  Readers return to the homepage.  If the relevant URL is not
-    yet wired (e.g. during early development), falls back gracefully to ``/``.
+    dashboard; readers return to the homepage.  A safe ``next`` URL in the
+    request always takes priority over the role default.  Falls back
+    gracefully to ``/`` when the relevant URL name is not yet wired.
 
-    A safe ``next`` URL in the request always takes priority over the role
-    default.
+    :param request: The current HTTP request.
+    :type request: HttpRequest
+    :param user: The freshly authenticated user whose role determines the
+        default landing page.
+    :type user: User
+    :return: A safe redirect path.
+    :rtype: str
     """
     # Honour a safe `next` URL first when one was supplied by the browser.
     # Django's built-in auth flow treats `next` as the post-login redirect
@@ -132,6 +144,15 @@ class DailyIndabaLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
+        """Return the post-login redirect URL.
+
+        Redirects to the oldest unread
+        :class:`~daily_indaba.models.ArticleNotification` when one exists;
+        otherwise delegates to :func:`_get_post_auth_redirect`.
+
+        :return: A safe redirect path.
+        :rtype: str
+        """
         # Local import avoids a circular dependency: accounts → daily_indaba
         # → accounts (via AUTH_USER_MODEL).  The import is cheap because
         # Django caches imported modules after the first load.
@@ -198,22 +219,20 @@ class DailyIndabaPasswordChangeView(PasswordChangeView):
 
 
 def register_user(request):
-    """
-    Register a new user account and assign them to their role group.
+    """Register a new user account and assign them to their role group.
 
     On successful registration the user is logged in immediately and
     redirected to their role's default landing page.
 
-    Args:
-        request (HttpRequest): The current HTTP request.
-
-    Returns:
-        HttpResponse: On successful POST, redirects to the role default or
-        ``next``.  On GET or invalid POST, renders ``accounts/register.html``
-        with:
-
-        - ``form`` — a bound or unbound ``RegistrationForm``
-        - ``next`` — the ``next`` query-string value
+    :param request: The current HTTP request. ``GET`` renders the blank
+        registration form; ``POST`` validates and, on success, creates the
+        account, logs the user in, and redirects.
+    :type request: HttpRequest
+    :return: On valid ``POST``, a redirect to the role default or ``next``.
+        On ``GET`` or invalid ``POST``, renders ``accounts/register.html``
+        with ``form``, ``next``, ``role_choices``, and ``selected_role`` in
+        context.
+    :rtype: HttpResponse
     """
     # ----------------------------------------------------------------------
     # Preserve the post-registration redirect target and bind the form:
@@ -291,23 +310,21 @@ def register_user(request):
 # ------------------------------------------------------------------
 
 def terms_and_conditions(request):
-    """
-    Display the role-specific terms and conditions.
+    """Display the role-specific terms and conditions.
 
     Accepts an optional ``role`` query parameter (``reader``,
     ``journalist``, ``editor``, or ``publisher``) to highlight the
-    relevant section. Invalid values are silently ignored and the
-    full page is shown without a pre-selected role.
+    relevant section. Invalid values are silently ignored and the full
+    page is shown without a pre-selected role.
 
-    This view is intentionally public — users must be able to read
-    the terms before they register.
+    This view is intentionally public — users must be able to read the
+    terms before they register.
 
-    Args:
-        request (HttpRequest): The current HTTP request.
-
-    Returns:
-        HttpResponse: Renders ``accounts/terms_and_conditions.html``
-        with ``role`` in context (empty string when absent/invalid).
+    :param request: The current HTTP request.
+    :type request: HttpRequest
+    :return: Renders ``accounts/terms_and_conditions.html`` with ``role``
+        in context (empty string when the parameter is absent or invalid).
+    :rtype: HttpResponse
     """
     # Read the optional role hint so the template can highlight the matching section.
     role = request.GET.get("role", "")
@@ -327,32 +344,34 @@ def terms_and_conditions(request):
 
 @login_required
 def account_profile(request):
-    """
-    Display the logged-in user's profile summary.
+    """Display the logged-in user's profile summary.
 
-    Shows the user's role, bio, and profile picture.  Provides links to edit
-    profile and (for readers) manage subscriptions.
+    Shows the user's role, bio, and profile picture. Provides links to edit
+    the profile and (for readers) manage subscriptions.
 
-    Returns:
-        HttpResponse: Renders ``accounts/profile.html``.
+    :param request: The current HTTP request (authenticated user only).
+    :type request: HttpRequest
+    :return: Renders ``accounts/profile.html``.
+    :rtype: HttpResponse
     """
     return render(request, "accounts/profile.html")
 
 
 @login_required
 def update_profile(request):
-    """
-    Update the logged-in user's profile information.
+    """Update the logged-in user's profile information.
 
-    Handles first/last name, email, bio, and profile picture.  On a valid
-    POST, saves the changes and redirects to the profile page with a success
-    message.
+    Handles first/last name, email, bio, and profile picture. On a valid
+    ``POST``, saves the changes and redirects to the profile page with a
+    success message.
 
-    Returns:
-        HttpResponse: On valid POST, redirects to profile.  Otherwise renders
-        ``accounts/update_profile.html`` with:
-
-        - ``form`` — a bound or unbound ``ProfileUpdateForm``
+    :param request: The current HTTP request (authenticated user only).
+    :type request: HttpRequest
+    :return: On valid ``POST``, redirects to ``accounts:profile``.
+        Otherwise renders ``accounts/update_profile.html`` with ``form``
+        (a bound or unbound :class:`~accounts.forms.ProfileUpdateForm`) in
+        context.
+    :rtype: HttpResponse
     """
     # Keep the previous username so editor-name changes can be highlighted after save.
     previous_username = request.user.username
@@ -393,19 +412,20 @@ def update_profile(request):
 
 @login_required
 def subscriptions(request):
-    """
-    Display and manage the reader's active subscriptions.
+    """Display and manage the reader's active subscriptions.
 
     Only meaningful for readers; journalists and editors see an
-    informational placeholder.  Unsubscribe POST actions are handled
-    by ``news:toggle_subscription`` in the daily_indaba app.
+    informational placeholder. Unsubscribe POST actions are handled by
+    ``news:toggle_subscription`` in the daily_indaba app.
 
-    Returns:
-        HttpResponse: Renders ``accounts/subscriptions.html`` with:
-
-        - ``publisher_subs``  — Subscription rows for publishers
-        - ``journalist_subs`` — Subscription rows for journalists
-        - ``pricing``         — Dict with discount tier and monthly total
+    :param request: The current HTTP request (authenticated user only).
+    :type request: HttpRequest
+    :return: Renders ``accounts/subscriptions.html`` with
+        ``publisher_subs``, ``journalist_subs``, ``pricing``,
+        ``available_publishers``, ``available_journalists``,
+        ``subscribed_publisher_ids``, ``subscribed_journalist_ids``, and
+        ``pricing_tiers`` in context.
+    :rtype: HttpResponse
     """
     from decimal import Decimal
 

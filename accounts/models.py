@@ -156,6 +156,10 @@ class SubscriptionPricingPolicy(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
+        """Return a human-readable label for the pricing policy.
+
+        :rtype: str
+        """
         return "Daily Indaba subscription pricing"
 
 
@@ -405,35 +409,60 @@ class User(AbstractUser):
 
     @property
     def profile_picture_url(self):
-        """Return the uploaded profile picture URL when one exists."""
+        """Return the uploaded profile picture URL when one exists.
+
+        :return: The URL string of the profile picture, or ``None`` when
+            no picture has been uploaded.
+        :rtype: str or None
+        """
         if self.profile_picture:
             return self.profile_picture.url
         return None
 
     @property
     def is_reader(self):
+        """Return ``True`` when this account has the reader role.
+
+        :rtype: bool
+        """
         return self.role == "reader"
 
     @property
     def is_journalist(self):
+        """Return ``True`` when this account has the journalist role.
+
+        :rtype: bool
+        """
         return self.role == "journalist"
 
     @property
     def is_editor(self):
+        """Return ``True`` when this account has the editor role.
+
+        :rtype: bool
+        """
         return self.role == "editor"
 
     @property
     def is_publisher(self):
+        """Return ``True`` when this account has the publisher role.
+
+        :rtype: bool
+        """
         return self.role == "publisher"
 
     @property
     def public_name(self):
         """Return the role-appropriate public identity string.
 
-        Use this property everywhere a user's name is displayed
-        publicly (by-lines, comment authors, profile headings).
-        Editors show their full real name when available because
-        pseudonyms are not permitted for that role.
+        Use this property everywhere a user's name is displayed publicly
+        (by-lines, comment authors, profile headings). Editors show their
+        full real name when available because pseudonyms are not permitted
+        for that role.
+
+        :return: The user's display name, organisation name, or username,
+            depending on their role and what profile fields are populated.
+        :rtype: str
         """
         if self.role == "editor":
             full_name = self.get_full_name().strip()
@@ -453,7 +482,12 @@ class User(AbstractUser):
         return self.username
 
     def clean(self):
-        """Validate pricing rules that depend on the seeded policy row."""
+        """Validate that the journalist fee falls within the seeded policy range.
+
+        :raises ValidationError: If ``journalist_monthly_fee`` is outside the
+            configured minimum / maximum bounds.
+        :rtype: None
+        """
         super().clean()
         validate_journalist_fee(self.journalist_monthly_fee)
 
@@ -590,17 +624,16 @@ class TermsAcceptance(models.Model):
 
     @classmethod
     def record_for(cls, user):
-        """
-        Create a T&C acceptance record for the given user.
+        """Create a T&C acceptance record for *user* at registration.
 
-        Derives the correct version from ``TERMS_VERSIONS`` based on the
-        user's current role.
+        Derives the terms version from ``TERMS_VERSIONS`` based on the
+        user's current role, falling back to ``"<role>-v1"`` for
+        unrecognised roles.
 
-        Args:
-            user (User): The registered user.
-
-        Returns:
-            TermsAcceptance: The saved acceptance record.
+        :param user: The newly registered user.
+        :type user: User
+        :return: The saved acceptance record.
+        :rtype: TermsAcceptance
         """
         version = TERMS_VERSIONS.get(user.role, f"{user.role}-v1")
         return cls.objects.create(
@@ -610,6 +643,10 @@ class TermsAcceptance(models.Model):
         )
 
     def __str__(self):
+        """Return a human-readable summary of the acceptance record.
+
+        :rtype: str
+        """
         return (
             f"{self.user} accepted {self.terms_version}"
             f" on {self.accepted_at:%Y-%m-%d}"

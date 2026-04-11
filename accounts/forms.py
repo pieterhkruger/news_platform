@@ -42,13 +42,22 @@ User = get_user_model()
 # Helpers: Username generation
 # =============================================================================
 def _build_unique_editor_username(*, first_name, last_name, exclude_pk=None):
-    """
-    Generate a unique login username from an editor's real name.
+    """Generate a unique login username from an editor's real name.
 
     Editors must present a real-name identity publicly, so self-service
-    account flows derive the username from first_name + last_name instead of
-    trusting a freely chosen handle. A numeric suffix is appended when the
+    account flows derive the username from ``first_name + last_name`` instead
+    of trusting a freely chosen handle. A numeric suffix is appended when the
     base username is already taken.
+
+    :param first_name: The editor's first name (keyword-only).
+    :type first_name: str
+    :param last_name: The editor's last name (keyword-only).
+    :type last_name: str
+    :param exclude_pk: Primary key of an existing user to exclude from the
+        uniqueness check, used when editing an existing account (keyword-only).
+    :type exclude_pk: int or None
+    :return: A unique, login-safe username derived from the editor's name.
+    :rtype: str
     """
     joined_name = " ".join(
         part.strip() for part in (first_name, last_name) if part and part.strip()
@@ -76,11 +85,20 @@ def _build_unique_editor_username(*, first_name, last_name, exclude_pk=None):
 
 
 def _build_unique_publisher_username(*, publisher_name, exclude_pk=None):
-    """
-    Generate a unique login username from a publisher's organisation name.
+    """Generate a unique login username from a publisher's organisation name.
 
     Publisher accounts represent organisations, so the login username is
-    derived from the publisher name instead of a free-form handle.
+    derived from the publisher name instead of a free-form handle. A numeric
+    suffix is appended when the base username is already taken.
+
+    :param publisher_name: The organisation name to derive the username from
+        (keyword-only).
+    :type publisher_name: str
+    :param exclude_pk: Primary key of an existing user to exclude from the
+        uniqueness check, used when editing an existing account (keyword-only).
+    :type exclude_pk: int or None
+    :return: A unique, login-safe username derived from the publisher name.
+    :rtype: str
     """
     base_username = (
         slugify((publisher_name or "").strip()).replace("-", ".").strip(".")
@@ -171,6 +189,17 @@ class RegistrationForm(UserCreationForm):
         )
 
     def __init__(self, *args, **kwargs):
+        """Initialise the form with role-aware username help text and
+        field requirements.
+
+        Adjusts the ``username`` field's help text and required state
+        depending on the selected role: editor and publisher accounts
+        receive generated usernames, so the field is marked optional for
+        those roles.
+
+        :param args: Positional arguments forwarded to the parent form.
+        :param kwargs: Keyword arguments forwarded to the parent form.
+        """
         super().__init__(*args, **kwargs)
         selected_role = (
             self.data.get("role")
@@ -197,8 +226,16 @@ class RegistrationForm(UserCreationForm):
             self.fields["username"].required = False
 
     def clean(self):
-        """
-        Require a real-name identity for editor self-registration.
+        """Enforce role-specific identity rules and generate usernames.
+
+        Requires a real first and last name for editors, and a unique
+        organisation name for publishers. Generates the login username
+        for editor and publisher accounts from their public identity.
+
+        :raises forms.ValidationError: If required role-specific fields
+            are missing or a publisher name is already taken.
+        :return: The validated and augmented cleaned data dictionary.
+        :rtype: dict
         """
         cleaned_data = super().clean()
         role = cleaned_data.get("role")
@@ -256,12 +293,16 @@ class RegistrationForm(UserCreationForm):
         return cleaned_data
 
     def clean_email(self):
-        """
-        Treat e-mail addresses as a unique self-service identity.
+        """Enforce unique email addresses at registration.
 
         Django's default user model does not require unique emails, but this
-        project uses email for password-reset and account recovery.  Rejecting
+        project uses email for password-reset and account recovery. Rejecting
         duplicates during registration keeps that recovery path unambiguous.
+
+        :raises forms.ValidationError: If the submitted email is already
+            associated with an existing account.
+        :return: The normalised email address.
+        :rtype: str
         """
         email = self.cleaned_data["email"].strip()
         # Build a queryset with WHERE lower(email) = lower(the submitted email), then
@@ -273,6 +314,19 @@ class RegistrationForm(UserCreationForm):
         return email
 
     def save(self, commit=True):
+        """Create the new user account with role-specific field population.
+
+        Sets ``email``, ``role``, and name fields from cleaned data. Editor
+        and publisher accounts receive generated usernames. Publisher accounts
+        also create or update the linked
+        :class:`~daily_indaba.models.Publisher` row.
+
+        :param commit: If ``True`` (default), saves the user to the database
+            and handles publisher row creation/update.
+        :type commit: bool
+        :return: The newly created user instance.
+        :rtype: User
+        """
         # super().save(commit=False) creates the User object in memory WITHOUT
         # writing it to the database yet, giving us a chance to set extra fields
         # (email, role) before the INSERT happens.  commit=True then calls
@@ -347,6 +401,27 @@ class PasswordResetRequestForm(PasswordResetForm):
         to_email,
         html_email_template_name=None,
     ):
+        """Render and dispatch the password-reset email via the project helper.
+
+        Overrides Django's default SMTP transport so the project's fallback
+        email logic in :func:`~accounts.utils.send_password_reset_email` is
+        used consistently for password-reset messages.
+
+        :param subject_template_name: Template path for the email subject line.
+        :type subject_template_name: str
+        :param email_template_name: Template path for the plain-text body.
+        :type email_template_name: str
+        :param context: Template context provided by ``PasswordResetView``.
+        :type context: dict
+        :param from_email: Sender address, or ``None`` to use the default.
+        :type from_email: str or None
+        :param to_email: Recipient address.
+        :type to_email: str
+        :param html_email_template_name: Optional template path for an HTML
+            alternative body.
+        :type html_email_template_name: str or None
+        :rtype: None
+        """
         # Django renders the subject/body templates before calling send_mail().
         # We keep that standard flow, then delegate the actual transport to the
         # project's helper so SMTP fallback stays consistent.
@@ -449,6 +524,16 @@ class ProfileUpdateForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """Initialise the form with role-appropriate field configuration.
+
+        Hides ``display_name`` for editors, marks name fields required for
+        editors, adjusts labels and help texts for publisher accounts, and
+        adds the logo-confirmation checkbox when an editor uploads an image.
+
+        :param args: Positional arguments forwarded to the parent form.
+        :param kwargs: Keyword arguments forwarded to the parent form.
+            Must include ``instance`` for role-aware field customisation.
+        """
         super().__init__(*args, **kwargs)
         # Editors must use their real identity — hide the field entirely.
         # self.fields is an OrderedDict of field objects keyed by field name.
@@ -493,7 +578,17 @@ class ProfileUpdateForm(forms.ModelForm):
             )
 
     def clean_display_name(self):
-        """Prevent editors from setting a display name."""
+        """Prevent editors from setting a display name.
+
+        Returns an empty string for editor accounts regardless of what was
+        submitted. Raises a validation error when a publisher account omits
+        the required organisation name.
+
+        :raises forms.ValidationError: If a publisher account submits an
+            empty display name.
+        :return: The validated display name, or ``""`` for editor accounts.
+        :rtype: str
+        """
         # Developer's note: Django calls clean_<fieldname>() automatically
         # during form validation for each field with such a method defined.
         # Returning "" here overrides whatever the browser submitted, providing
@@ -510,9 +605,12 @@ class ProfileUpdateForm(forms.ModelForm):
         return value
 
     def clean_email(self):
-        """
-        Prevent two accounts from claiming the same e-mail via self-service
-        profile edits.
+        """Prevent two accounts from sharing the same email address.
+
+        :raises forms.ValidationError: If another account already uses the
+            submitted email address.
+        :return: The normalised email address.
+        :rtype: str
         """
         email = self.cleaned_data["email"].strip()
         duplicate = (
@@ -530,8 +628,18 @@ class ProfileUpdateForm(forms.ModelForm):
         return email
 
     def clean(self):
-        """
-        Enforce editor identity and logo rules during profile edits.
+        """Enforce role-specific identity and logo rules during profile edits.
+
+        For editors: requires real first/last names, clears the display name,
+        and validates logo confirmation when a new image is uploaded. For
+        publishers: enforces a unique organisation name and generates a
+        username from it.
+
+        :raises forms.ValidationError: If required name fields are missing,
+            the logo confirmation is absent, or a duplicate publisher name is
+            submitted.
+        :return: The validated and augmented cleaned data dictionary.
+        :rtype: dict
         """
         cleaned_data = super().clean()
         instance = getattr(self, "instance", None)
@@ -599,8 +707,18 @@ class ProfileUpdateForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
-        """
-        Persist the profile update while keeping editor identity fields aligned.
+        """Persist the profile update keeping role identity fields aligned.
+
+        Generates and applies the login username for editor and publisher
+        accounts from their cleaned name data. Clears prohibited fields per
+        role (e.g. ``display_name`` for editors). Also updates the linked
+        :class:`~daily_indaba.models.Publisher` row name for publisher accounts.
+
+        :param commit: If ``True`` (default), saves the user and any related
+            publisher row to the database.
+        :type commit: bool
+        :return: The updated user instance.
+        :rtype: User
         """
         user = super().save(commit=False)
         self.editor_username_changed = False

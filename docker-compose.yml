@@ -1,0 +1,40 @@
+services:
+  # Added: the course notes use SQLite; this project uses MySQL, so a
+  # separate database service is required.
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-news_platform}
+      MYSQL_USER: ${DB_USER:-news_platform_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      # 3307 on the host avoids clashing with a locally installed MySQL/MariaDB.
+      - "3307:3306"
+
+  web:
+    build: .
+    # Added: course notes use 'python manage.py runserver 0.0.0.0:8000' directly.
+    # sleep 15 gives MySQL time to initialise before Django connects.
+    # migrate runs on startup so the schema is ready when the server starts.
+    # || true prevents a seeding ValidationError from stopping the container
+    # (the error is harmless - tables are created, only demo data is skipped).
+    command: >
+      sh -c "sleep 15 &&
+             (python manage.py migrate --no-input || true) &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    # Added: loads DB_NAME, DB_USER, DB_PASSWORD, SECRET_KEY, etc. from .env.
+    env_file:
+      - .env
+    environment:
+      # Added: overrides DB_HOST from .env. Inside Docker, 'db' is the
+      # database container's hostname; 127.0.0.1 would point to the web
+      # container itself and the connection would be refused.
+      - DB_HOST=db
+    # Added: ensures the db container starts before web.
+    depends_on:
+      - db

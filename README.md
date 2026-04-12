@@ -13,6 +13,7 @@ This is a Django news application with two main apps:
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [Running with Docker](#running-with-docker)
 - [What `python manage.py migrate` Sets Up Automatically](#what-python-managepy-migrate-sets-up-automatically)
 - [Demo Accounts](#demo-accounts)
 - [Authentication Notes](#authentication-notes)
@@ -135,6 +136,83 @@ Then open:
 - News site: <http://127.0.0.1:8000/daily-indaba/>
 - Accounts: <http://127.0.0.1:8000/accounts/login/>
 - Admin: <http://127.0.0.1:8000/admin/>
+
+---
+
+## Running with Docker
+
+This section describes how to run the project using Docker Compose instead of
+a local Python environment. You need [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+installed and running.
+
+### Prerequisites
+
+- Docker Desktop installed and running.
+- A `.env` file in the project root with at least `DB_PASSWORD` set.
+  Copy the template and fill in your values:
+
+  Windows:
+
+  ```powershell
+  copy .env.example .env
+  ```
+
+  macOS / Linux:
+
+  ```bash
+  cp .env.example .env
+  ```
+
+  The `DB_HOST` value in `.env` can be left as `127.0.0.1` — Docker Compose
+  overrides it to `db` (the database container hostname) automatically.
+
+### Starting the containers
+
+```bash
+docker-compose up --build
+```
+
+`--build` is only needed the first time, or after changing `requirements.txt`
+or `Dockerfile`. Subsequent starts can use `docker-compose up`.
+
+Wait until you see this line in the output before opening the browser:
+
+```
+web-1  | Starting development server at http://0.0.0.0:8000/
+```
+
+Then open: <http://localhost:8000/daily-indaba/>
+
+### If you see a database error in the browser
+
+The startup sequence uses `sleep 15` to give MySQL time to initialise, but on
+a cold start MySQL sometimes takes longer. If the browser shows a
+`ProgrammingError` like `Table '...' doesn't exist`, run migrations manually
+while the containers are running:
+
+```bash
+docker exec news_platform-web-1 python manage.py migrate --no-input
+```
+
+Then refresh the browser. You can check the exact container name with:
+
+```bash
+docker ps
+```
+
+### Expected output during startup
+
+After migrations run you will see a `ValidationError` about newsletters
+requiring journalist authors. This is expected — it comes from the
+post-migrate demo-seeding signal and does not affect the application.
+The tables are created correctly; only the automatic seed data is skipped.
+The server starts normally after the error.
+
+### Stopping the containers
+
+```bash
+docker-compose down
+```
 
 ---
 

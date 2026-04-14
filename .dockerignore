@@ -1,0 +1,10 @@
+.git
+.venv
+media
+docs
+__pycache__/
+*.py[cod]
+*.log
+.env
+Test APIs in Postman (screenshots).docx
+test_APIS_in_Postman.txt

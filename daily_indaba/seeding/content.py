@@ -535,11 +535,22 @@ def _seed_comments(
                         article=article,
                         author=author,
                         body=comment_data["body"],
-                        parent=parent,
+                        parent_id=parent.pk if parent else None,
                         depth=depth,
                         created_at=created_at,
                     )
                 ])
+                if comment_obj.pk is None:
+                    # Some MySQL backends insert the row successfully but do
+                    # not populate the primary key back onto objects returned
+                    # by bulk_create(). Re-fetch the just-created seed comment
+                    # so later replies always see a persisted parent with a pk.
+                    comment_obj = qs.order_by("-pk").first()
+                    if comment_obj is None:
+                        raise CommandError(
+                            "Seed comment insert succeeded without a "
+                            "recoverable primary key."
+                        )
                 # Force the seeded timestamp back onto the row in case model-
                 # level auto_now_add/default behavior overrode it on insert.
                 Comment.objects.filter(pk=comment_obj.pk).update(

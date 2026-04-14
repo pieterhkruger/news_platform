@@ -10,8 +10,9 @@ This is a Django news application with two main apps:
 ## Table of Contents
 
 - [Reviewer Start Here](#reviewer-start-here)
+- [Setup Paths](#setup-paths)
 - [Prerequisites](#prerequisites)
-- [Installation](#installation)
+- [Local Setup (Python + MySQL)](#local-setup-python--mysql)
 - [Quick Start](#quick-start)
 - [Running with Docker](#running-with-docker)
 - [What `python manage.py migrate` Sets Up Automatically](#what-python-managepy-migrate-sets-up-automatically)
@@ -46,21 +47,59 @@ to that brief.
 
 ---
 
+## Setup Paths
+
+Start by cloning the repository and moving into the project root:
+
+```bash
+git clone https://github.com/pieterhkruger/news_platform.git
+cd news_platform
+```
+
+From there, choose one of two setup approaches:
+
+- **Local Python + MySQL**
+  Use this if you want to run Django and MySQL directly on your machine.
+  You need Python 3.10+ plus MySQL 8.0+ or MariaDB, and you must create the
+  database and user yourself before running `python manage.py migrate`.
+- **Docker Compose**
+  Use this if you want Docker to create the app and database containers for
+  you. You need Docker Desktop, but you do not need a separately installed
+  local MySQL or MariaDB server. Build and run from this same `news_platform/`
+  directory.
+
+Both paths use a project-root `.env` file:
+
+- In the **local** path, Django reads `.env` to connect to the database and
+  user you created manually.
+- In the **Docker** path, Docker Compose reads the same values so the `db`
+  container can create the MySQL database/user and the `web` container can
+  connect with matching credentials.
+
+The rest of the README documents both paths separately.
+
+---
+
 ## Prerequisites
 
+- **Git**
 - **Python 3.10+**
 - A working virtual environment is recommended.
-- **MariaDB** installed locally, with a database and user already created for
-  this project.
+- **MySQL 8.0+** or **MariaDB** installed locally if you want to run the
+  project without Docker.
 
 Database connection settings are loaded automatically from a local `.env` file
 via `python-dotenv`.
 
 ---
 
-## Installation
+## Local Setup (Python + MySQL)
 
-Run all commands from this folder, which contains `manage.py`:
+If you chose the local Python + MySQL approach, continue from the same
+`news_platform/` folder you cloned above.
+
+Run all commands from this folder, which contains `manage.py`,
+`Dockerfile`, and `docker-compose.yml`:
 
 ```text
 news_platform/
@@ -93,8 +132,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Create a local `.env` file from the template and fill in your MariaDB
-   credentials.
+3. Create a local `.env` file from the template.
 
 Windows:
 
@@ -108,7 +146,23 @@ macOS / Linux:
 cp .env.example .env
 ```
 
-Example values:
+4. Create the MySQL database and user before running migrations.
+
+Example using the MySQL command-line client:
+
+```sql
+mysql -u root -p
+CREATE DATABASE news_platform CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'news_platform_user'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON news_platform.* TO 'news_platform_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+If you prefer to use an existing MySQL or MariaDB user, create the database
+and then set `.env` to match that user's credentials.
+
+5. Update `.env` with the database settings you created:
 
 ```text
 DB_NAME=news_platform
@@ -121,6 +175,8 @@ DB_PORT=3306
 ---
 
 ## Quick Start
+
+From the same `news_platform/` directory:
 
 ```bash
 # 1. Apply migrations, create role groups, and auto-seed demo data
@@ -148,7 +204,14 @@ installed and running.
 ### Prerequisites
 
 - Docker Desktop installed and running.
-- A `.env` file in the project root with at least `DB_PASSWORD` set.
+- You are in the project root (`news_platform/`), the same folder that
+  contains `manage.py`, `Dockerfile`, and `docker-compose.yml`.
+- A `.env` file in the project root.
+  In this Docker path, Docker Compose uses the values in `.env` twice:
+  the `db` service uses them to create the MySQL database and user, and the
+  `web` service uses the same values so Django can connect to that database.
+  If you copy `.env.example`, `DB_NAME` and `DB_USER` are already set to the
+  default demo values, so the one value you must change is `DB_PASSWORD`.
   Copy the template and fill in your values:
 
   Windows:
@@ -166,14 +229,17 @@ installed and running.
   The `DB_HOST` value in `.env` can be left as `127.0.0.1` — Docker Compose
   overrides it to `db` (the database container hostname) automatically.
 
+Docker Compose creates the MySQL service for you, so you do not need to create
+the database manually when using this option.
+
 ### Starting the containers
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 `--build` is only needed the first time, or after changing `requirements.txt`
-or `Dockerfile`. Subsequent starts can use `docker-compose up`.
+or `Dockerfile`. Subsequent starts can use `docker compose up`.
 
 Wait until you see this line in the output before opening the browser:
 
@@ -183,35 +249,15 @@ web-1  | Starting development server at http://0.0.0.0:8000/
 
 Then open: <http://localhost:8000/daily-indaba/>
 
-### If you see a database error in the browser
-
-The startup sequence uses `sleep 15` to give MySQL time to initialise, but on
-a cold start MySQL sometimes takes longer. If the browser shows a
-`ProgrammingError` like `Table '...' doesn't exist`, run migrations manually
-while the containers are running:
-
-```bash
-docker exec news_platform-web-1 python manage.py migrate --no-input
-```
-
-Then refresh the browser. You can check the exact container name with:
-
-```bash
-docker ps
-```
-
 ### Expected output during startup
 
-After migrations run you will see a `ValidationError` about newsletters
-requiring journalist authors. This is expected — it comes from the
-post-migrate demo-seeding signal and does not affect the application.
-The tables are created correctly; only the automatic seed data is skipped.
-The server starts normally after the error.
+After migrations run successfully you should see the Django development server
+start without a newsletter seeding validation error.
 
 ### Stopping the containers
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ---

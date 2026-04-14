@@ -1,6 +1,7 @@
 .git
 .venv
 media
+daily_indaba/seed_data/images
 docs
 __pycache__/
 *.py[cod]

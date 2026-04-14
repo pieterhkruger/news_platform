@@ -9,7 +9,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: rootpassword
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      test: ["CMD-SHELL", "mysqladmin ping --protocol=tcp -h 127.0.0.1 -P 3306 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -21,10 +21,16 @@ services:
   web:
     build: .
     # Added: course notes use 'python manage.py runserver 0.0.0.0:8000' directly.
-    # Wait for MySQL to report healthy, then migrate before the dev server
-    # starts so schema creation and demo seeding succeed on first boot.
+    # Wait for MySQL TCP connections using the app credentials, then migrate
+    # before the dev server starts so first-boot initialisation works even on
+    # slower machines where MySQL finishes container startup before it is ready
+    # for real network clients.
     command: >
-      sh -c "python manage.py migrate --no-input &&
+      sh -c "until python -c \"import os, MySQLdb; MySQLdb.connect(host=os.getenv('DB_HOST', 'db'), user=os.getenv('DB_USER', 'news_platform_user'), passwd=os.getenv('DB_PASSWORD', ''), db=os.getenv('DB_NAME', 'news_platform'), port=int(os.getenv('DB_PORT', '3306')))\"; do
+               echo 'Waiting for MySQL...';
+               sleep 2;
+             done &&
+             python manage.py migrate --no-input &&
              python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
